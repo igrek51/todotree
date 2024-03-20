@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
-import 'favourite.dart';
-import 'generator.dart';
+import 'page_favourite.dart';
+import 'page_generator.dart';
 
-class MyHomePage extends StatefulWidget {
+class AppHomePage extends StatefulWidget {
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<AppHomePage> createState() => _AppHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _AppHomePageState extends State<AppHomePage> {
 
   var selectedIndex = 0;
 

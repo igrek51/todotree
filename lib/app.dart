@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'page/home.dart';
+import 'components/page_home.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -18,8 +18,23 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         ),
-        home: MyHomePage(),
+        home: AppScaffold(),
+        debugShowCheckedModeBanner: false,
       ),
+    );
+  }
+}
+
+class AppScaffold extends StatelessWidget {
+  const AppScaffold({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('ToDo Tree'),
+      ),
+      body: AppHomePage(),
     );
   }
 }
