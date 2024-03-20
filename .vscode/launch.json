@@ -1,0 +1,18 @@
+{
+    // https://dartcode.org/docs/launch-configuration/
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Flutter run (Linux)",
+            "request": "launch",
+            "type": "dart",
+            "deviceId": "linux",
+        },
+        {
+            "name": "Flutter run (release mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release",
+        }
+    ]
+}

@@ -1,10 +1,19 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'dart:math';
+import 'package:window_manager/window_manager.dart';
 
-void main() {
+
+void main() async {
+  if (Platform.isLinux) {
+    WidgetsFlutterBinding.ensureInitialized();
+    await windowManager.ensureInitialized();
+    await windowManager.setSize(Size(450, 800));
+  }
   runApp(MyApp());
-}
+} 
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
