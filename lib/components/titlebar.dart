@@ -29,7 +29,7 @@ class TitleBar extends StatelessWidget {
               ),
               IconButton(
                 iconSize: 32,
-                icon: const Icon(Icons.more_vert),
+                icon: const Icon(Icons.more_vert, size: 28),
                 onPressed: () {
                   appState.addRandomItem();
                 },

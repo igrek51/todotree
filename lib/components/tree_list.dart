@@ -1,7 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../app_state.dart';
+import '../tree/tree_item.dart';
 
 class TreeList extends StatelessWidget {
   const TreeList({super.key});
@@ -13,19 +15,77 @@ class TreeList extends StatelessWidget {
     return ListView(
       children: [
         for (var item in appState.items)
-          ListTile(
-            leading: Icon(Icons.reorder),
-            title: Text(item.name),
-            onTap: () {
-            },
+          TreeListItemWidget(
+            treeItem: item,
           ),
-        ListTile(
-          leading: Icon(Icons.add),
-          title: Text('+'),
-          onTap: () {
+        PlusItemWidget(),
+      ],
+    );
+  }
+}
+
+class TreeListItemWidget extends StatelessWidget {
+  const TreeListItemWidget({
+    super.key,
+    required this.treeItem,
+  });
+
+  final TreeItem treeItem;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        IconButton(
+          iconSize: 30,
+          icon: const Icon(Icons.reorder, size: 26),
+          onPressed: () {
+          },
+        ),
+        Expanded(
+          child: Text(treeItem.name),
+        ),
+        IconButton(
+          iconSize: 30,
+          icon: const Icon(Icons.more_vert, size: 26),
+          onPressed: () {
+          },
+        ),
+        IconButton(
+          iconSize: 30,
+          icon: const Icon(Icons.edit, size: 26),
+          onPressed: () {
+          },
+        ),
+        IconButton(
+          iconSize: 30,
+          icon: const Icon(Icons.add, size: 26),
+          onPressed: () {
           },
         ),
       ],
+    );
+  }
+}
+
+class PlusItemWidget extends StatelessWidget {
+  const PlusItemWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          debugPrint('InkWell tap');
+        },
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.add),
+          ],
+        ),
+      ),
     );
   }
 }
