@@ -9,10 +9,13 @@ run-flutter:
 	flutter run
 
 run-linux:
-	flutter run -d linux
+	flutter run --device-id linux
+
+run-chrome:
+	flutter run --device-id chrome --web-renderer html
 
 run-mobile:
-	flutter run -d 958744f
+	flutter run --device-id 958744f
 
 dart-fix-dry:
 	dart fix --dry-run

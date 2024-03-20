@@ -12,17 +12,19 @@ class TreeList extends StatelessWidget {
 
     return ListView(
       children: [
-        Padding(
-          padding: const EdgeInsets.all(20),
-          child: Text('You have 0 favorites:'),
-        ),
         for (var item in appState.items)
           ListTile(
-            leading: Icon(Icons.favorite),
+            leading: Icon(Icons.reorder),
             title: Text(item.name),
             onTap: () {
             },
           ),
+        ListTile(
+          leading: Icon(Icons.add),
+          title: Text('+'),
+          onTap: () {
+          },
+        ),
       ],
     );
   }
