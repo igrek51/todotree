@@ -15,11 +15,11 @@ class TitleBar extends StatelessWidget {
     return Material(
       elevation: 5,
       child: Container(
-        height: 80,
+        height: 70,
         alignment: Alignment.center,
-        color: theme.colorScheme.secondaryContainer,
+        color: theme.colorScheme.primary,
         child: Padding(
-          padding: const EdgeInsets.all(20.0),
+          padding: const EdgeInsets.all(14.0),
           child: Row(
             children: [
               Icon(Icons.arrow_back),
@@ -28,7 +28,7 @@ class TitleBar extends StatelessWidget {
                 child: Text(appState.title, style: style),
               ),
               IconButton(
-                iconSize: 36,
+                iconSize: 32,
                 icon: const Icon(Icons.more_vert),
                 onPressed: () {
                   appState.addItem('new');

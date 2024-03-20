@@ -19,6 +19,7 @@ class MyApp extends StatelessWidget {
             brightness: Brightness.dark,
             seedColor: Color(0xFF134DA3),
             primary: Color(0xFF1564C0),
+            inversePrimary: Color(0xFF134DA3),
             secondary: Color(0xFF6E9AE9),
           ),
         ),

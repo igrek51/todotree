@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'tree_list.dart';
 import 'titlebar.dart';
@@ -8,7 +9,7 @@ class AppHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    final scaffold = Scaffold(
       body: LayoutBuilder(
         builder: (context, constraints) {
           return Column(
@@ -19,13 +20,23 @@ class AppHomePage extends StatelessWidget {
               TitleBar(),
               Expanded(
                 child: Container(
-                  color: Theme.of(context).colorScheme.primaryContainer,
+                  color: Theme.of(context).colorScheme.onSecondary,
                   child: TreeList(),
                 ),
               ),
             ],
           );
         }
+      ),
+    );
+    final statusBarColor = Theme.of(context).colorScheme.inversePrimary;
+    return SafeArea(
+      child: AnnotatedRegion(
+        value: SystemUiOverlayStyle(
+          statusBarColor: statusBarColor,
+          statusBarIconBrightness: Brightness.light,
+        ),
+        child: scaffold,
       ),
     );
   }
