@@ -3,8 +3,13 @@
 devices:
 	flutter devices
 
-run:
+run: run-linux
+
+run-flutter:
 	flutter run
+
+run-linux:
+	flutter run -d linux
 
 run-mobile:
 	flutter run -d 958744f
