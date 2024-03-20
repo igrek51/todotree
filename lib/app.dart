@@ -16,9 +16,15 @@ class MyApp extends StatelessWidget {
         title: 'ToDo Tree',
         theme: ThemeData(
           useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+          colorScheme: ColorScheme.fromSeed(
+            brightness: Brightness.dark,
+            seedColor: Color(0xFF134DA3),
+            primary: Color(0xFF1564C0),
+            secondary: Color(0xFF6E9AE9),
+          ),
         ),
         home: AppScaffold(),
+        themeMode: ThemeMode.dark,
         debugShowCheckedModeBanner: false,
       ),
     );
