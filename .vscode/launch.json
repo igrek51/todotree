@@ -6,7 +6,10 @@
             "name": "Flutter run (Linux)",
             "request": "launch",
             "type": "dart",
+            "program": "lib/main.dart",
             "deviceId": "linux",
+            // "debug", "profile" or "release".
+            "flutterMode": "debug",
         },
         {
             "name": "Flutter run (release mode)",
