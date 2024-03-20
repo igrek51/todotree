@@ -14,8 +14,11 @@ run-linux:
 run-chrome:
 	flutter run --device-id chrome --web-renderer html
 
-run-mobile:
+run-android:
 	flutter run --device-id 958744f
+
+run-android-release:
+	flutter run --device-id 958744f --release
 
 dart-fix-dry:
 	dart fix --dry-run
