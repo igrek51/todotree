@@ -24,7 +24,9 @@ class TitleBar extends StatelessWidget {
           name: 'Populate',
           action: () {
             changesHistory.registerChange();
-            appState.addRandomItem();
+            for (int i = 0; i < 10; i++) {
+              appState.addRandomItem();
+            }
           }),
       ActionMenuItem(
           id: 'snackbar',

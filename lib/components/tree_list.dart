@@ -23,17 +23,12 @@ class TreeList extends StatelessWidget {
             index: index,
             treeItem: item,
           ),
-      ],
-    );
-
-    return Column(
-      children: [
-        Expanded(
-          child: reorderableList,
+        PlusItemWidget(
+          key: const Key('plus'),
         ),
-        PlusItemWidget(),
       ],
     );
+    return reorderableList;
   }
 }
 
