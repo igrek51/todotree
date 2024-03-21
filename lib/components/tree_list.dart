@@ -11,13 +11,26 @@ class TreeList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<AppState>();
+    // var itemsContainer = context.watch<ItemsContainer>();
 
-    return ListView(
-      children: [
-        for (var item in appState.items)
+    final reorderableList = ReorderableListView(
+      onReorder: (int oldIndex, int newIndex) {},
+      buildDefaultDragHandles: false,
+      children: <Widget>[
+        for (final (index, item) in appState.items.indexed)
           TreeListItemWidget(
+            key: Key(item.name),
+            index: index,
             treeItem: item,
           ),
+      ],
+    );
+
+    return Column(
+      children: [
+        Expanded(
+          child: reorderableList,
+        ),
         PlusItemWidget(),
       ],
     );
@@ -27,21 +40,28 @@ class TreeList extends StatelessWidget {
 class TreeListItemWidget extends StatelessWidget {
   const TreeListItemWidget({
     super.key,
+    required this.index,
     required this.treeItem,
   });
 
+  final int index;
   final TreeItem treeItem;
 
   @override
   Widget build(BuildContext context) {
+    // final itemsContainer = context.watch<ItemsContainer>();
     return Row(
       children: [
-        IconButton(
-          iconSize: 30,
-          icon: const Icon(Icons.reorder, size: 26),
-          onPressed: () {
-          },
+        ReorderableDragStartListener(
+          index: index,
+          child: IconButton(
+            iconSize: 30,
+            icon: const Icon(Icons.reorder, size: 26),
+            onPressed: () {
+            },
+          ),
         ),
+        
         Expanded(
           child: Text(treeItem.name),
         ),

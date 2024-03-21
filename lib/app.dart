@@ -4,12 +4,14 @@ import 'package:todotreev2/services/changes_history.dart';
 
 import 'components/home_page.dart';
 import 'app_state.dart';
+import 'tree/tree_item.dart';
 
 class MyApp extends StatelessWidget {
   MyApp({super.key});
 
   final providers = [
     ChangeNotifierProvider(create: (context) => AppState()),
+    ChangeNotifierProvider(create: (context) => ItemsContainer()),
     Provider<ChangesHistory>(create: (context) => ChangesHistory()),
   ];
 
