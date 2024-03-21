@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../app_state.dart';
+import '../services/logger.dart';
 import '../tree/tree_item.dart';
 
 class TreeList extends StatelessWidget {
@@ -76,7 +77,7 @@ class PlusItemWidget extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: () {
-          debugPrint('InkWell tap');
+          logger.debug('InkWell tap');
         },
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,

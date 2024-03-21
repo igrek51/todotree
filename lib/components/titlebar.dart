@@ -3,6 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../app_state.dart';
+import '../services/changes_history.dart';
+import '../services/info_service.dart';
+import '../services/logger.dart';
 
 class TitleBar extends StatelessWidget {
   const TitleBar({super.key});
@@ -13,24 +16,21 @@ class TitleBar extends StatelessWidget {
     final appState = context.watch<AppState>();
     final style = theme.textTheme.titleMedium;
 
+    final changesHistory = Provider.of<ChangesHistory>(context);
+
     final menuActions = <ActionMenuItem>[
       ActionMenuItem(
           id: 'populate',
           name: 'Populate',
           action: () {
+            changesHistory.registerChange();
             appState.addRandomItem();
           }),
       ActionMenuItem(
           id: 'snackbar',
           name: 'Snackbar',
           action: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: const Text('Hello, Snackbar!'),
-                showCloseIcon: true,
-                dismissDirection: DismissDirection.horizontal,
-              ),
-            );
+            InfoService.showInfo(context, 'Hello, Snackbar!');
           }),
       ActionMenuItem(
           id: 'exit',
@@ -50,8 +50,19 @@ class TitleBar extends StatelessWidget {
           padding: const EdgeInsets.all(14.0),
           child: Row(
             children: [
-              Icon(Icons.arrow_back),
-              Icon(Icons.save),
+              IconButton(
+                iconSize: 32,
+                icon: const Icon(Icons.arrow_back, size: 28),
+                onPressed: () {
+                },
+              ),
+              
+              IconButton(
+                iconSize: 32,
+                icon: const Icon(Icons.save, size: 28),
+                onPressed: () {
+                },
+              ),
 
               Expanded(
                 child: Text(appState.title, style: style),
@@ -61,7 +72,7 @@ class TitleBar extends StatelessWidget {
                 iconSize: 32,
                 icon: const Icon(Icons.more_vert, size: 28),
                 onSelected: (value) {
-                  print('popup menu selected: $value');
+                  logger.debug('popup menu selected: $value');
                   final action = menuActions.firstWhere((element) => element.id == value);
                   action.action();
                 },

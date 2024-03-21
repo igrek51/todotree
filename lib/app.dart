@@ -1,16 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:todotreev2/services/changes_history.dart';
 
 import 'components/home_page.dart';
 import 'app_state.dart';
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  MyApp({super.key});
+
+  final providers = [
+    ChangeNotifierProvider(create: (context) => AppState()),
+    Provider<ChangesHistory>(create: (context) => ChangesHistory()),
+  ];
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => AppState(),
+    return MultiProvider(
+      providers: providers,
       child: MaterialApp(
         title: 'ToDo Tree',
         theme: ThemeData(
