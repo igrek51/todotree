@@ -11,7 +11,6 @@ class TreeList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<AppState>();
-    // var itemsContainer = context.watch<ItemsContainer>();
 
     final reorderableList = ReorderableListView(
       onReorder: (int oldIndex, int newIndex) {},
@@ -44,41 +43,48 @@ class TreeListItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // final itemsContainer = context.watch<ItemsContainer>();
-    return Row(
-      children: [
-        ReorderableDragStartListener(
-          index: index,
-          child: IconButton(
-            iconSize: 30,
-            icon: const Icon(Icons.reorder, size: 26),
-            onPressed: () {
-            },
-          ),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          logger.debug('Item tap');
+        },
+        child: Row(
+          children: [
+            ReorderableDragStartListener(
+              index: index,
+              child: IconButton(
+                iconSize: 30,
+                icon: const Icon(Icons.reorder, size: 26),
+                onPressed: () {
+                },
+              ),
+            ),
+            
+            Expanded(
+              child: Text(treeItem.name),
+            ),
+            IconButton(
+              iconSize: 30,
+              icon: const Icon(Icons.more_vert, size: 26),
+              onPressed: () {
+              },
+            ),
+            IconButton(
+              iconSize: 30,
+              icon: const Icon(Icons.edit, size: 26),
+              onPressed: () {
+              },
+            ),
+            IconButton(
+              iconSize: 30,
+              icon: const Icon(Icons.add, size: 26),
+              onPressed: () {
+              },
+            ),
+          ],
         ),
-        
-        Expanded(
-          child: Text(treeItem.name),
-        ),
-        IconButton(
-          iconSize: 30,
-          icon: const Icon(Icons.more_vert, size: 26),
-          onPressed: () {
-          },
-        ),
-        IconButton(
-          iconSize: 30,
-          icon: const Icon(Icons.edit, size: 26),
-          onPressed: () {
-          },
-        ),
-        IconButton(
-          iconSize: 30,
-          icon: const Icon(Icons.add, size: 26),
-          onPressed: () {
-          },
-        ),
-      ],
+      ),
     );
   }
 }
@@ -94,11 +100,11 @@ class PlusItemWidget extends StatelessWidget {
         onTap: () {
           logger.debug('InkWell tap');
         },
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.add),
-          ],
+        child: SizedBox(
+          height: 50,
+          child: Center(
+            child: const Icon(Icons.add),
+          ),
         ),
       ),
     );

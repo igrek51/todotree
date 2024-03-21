@@ -1,16 +1,8 @@
-import 'package:flutter/foundation.dart';
-
 class TreeItem {
   TreeItem(this.name);
 
   String name;
-}
-
-class ItemsContainer extends ChangeNotifier {
-  double offset = 0;
-
-  setOffset(double offset) {
-    this.offset = offset;
-    notifyListeners();
-  }
+  TreeItem? _parent;
+  List<TreeItem> children = [];
+  String typeName = 'text';
 }

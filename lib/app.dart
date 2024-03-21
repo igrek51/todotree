@@ -11,7 +11,6 @@ class MyApp extends StatelessWidget {
 
   final providers = [
     ChangeNotifierProvider(create: (context) => AppState()),
-    ChangeNotifierProvider(create: (context) => ItemsContainer()),
     Provider<ChangesHistory>(create: (context) => ChangesHistory()),
   ];
 
