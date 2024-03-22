@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../app_state.dart';
 import '../services/logger.dart';
-import '../tree/tree_item.dart';
+import '../tree/tree_node.dart';
 
 class TreeList extends StatelessWidget {
   const TreeList({super.key});
@@ -39,7 +39,7 @@ class TreeListItemWidget extends StatelessWidget {
   });
 
   final int index;
-  final TreeItem treeItem;
+  final TreeNode treeItem;
 
   @override
   Widget build(BuildContext context) {

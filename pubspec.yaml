@@ -13,6 +13,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   provider: ^6.0.0
   window_manager: ^0.3.8
+  collection: ^1.18.0
 
 dev_dependencies:
   flutter_test:

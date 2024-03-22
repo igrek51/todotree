@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import 'tree/tree_item.dart';
+import 'tree/tree_node.dart';
 
 class AppState extends ChangeNotifier {
 
@@ -14,10 +14,10 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  var items = <TreeItem>[];
+  var items = <TreeNode>[];
 
   void addItem(String name) {
-    items.add(TreeItem(name));
+    items.add(TreeNode.textNode(name));
     notifyListeners();
   }
 
@@ -26,7 +26,7 @@ class AppState extends ChangeNotifier {
     Random random = Random();
     final currentPass = String.fromCharCodes(Iterable.generate(
       16, (_) => allowedChars.codeUnitAt(random.nextInt(allowedChars.length))));
-    items.add(TreeItem(currentPass));
+    items.add(TreeNode.textNode(currentPass));
     notifyListeners();
     debugPrint('added random item');
   }

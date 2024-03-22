@@ -16,14 +16,13 @@ class TitleBar extends StatelessWidget {
     final appState = context.watch<AppState>();
     final style = theme.textTheme.titleMedium;
 
-    final changesHistory = Provider.of<ChangesHistory>(context);
+    // final changesHistory = Provider.of<ChangesHistory>(context);
 
     final menuActions = <ActionMenuItem>[
       ActionMenuItem(
           id: 'populate',
           name: 'Populate',
           action: () {
-            changesHistory.registerChange();
             for (int i = 0; i < 10; i++) {
               appState.addRandomItem();
             }
