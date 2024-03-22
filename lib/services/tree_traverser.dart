@@ -24,7 +24,7 @@ class TreeTraverser {
 
   TreeNode getChild(int position) => currentParent.getChild(position);
 
-  void addChild(int? position, TreeNode item) {
+  void addChild(TreeNode item, {int? position}) {
     final nPosision = position ?? currentParent.size;
     item.parent = currentParent;
     changesMade = true;

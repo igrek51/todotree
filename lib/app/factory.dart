@@ -11,5 +11,6 @@ class AppFactory {
     uiState = UiState();
     treeTraverser = TreeTraverser();
     uiSupervisor = UiSupervisor(uiState, treeTraverser);
+    print('AppFactory created');
   }
 }

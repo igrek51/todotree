@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 import 'tree_traverser.dart';
 import '../tree/tree_node.dart';
 import '../util/strings.dart';
@@ -13,7 +11,7 @@ class UiSupervisor {
 
   void init() {
     renderTitle();
-    populateItems();
+    addRandomItem();
     renderItems();
   }
 
@@ -27,12 +25,16 @@ class UiSupervisor {
     uiState.notify();
   }
 
-  void populateItems() {
-    for (int i = 0; i < 10; i++) {
-      uiState.items.add(TreeNode.textNode(randomName()));
-      debugPrint('added random item');
-    }
-    uiState.notify();
+  void addRandomItem() {
+    final name = randomName();
+    treeTraverser.addChild(TreeNode.textNode(name));
+    print('Added item: $name');
+    renderItems();
   }
 
+  void populateItems() {
+    for (int i = 0; i < 10; i++) {
+      addRandomItem();
+    }
+  }
 }

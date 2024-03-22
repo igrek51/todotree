@@ -6,14 +6,13 @@ class TreeNode {
   TreeNode({
     required this.name,
     this.parent,
-    this.children = const [],
     this.type = TreeNodeType.text,
     this.targetData = '',
   });
 
   String name;
   TreeNode? parent;
-  List<TreeNode> children;
+  List<TreeNode> children = [];
   TreeNodeType type;
   String targetData;
 
