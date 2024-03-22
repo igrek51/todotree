@@ -22,10 +22,10 @@ class AppFactory {
     homeState = HomeState();
     browserState = BrowserState();
     editorState = EditorState();
+    treeTraverser = TreeTraverser();
     browserController = BrowserController(homeState, browserState, editorState, treeTraverser);
     editorController = EditorController(homeState, editorState, treeTraverser, () => browserController);
     homeController = HomeController(homeState, treeTraverser);
-    treeTraverser = TreeTraverser();
     print('AppFactory created');
   }
 }

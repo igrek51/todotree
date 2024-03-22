@@ -18,7 +18,9 @@ class EditorController {
     final newName = editorState.editTextController.text;
     editorState.editedNode?.name = newName;
     editorState.editTextController.clear();
+    editorState.notify();
     homeState.pageView = HomePageView.itemsList;
+    homeState.notify();
     browserControllerProvider().renderItems();
   }
 }
