@@ -1,14 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
+import '../app/ui_state.dart';
+import 'item_editor.dart';
 import 'tree_list.dart';
-import 'titlebar.dart';
+import 'title_bar.dart';
 
 class AppHomePage extends StatelessWidget {
   const AppHomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
+
+    final appState = context.watch<UiState>();
+    Widget bodyContent;
+    if (appState.appState == AppState.itemsList) {
+      bodyContent = TreeList();
+    } else {
+      bodyContent = ItemEditor();
+    }
+
     final scaffold = Scaffold(
       body: LayoutBuilder(
         builder: (context, constraints) {
@@ -21,7 +33,7 @@ class AppHomePage extends StatelessWidget {
               Expanded(
                 child: Container(
                   color: Theme.of(context).colorScheme.onSecondary,
-                  child: TreeList(),
+                  child: bodyContent,
                 ),
               ),
             ],
@@ -30,6 +42,7 @@ class AppHomePage extends StatelessWidget {
       ),
     );
     final statusBarColor = Theme.of(context).colorScheme.inversePrimary;
+    
     return SafeArea(
       child: AnnotatedRegion(
         value: SystemUiOverlayStyle(

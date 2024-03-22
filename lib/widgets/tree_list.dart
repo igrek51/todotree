@@ -43,11 +43,15 @@ class TreeListItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var appState = context.watch<UiState>();
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: () {
           logger.debug('Item tap');
+          appState.appState = AppState.itemEditor;
+          appState.notify();
         },
         child: Row(
           children: [

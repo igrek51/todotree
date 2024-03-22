@@ -6,9 +6,13 @@ import '../tree/tree_node.dart';
 class UiState extends ChangeNotifier {
 
   String title = '';
-  var items = <TreeNode>[];
+  List<TreeNode> items = [];
+  AppState appState = AppState.itemsList;
+  String editTextField = '';
 
   void notify() {
     notifyListeners();
   }
 }
+
+enum AppState { itemsList, itemEditor }

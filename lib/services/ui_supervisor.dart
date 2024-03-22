@@ -11,7 +11,6 @@ class UiSupervisor {
 
   void init() {
     renderTitle();
-    addRandomItem();
     renderItems();
   }
 
@@ -36,5 +35,11 @@ class UiSupervisor {
     for (int i = 0; i < 10; i++) {
       addRandomItem();
     }
+  }
+
+  void editNode(TreeNode node) {
+    uiState.editTextField = node.name;
+    uiState.appState = AppState.itemEditor;
+    uiState.notify();
   }
 }

@@ -13,9 +13,9 @@ class TitleBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final appState = context.watch<UiState>();
     final style = theme.textTheme.titleMedium;
-
+    
+    final appState = context.watch<UiState>();
     final uiSupervisor = Provider.of<UiSupervisor>(context);
 
     final menuActions = <ActionMenuItem>[
@@ -40,7 +40,7 @@ class TitleBar extends StatelessWidget {
     ];
 
     return Material(
-      elevation: 5,
+      elevation: 20,
       child: Container(
         height: 65,
         alignment: Alignment.center,
