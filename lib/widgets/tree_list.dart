@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../app_state.dart';
+import '../ui/ui_state.dart';
 import '../services/logger.dart';
 import '../tree/tree_node.dart';
 
@@ -10,7 +10,7 @@ class TreeList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var appState = context.watch<AppState>();
+    var appState = context.watch<UiState>();
 
     final reorderableList = ReorderableListView(
       onReorder: (int oldIndex, int newIndex) {},

@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'components/home_page.dart';
-import 'app_state.dart';
+import 'ui/ui_supervisor.dart';
+import 'ui/ui_state.dart';
+import 'widgets/home_page.dart';
 import 'services/tree_traverser.dart';
 
 class MyApp extends StatelessWidget {
   MyApp({super.key});
 
   final providers = [
-    ChangeNotifierProvider(create: (context) => AppState()),
-    ChangeNotifierProvider(create: (context) => TreeTraverser()),
-    // Provider<ChangesHistory>(create: (context) => ChangesHistory()),
+    ChangeNotifierProvider(create: (context) => UiState()),
+    // Provider<TreeTraverser>(create: (context) => TreeTraverser()),
+    Provider<UiSupervisor>(create: (context) => UiSupervisor(context)),
   ];
 
   @override

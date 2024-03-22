@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:todotreev2/ui/ui_supervisor.dart';
 
-import '../app_state.dart';
-import '../services/changes_history.dart';
+import '../ui/ui_state.dart';
 import '../services/info_service.dart';
 import '../services/logger.dart';
 
@@ -13,19 +13,17 @@ class TitleBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final appState = context.watch<AppState>();
+    final appState = context.watch<UiState>();
     final style = theme.textTheme.titleMedium;
 
-    // final changesHistory = Provider.of<ChangesHistory>(context);
+    final uiSupervisor = Provider.of<UiSupervisor>(context);
 
     final menuActions = <ActionMenuItem>[
       ActionMenuItem(
           id: 'populate',
           name: 'Populate',
           action: () {
-            for (int i = 0; i < 10; i++) {
-              appState.addRandomItem();
-            }
+            uiSupervisor.populateItems();
           }),
       ActionMenuItem(
           id: 'snackbar',

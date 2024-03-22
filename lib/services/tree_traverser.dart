@@ -1,8 +1,6 @@
-import 'package:flutter/foundation.dart';
-
 import '../tree/tree_node.dart';
 
-class TreeTraverser extends ChangeNotifier {
+class TreeTraverser {
 
   TreeNode rootNode = cRootNode;
   TreeNode currentParent = cRootNode;
@@ -16,7 +14,6 @@ class TreeTraverser extends ChangeNotifier {
     changesMade = false;
     newItemPosition = null;
     focusNode = null;
-    notifyListeners();
   }
 
   List<TreeNode> get childNodes => currentParent.children;
@@ -33,7 +30,6 @@ class TreeTraverser extends ChangeNotifier {
     changesMade = true;
     currentParent.insertAt(nPosision, item);
     focusNode = item;
-    notifyListeners();
   }
 
   void removeFromCurrentAt(int position) {
@@ -41,7 +37,6 @@ class TreeTraverser extends ChangeNotifier {
       currentParent.removeAt(position);
       changesMade = true;
       focusNode = null;
-      notifyListeners();
     }
   }
 
@@ -49,13 +44,11 @@ class TreeTraverser extends ChangeNotifier {
     currentParent.remove(item);
     changesMade = true;
     focusNode = null;
-    notifyListeners();
   }
 
   void removeFromParent(TreeNode item, TreeNode parent) {
     parent.remove(item);
     changesMade = true;
-    notifyListeners();
   }
 
   void goUp() {
@@ -69,7 +62,6 @@ class TreeTraverser extends ChangeNotifier {
         throw ArgumentError('null parent');
       }
     }
-    notifyListeners();
   }
 
   void goInto(int childIndex) {
@@ -80,7 +72,6 @@ class TreeTraverser extends ChangeNotifier {
   void goTo(TreeNode child) {
     focusNode = currentParent;
     currentParent = child;
-    notifyListeners();
   }
 }
 

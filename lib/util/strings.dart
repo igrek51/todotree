@@ -1,3 +1,5 @@
+import 'dart:math';
+
 class StringSimplifier {
   static final Map<String, String> specialCharsMapping = {
     'ą': 'a',
@@ -62,4 +64,14 @@ class DeEmojinator {
             next.codeUnitAt(0) >= 0xd000 &&
             next.codeUnitAt(0) <= 0xdfff);
   }
+}
+
+String randomName() {
+  const allowedChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  Random random = Random();
+  return String.fromCharCodes(
+    Iterable.generate(16, (_) => 
+      allowedChars.codeUnitAt(random.nextInt(allowedChars.length))
+    )
+  );
 }
