@@ -15,6 +15,12 @@ class BrowserController {
 
   void init() {
     renderItems();
+    renderTitle();
+  }
+
+  void renderTitle() {
+    browserState.title = treeTraverser.currentParent.name;
+    browserState.notify();
   }
 
   void renderItems() {
@@ -41,5 +47,21 @@ class BrowserController {
     editorState.notify();
     homeState.pageView = HomePageView.itemEditor;
     homeState.notify();
+  }
+
+  void goUp() {
+    try {
+      treeTraverser.goUp();
+      renderItems();
+      renderTitle();
+    } on NoSuperItemException {
+      // Can't go higher than root
+    }
+  }
+
+  void goIntoNode(TreeNode node) {
+    treeTraverser.goTo(node);
+    renderItems();
+    renderTitle();
   }
 }

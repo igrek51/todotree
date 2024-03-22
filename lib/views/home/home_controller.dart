@@ -1,18 +1,22 @@
 import '../../services/tree_traverser.dart';
+import '../editor/editor_controller.dart';
+import '../tree_browser/browser_controller.dart';
 import 'home_state.dart';
 
 class HomeController {
   HomeState homeState;
   TreeTraverser treeTraverser;
+  BrowserController browserController;
+  EditorController editorController;
   
-  HomeController(this.homeState, this.treeTraverser);
+  HomeController(this.homeState, this.treeTraverser, this.browserController, this.editorController);
 
   void init() {
-    renderTitle();
   }
-
-  void renderTitle() {
-    homeState.title = treeTraverser.currentParent.name;
-    homeState.notify();
+  
+  void goBack() {
+    if (homeState.pageView == HomePageView.treeBrowser) {
+      browserController.goUp();
+    }
   }
 }

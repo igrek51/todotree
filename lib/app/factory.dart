@@ -25,7 +25,7 @@ class AppFactory {
     treeTraverser = TreeTraverser();
     browserController = BrowserController(homeState, browserState, editorState, treeTraverser);
     editorController = EditorController(homeState, editorState, treeTraverser, () => browserController);
-    homeController = HomeController(homeState, treeTraverser);
+    homeController = HomeController(homeState, treeTraverser, browserController, editorController);
     print('AppFactory created');
   }
 }

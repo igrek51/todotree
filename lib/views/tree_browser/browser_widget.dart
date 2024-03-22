@@ -11,7 +11,7 @@ class BrowserWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var browserState = context.watch<BrowserState>();
+    final browserState = context.watch<BrowserState>();
 
     final reorderableList = ReorderableListView(
       onReorder: (int oldIndex, int newIndex) {},
@@ -75,8 +75,9 @@ class TreeListItemWidget extends StatelessWidget {
             ),
             IconButton(
               iconSize: 30,
-              icon: const Icon(Icons.edit, size: 26),
+              icon: const Icon(Icons.arrow_right, size: 26),
               onPressed: () {
+                browserController.goIntoNode(treeItem);
               },
             ),
             IconButton(

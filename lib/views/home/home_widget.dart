@@ -15,7 +15,7 @@ class HomeWidget extends StatelessWidget {
 
     final homeState = context.watch<HomeState>();
     Widget bodyContent;
-    if (homeState.pageView == HomePageView.itemsList) {
+    if (homeState.pageView == HomePageView.treeBrowser) {
       bodyContent = BrowserWidget();
     } else {
       bodyContent = EditorWidget();

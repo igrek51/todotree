@@ -5,7 +5,8 @@ import 'package:provider/provider.dart';
 import '../tree_browser/browser_controller.dart';
 import '../../services/info_service.dart';
 import '../../services/logger.dart';
-import 'home_state.dart';
+import '../tree_browser/browser_state.dart';
+import 'home_controller.dart';
 
 class TitleBar extends StatelessWidget {
   const TitleBar({super.key});
@@ -15,8 +16,9 @@ class TitleBar extends StatelessWidget {
     final theme = Theme.of(context);
     final style = theme.textTheme.titleMedium;
     
-    final homeState = context.watch<HomeState>();
+    final browserState = context.watch<BrowserState>();
     final browserController = Provider.of<BrowserController>(context);
+    final homeController = Provider.of<HomeController>(context);
 
     final menuActions = <ActionMenuItem>[
       ActionMenuItem(
@@ -53,6 +55,7 @@ class TitleBar extends StatelessWidget {
                 iconSize: 32,
                 icon: const Icon(Icons.arrow_back, size: 28),
                 onPressed: () {
+                  homeController.goBack();
                 },
               ),
               
@@ -64,7 +67,7 @@ class TitleBar extends StatelessWidget {
               ),
 
               Expanded(
-                child: Text(homeState.title, style: style),
+                child: Text(browserState.title, style: style),
               ),
 
               PopupMenuButton(

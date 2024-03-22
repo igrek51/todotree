@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 
 class HomeState extends ChangeNotifier {
 
-  String title = '';
-  HomePageView pageView = HomePageView.itemsList;
+  HomePageView pageView = HomePageView.treeBrowser;
 
   void notify() {
     notifyListeners();
   }
 }
 
-enum HomePageView { itemsList, itemEditor }
+enum HomePageView { treeBrowser, itemEditor }

@@ -19,7 +19,7 @@ class EditorController {
     editorState.editedNode?.name = newName;
     editorState.editTextController.clear();
     editorState.notify();
-    homeState.pageView = HomePageView.itemsList;
+    homeState.pageView = HomePageView.treeBrowser;
     homeState.notify();
     browserControllerProvider().renderItems();
   }
