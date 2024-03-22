@@ -1,16 +1,11 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:window_manager/window_manager.dart';
+import 'package:todotreev2/app/startup.dart';
 
-import 'app.dart';
+import 'app/app_widget.dart';
+import 'app/factory.dart';
 
 void main() async {
-  if (!kIsWeb && Platform.isLinux) {
-    WidgetsFlutterBinding.ensureInitialized();
-    await windowManager.ensureInitialized();
-    await windowManager.setSize(Size(450, 800));
-  }
-  runApp(MyApp());
+  final appFactory = AppFactory();
+  startupApp(appFactory);
+  runApp(AppWidget(appFactory: appFactory));
 }

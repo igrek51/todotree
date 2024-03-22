@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:todotreev2/ui/ui_supervisor.dart';
+import 'package:todotreev2/services/ui_supervisor.dart';
 
-import '../ui/ui_state.dart';
+import '../app/ui_state.dart';
 import '../services/info_service.dart';
 import '../services/logger.dart';
 
@@ -42,11 +42,11 @@ class TitleBar extends StatelessWidget {
     return Material(
       elevation: 5,
       child: Container(
-        height: 70,
+        height: 65,
         alignment: Alignment.center,
         color: theme.colorScheme.primary,
         child: Padding(
-          padding: const EdgeInsets.all(14.0),
+          padding: const EdgeInsets.all(12.0),
           child: Row(
             children: [
               IconButton(

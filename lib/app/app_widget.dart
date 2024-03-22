@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'ui/ui_supervisor.dart';
-import 'ui/ui_state.dart';
-import 'widgets/home_page.dart';
-import 'services/tree_traverser.dart';
+import '../services/ui_supervisor.dart';
+import 'factory.dart';
+import '../widgets/home_page.dart';
 
-class MyApp extends StatelessWidget {
-  MyApp({super.key});
+class AppWidget extends StatelessWidget {
+  AppWidget({super.key, required this.appFactory});
 
-  final providers = [
-    ChangeNotifierProvider(create: (context) => UiState()),
-    // Provider<TreeTraverser>(create: (context) => TreeTraverser()),
-    Provider<UiSupervisor>(create: (context) => UiSupervisor(context)),
-  ];
+  final AppFactory appFactory;
 
   @override
   Widget build(BuildContext context) {
+    final providers = [
+      ChangeNotifierProvider(create: (context) => appFactory.uiState),
+      Provider<UiSupervisor>(create: (context) => appFactory.uiSupervisor),
+    ];
+
     return MultiProvider(
       providers: providers,
       child: MaterialApp(

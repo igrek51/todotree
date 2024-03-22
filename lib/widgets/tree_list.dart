@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../ui/ui_state.dart';
+import '../app/ui_state.dart';
 import '../services/logger.dart';
 import '../tree/tree_node.dart';
 
