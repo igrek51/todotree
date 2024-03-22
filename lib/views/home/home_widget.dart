@@ -2,23 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
-import '../app/ui_state.dart';
-import 'item_editor.dart';
-import 'tree_list.dart';
+import '../editor/editor_widget.dart';
+import '../tree_browser/browser_widget.dart';
 import 'title_bar.dart';
+import 'home_state.dart';
 
-class AppHomePage extends StatelessWidget {
-  const AppHomePage({super.key});
+class HomeWidget extends StatelessWidget {
+  const HomeWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
 
-    final appState = context.watch<UiState>();
+    final homeState = context.watch<HomeState>();
     Widget bodyContent;
-    if (appState.appState == AppState.itemsList) {
-      bodyContent = TreeList();
+    if (homeState.pageView == HomePageView.itemsList) {
+      bodyContent = BrowserWidget();
     } else {
-      bodyContent = ItemEditor();
+      bodyContent = EditorWidget();
     }
 
     final scaffold = Scaffold(

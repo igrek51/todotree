@@ -1,16 +1,31 @@
+import 'package:todotreev2/views/editor/editor_controller.dart';
+
 import '../services/tree_traverser.dart';
-import 'ui_state.dart';
-import '../services/ui_supervisor.dart';
+import '../views/home/home_state.dart';
+import '../views/tree_browser/browser_controller.dart';
+import '../views/tree_browser/browser_state.dart';
+import '../views/home/home_controller.dart';
+import '../views/editor/editor_state.dart';
 
 class AppFactory {
-  late final UiState uiState;
+  late final HomeState homeState;
+  late final BrowserState browserState;
+  late final EditorState editorState;
+
+  late final HomeController homeController;
+  late final BrowserController browserController;
+  late final EditorController editorController;
+
   late final TreeTraverser treeTraverser;
-  late final UiSupervisor uiSupervisor;
 
   AppFactory() {
-    uiState = UiState();
+    homeState = HomeState();
+    browserState = BrowserState();
+    editorState = EditorState();
+    browserController = BrowserController(homeState, browserState, editorState, treeTraverser);
+    editorController = EditorController(homeState, editorState, treeTraverser, () => browserController);
+    homeController = HomeController(homeState, treeTraverser);
     treeTraverser = TreeTraverser();
-    uiSupervisor = UiSupervisor(uiState, treeTraverser);
     print('AppFactory created');
   }
 }

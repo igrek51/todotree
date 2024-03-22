@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../app/ui_state.dart';
-import '../services/ui_supervisor.dart';
+import 'editor_controller.dart';
+import 'editor_state.dart';
 
-class ItemEditor extends StatelessWidget {
-  ItemEditor({super.key});
+class EditorWidget extends StatelessWidget {
+  EditorWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final appState = context.watch<UiState>();
-    final uiSupervisor = Provider.of<UiSupervisor>(context);
+    final editorState = context.watch<EditorState>();
+    final editorController = Provider.of<EditorController>(context);
 
     return Column(
       children: [
         TextField(
-          controller: appState.editTextController,
+          controller: editorState.editTextController,
           decoration: InputDecoration(
             border: OutlineInputBorder(),
             hintText: 'Text',
@@ -23,7 +23,7 @@ class ItemEditor extends StatelessWidget {
         ),
         ElevatedButton(
           onPressed: () {
-            uiSupervisor.saveEditedNode();
+            editorController.saveEditedNode();
           },
           child: const Text('Save'),
         ),

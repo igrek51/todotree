@@ -8,7 +8,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:todotreev2/app/app_widget.dart';
+import 'package:todotreev2/app/app.dart';
 import 'package:todotreev2/app/factory.dart';
 
 void main() {

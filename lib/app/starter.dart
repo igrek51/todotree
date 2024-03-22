@@ -8,7 +8,9 @@ import 'factory.dart';
 
 void startupApp(AppFactory app) async {
   _resizeWindow();
-  app.uiSupervisor.init();
+  app.homeController.init();
+  app.browserController.init();
+  app.editorController.init();
   print('App initialized');
 }
 

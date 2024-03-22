@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../app/ui_state.dart';
-import '../services/logger.dart';
-import '../services/ui_supervisor.dart';
-import '../tree/tree_node.dart';
+import 'browser_controller.dart';
+import 'browser_state.dart';
+import '../../services/logger.dart';
+import '../../model/tree_node.dart';
 
-class TreeList extends StatelessWidget {
-  const TreeList({super.key});
+class BrowserWidget extends StatelessWidget {
+  const BrowserWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
-    var appState = context.watch<UiState>();
+    var browserState = context.watch<BrowserState>();
 
     final reorderableList = ReorderableListView(
       onReorder: (int oldIndex, int newIndex) {},
       buildDefaultDragHandles: false,
       children: <Widget>[
-        for (final (index, item) in appState.items.indexed)
+        for (final (index, item) in browserState.items.indexed)
           TreeListItemWidget(
             key: Key(item.name),
             index: index,
@@ -44,14 +44,13 @@ class TreeListItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final uiSupervisor = Provider.of<UiSupervisor>(context);
+    final browserController = Provider.of<BrowserController>(context);
 
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: () {
-          logger.debug('Item tap');
-          uiSupervisor.editNode(treeItem);
+          browserController.editNode(treeItem);
         },
         child: Row(
           children: [

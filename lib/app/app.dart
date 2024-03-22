@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../services/ui_supervisor.dart';
+import '../views/editor/editor_controller.dart';
+import '../views/home/home_controller.dart';
+import '../views/tree_browser/browser_controller.dart';
 import 'factory.dart';
-import '../widgets/home_page.dart';
+import '../views/home/home_widget.dart';
 
 class AppWidget extends StatelessWidget {
   AppWidget({super.key, required this.appFactory});
@@ -13,8 +15,12 @@ class AppWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final providers = [
-      ChangeNotifierProvider(create: (context) => appFactory.uiState),
-      Provider<UiSupervisor>(create: (context) => appFactory.uiSupervisor),
+      ChangeNotifierProvider(create: (context) => appFactory.homeState),
+      ChangeNotifierProvider(create: (context) => appFactory.browserState),
+      ChangeNotifierProvider(create: (context) => appFactory.editorState),
+      Provider<HomeController>(create: (context) => appFactory.homeController),
+      Provider<BrowserController>(create: (context) => appFactory.browserController),
+      Provider<EditorController>(create: (context) => appFactory.editorController),
     ];
 
     return MultiProvider(
@@ -31,7 +37,7 @@ class AppWidget extends StatelessWidget {
             secondary: Color(0xFF6E9AE9),
           ),
         ),
-        home: AppHomePage(),
+        home: HomeWidget(),
         themeMode: ThemeMode.dark,
         debugShowCheckedModeBanner: false,
       ),

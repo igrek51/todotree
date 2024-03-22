@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:todotreev2/app/startup.dart';
+import 'package:todotreev2/app/starter.dart';
 
-import 'app/app_widget.dart';
+import 'app/app.dart';
 import 'app/factory.dart';
 
 void main() async {

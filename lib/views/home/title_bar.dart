@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:todotreev2/services/ui_supervisor.dart';
 
-import '../app/ui_state.dart';
-import '../services/info_service.dart';
-import '../services/logger.dart';
+import '../tree_browser/browser_controller.dart';
+import '../../services/info_service.dart';
+import '../../services/logger.dart';
+import 'home_state.dart';
 
 class TitleBar extends StatelessWidget {
   const TitleBar({super.key});
@@ -15,15 +15,15 @@ class TitleBar extends StatelessWidget {
     final theme = Theme.of(context);
     final style = theme.textTheme.titleMedium;
     
-    final appState = context.watch<UiState>();
-    final uiSupervisor = Provider.of<UiSupervisor>(context);
+    final homeState = context.watch<HomeState>();
+    final browserController = Provider.of<BrowserController>(context);
 
     final menuActions = <ActionMenuItem>[
       ActionMenuItem(
           id: 'populate',
           name: 'Populate',
           action: () {
-            uiSupervisor.populateItems();
+            browserController.populateItems();
           }),
       ActionMenuItem(
           id: 'snackbar',
@@ -64,7 +64,7 @@ class TitleBar extends StatelessWidget {
               ),
 
               Expanded(
-                child: Text(appState.title, style: style),
+                child: Text(homeState.title, style: style),
               ),
 
               PopupMenuButton(

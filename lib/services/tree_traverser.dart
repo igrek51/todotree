@@ -1,4 +1,4 @@
-import '../tree/tree_node.dart';
+import '../model/tree_node.dart';
 
 class TreeTraverser {
 
