@@ -8,7 +8,8 @@ class UiState extends ChangeNotifier {
   String title = '';
   List<TreeNode> items = [];
   AppState appState = AppState.itemsList;
-  String editTextField = '';
+  TextEditingController editTextController = TextEditingController();
+  TreeNode? editedNode;
 
   void notify() {
     notifyListeners();

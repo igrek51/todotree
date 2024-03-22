@@ -38,8 +38,17 @@ class UiSupervisor {
   }
 
   void editNode(TreeNode node) {
-    uiState.editTextField = node.name;
+    uiState.editTextController.text = node.name;
+    uiState.editedNode = node;
     uiState.appState = AppState.itemEditor;
     uiState.notify();
+  }
+
+  void saveEditedNode() {
+    final newName = uiState.editTextController.text;
+    uiState.editedNode?.name = newName;
+    uiState.editTextController.clear();
+    uiState.appState = AppState.itemsList;
+    renderItems();
   }
 }

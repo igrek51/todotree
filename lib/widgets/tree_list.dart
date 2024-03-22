@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../app/ui_state.dart';
 import '../services/logger.dart';
+import '../services/ui_supervisor.dart';
 import '../tree/tree_node.dart';
 
 class TreeList extends StatelessWidget {
@@ -43,15 +44,14 @@ class TreeListItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var appState = context.watch<UiState>();
+    final uiSupervisor = Provider.of<UiSupervisor>(context);
 
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: () {
           logger.debug('Item tap');
-          appState.appState = AppState.itemEditor;
-          appState.notify();
+          uiSupervisor.editNode(treeItem);
         },
         child: Row(
           children: [
