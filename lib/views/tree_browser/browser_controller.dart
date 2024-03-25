@@ -1,3 +1,4 @@
+import '../../services/info_service.dart';
 import '../../services/logger.dart';
 import '../editor/editor_controller.dart';
 import '../editor/editor_state.dart';
@@ -107,7 +108,25 @@ class BrowserController {
       newList.insert(newIndex, node);
     }
     treeTraverser.currentParent.children = newList;
+    treeTraverser.changesMade = true;
     renderItems();
     logger.debug('Reordered nodes: $oldIndex -> $newIndex');
+  }
+
+  void removeNode(TreeNode node) {
+    treeTraverser.removeFromCurrent(node);
+    renderItems();
+    InfoService.showInfo('Node removed: ${node.name}');
+  }
+
+  void runNodeMenuAction(String action, TreeNode node) {
+    switch (action) {
+      case 'remove-node':
+        removeNode(node);
+      case 'edit-node':
+        editNode(node);
+      default:
+        logger.debug('Unknown action: $action');
+    }
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../components/node_menu_dialog.dart';
 import '../components/rounded_badge.dart';
 import 'browser_controller.dart';
 import 'browser_state.dart';
@@ -85,6 +86,26 @@ class TreeListItemWidget extends StatelessWidget {
     }
   }
 
+  Widget buildMoreActionButton(BuildContext context) {
+    final browserController = Provider.of<BrowserController>(context);
+    return IconButton(
+      iconSize: 30,
+      icon: const Icon(Icons.more_vert, size: 26),
+      onPressed: () {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return NodeMenuDialog();
+          },
+        ).then((value) {
+          if (value != null) {
+            browserController.runNodeMenuAction(value, treeItem);
+          }
+        });
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final browserController = Provider.of<BrowserController>(context);
@@ -113,13 +134,8 @@ class TreeListItemWidget extends StatelessWidget {
             
             buildMiddleText(),
 
-            IconButton(
-              iconSize: 30,
-              icon: const Icon(Icons.more_vert, size: 26),
-              onPressed: () {
+            buildMoreActionButton(context),
 
-              },
-            ),
             buildMiddleActionButton(context),
             IconButton(
               iconSize: 30,

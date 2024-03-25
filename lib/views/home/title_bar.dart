@@ -31,7 +31,7 @@ class TitleBar extends StatelessWidget {
           id: 'snackbar',
           name: 'Snackbar',
           action: () {
-            InfoService.showInfo(context, 'Hello, Snackbar!');
+            InfoService.showInfo('Hello, Snackbar!');
           }),
       ActionMenuItem(
           id: 'exit',

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../services/info_service.dart';
 import '../views/editor/editor_controller.dart';
 import '../views/home/home_controller.dart';
 import '../views/tree_browser/browser_controller.dart';
@@ -27,6 +28,7 @@ class AppWidget extends StatelessWidget {
       providers: providers,
       child: MaterialApp(
         title: 'ToDo Tree',
+        scaffoldMessengerKey: scaffoldMessengerKey,
         theme: ThemeData(
           useMaterial3: true,
           colorScheme: ColorScheme.fromSeed(
