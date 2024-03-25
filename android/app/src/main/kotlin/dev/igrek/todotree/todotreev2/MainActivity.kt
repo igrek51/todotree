@@ -1,4 +1,4 @@
-package dev.igrek.todotree.todotreev2
+package dev.igrek.todotree.v2
 
 import io.flutter.embedding.android.FlutterActivity
 

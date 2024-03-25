@@ -1,17 +1,28 @@
 import '../model/tree_node.dart';
+import 'tree_storage.dart';
 
 class TreeTraverser {
+
+  TreeStorage treeStorage;
 
   TreeNode rootNode = cRootNode;
   TreeNode currentParent = cRootNode;
   bool changesMade = false;
   TreeNode? focusNode;
 
+  TreeTraverser(this.treeStorage);
+
   void reset() {
     rootNode = cRootNode;
     currentParent = rootNode;
     changesMade = false;
     focusNode = null;
+  }
+
+  Future<void> load() async {
+    final value = await treeStorage.readDbTree();
+    rootNode = value;
+    currentParent = value;
   }
 
   List<TreeNode> get childNodes => currentParent.children;

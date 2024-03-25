@@ -9,6 +9,7 @@ import 'factory.dart';
 
 void startupApp(AppFactory app) async {
   _resizeWindow();
+  await app.treeTraverser.load();
   app.homeController.init();
   app.browserController.init();
   app.editorController.init();

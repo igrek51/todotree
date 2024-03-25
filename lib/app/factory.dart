@@ -1,7 +1,10 @@
 import 'package:todotreev2/views/editor/editor_controller.dart';
 
 import '../services/logger.dart';
+import '../services/tree_storage.dart';
 import '../services/tree_traverser.dart';
+import '../services/yaml_tree_deserializer.dart';
+import '../services/yaml_tree_serializer.dart';
 import '../views/home/home_state.dart';
 import '../views/tree_browser/browser_controller.dart';
 import '../views/tree_browser/browser_state.dart';
@@ -18,12 +21,18 @@ class AppFactory {
   late final EditorController editorController;
 
   late final TreeTraverser treeTraverser;
+  late final YamlTreeSerializer yamlTreeSerializer;
+  late final YamlTreeDeserializer yamlTreeDeserializer;
+  late final TreeStorage treeStorage;
 
   AppFactory() {
     homeState = HomeState();
     browserState = BrowserState();
     editorState = EditorState();
-    treeTraverser = TreeTraverser();
+    yamlTreeSerializer = YamlTreeSerializer();
+    yamlTreeDeserializer = YamlTreeDeserializer();
+    treeStorage = TreeStorage();
+    treeTraverser = TreeTraverser(treeStorage);
     browserController = BrowserController(homeState, browserState, editorState, treeTraverser);
     editorController = EditorController(homeState, editorState, treeTraverser);
     browserController.editorController = editorController;
