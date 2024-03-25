@@ -94,4 +94,20 @@ class BrowserController {
     addNodeAt(treeTraverser.currentParent.size);
   }
 
+  void reorderNodes(int oldIndex, int newIndex) {
+    if (newIndex > oldIndex) newIndex--;
+    final newList = treeTraverser.currentParent.children.toList();
+    if (newIndex >= newList.length) newIndex = newList.length - 1;
+    if (newIndex == oldIndex) return;
+    if (newIndex < oldIndex) {
+      final node = newList.removeAt(oldIndex);
+      newList.insert(newIndex, node);
+    } else {
+      final node = newList.removeAt(oldIndex);
+      newList.insert(newIndex, node);
+    }
+    treeTraverser.currentParent.children = newList;
+    renderItems();
+    logger.debug('Reordered nodes: $oldIndex -> $newIndex');
+  }
 }

@@ -5,14 +5,12 @@ class RoundedBadge extends StatelessWidget {
   final Color backgroundColor;
   final Color textColor;
   final double borderRadius;
-  final double padding;
 
   const RoundedBadge({
     required this.text,
     this.backgroundColor = const Color(0xFF424242),
     this.textColor = Colors.white,
-    this.borderRadius = 8.0,
-    this.padding = 4.0,
+    this.borderRadius = 16.0,
   });
 
   @override
@@ -22,7 +20,7 @@ class RoundedBadge extends StatelessWidget {
         color: backgroundColor,
         borderRadius: BorderRadius.circular(borderRadius),
       ),
-      padding: EdgeInsets.all(padding),
+      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       child: Text(
         text,
         style: TextStyle(color: textColor),

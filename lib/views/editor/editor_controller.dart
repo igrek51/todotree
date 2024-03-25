@@ -23,6 +23,7 @@ class EditorController {
     } else if (editorState.newItemPosition != null) {
       saveNewNode();
     }
+    treeTraverser.changesMade = true;
   }
 
   void saveEditedNode() {
@@ -40,6 +41,13 @@ class EditorController {
     final newNode = TreeNode.textNode(newName);
     treeTraverser.addChildToCurrent(newNode, position: editorState.newItemPosition);
     browserController.renderItems();
+    homeState.pageView = HomePageView.treeBrowser;
+    homeState.notify();
+    editorState.editTextController.clear();
+    editorState.notify();
+  }
+
+  void cancelEdit() {
     homeState.pageView = HomePageView.treeBrowser;
     homeState.notify();
     editorState.editTextController.clear();

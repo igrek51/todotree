@@ -12,9 +12,12 @@ class BrowserWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final browserState = context.watch<BrowserState>();
+    final browserController = Provider.of<BrowserController>(context);
 
     final reorderableList = ReorderableListView(
-      onReorder: (int oldIndex, int newIndex) {},
+      onReorder: (int oldIndex, int newIndex) {
+        browserController.reorderNodes(oldIndex, newIndex);
+      },
       buildDefaultDragHandles: false,
       children: <Widget>[
         for (final (index, item) in browserState.items.indexed)

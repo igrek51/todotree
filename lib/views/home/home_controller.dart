@@ -19,6 +19,8 @@ class HomeController {
   void goBack() {
     if (homeState.pageView == HomePageView.treeBrowser) {
       browserController.goUp();
+    } else if (homeState.pageView == HomePageView.itemEditor) {
+      editorController.cancelEdit();
     }
   }
 }
