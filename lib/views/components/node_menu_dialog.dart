@@ -15,6 +15,12 @@ class NodeMenuDialog extends StatelessWidget {
               Navigator.pop(context, 'remove-node');
             },
           ),
+          ListTile(
+            title: Text('Edit'),
+            onTap: () {
+              Navigator.pop(context, 'edit-node');
+            },
+          ),
         ],
       ),
     );

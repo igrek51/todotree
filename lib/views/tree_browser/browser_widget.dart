@@ -23,7 +23,7 @@ class BrowserWidget extends StatelessWidget {
       children: <Widget>[
         for (final (index, item) in browserState.items.indexed)
           TreeListItemWidget(
-            key: Key(item.name),
+            key: Key(identityHashCode(item).toString()),
             index: index,
             treeItem: item,
           ),
@@ -46,6 +46,47 @@ class TreeListItemWidget extends StatelessWidget {
   final int index;
   final TreeNode treeItem;
 
+  @override
+  Widget build(BuildContext context) {
+    final browserController = Provider.of<BrowserController>(context);
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          if (treeItem.isLeaf) {
+            browserController.editNode(treeItem);
+          } else {
+            browserController.goIntoNode(treeItem);
+          }
+        },
+        child: Row(
+          children: [
+            ReorderableDragStartListener(
+              index: index,
+              child: IconButton(
+                iconSize: 30,
+                icon: const Icon(Icons.reorder, size: 26),
+                onPressed: () {
+                },
+              ),
+            ),
+            buildMiddleText(),
+            buildMoreActionButton(context),
+            buildMiddleActionButton(context),
+            IconButton(
+              iconSize: 30,
+              icon: const Icon(Icons.add, size: 26),
+              onPressed: () {
+                browserController.addNodeAt(index);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget buildMiddleText() {
     if (treeItem.isLeaf) {
       return Expanded(
@@ -56,7 +97,10 @@ class TreeListItemWidget extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: Text(treeItem.name),
+            child: Text(
+              treeItem.name,
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
           ),
           SizedBox(width: 5),
           RoundedBadge(text: treeItem.size.toString()),
@@ -103,50 +147,6 @@ class TreeListItemWidget extends StatelessWidget {
           }
         });
       },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final browserController = Provider.of<BrowserController>(context);
-
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () {
-          if (treeItem.isLeaf) {
-            browserController.editNode(treeItem);
-          } else {
-            browserController.goIntoNode(treeItem);
-          }
-        },
-        child: Row(
-          children: [
-            ReorderableDragStartListener(
-              index: index,
-              child: IconButton(
-                iconSize: 30,
-                icon: const Icon(Icons.reorder, size: 26),
-                onPressed: () {
-                },
-              ),
-            ),
-            
-            buildMiddleText(),
-
-            buildMoreActionButton(context),
-
-            buildMiddleActionButton(context),
-            IconButton(
-              iconSize: 30,
-              icon: const Icon(Icons.add, size: 26),
-              onPressed: () {
-                browserController.addNodeAt(index);
-              },
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

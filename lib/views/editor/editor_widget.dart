@@ -16,16 +16,30 @@ class EditorWidget extends StatelessWidget {
       children: [
         TextField(
           controller: editorState.editTextController,
+          autofocus: true,
+          keyboardType: TextInputType.multiline,
+          maxLines: null,
           decoration: InputDecoration(
             border: OutlineInputBorder(),
             hintText: 'Text',
           ),
         ),
-        ElevatedButton(
-          onPressed: () {
-            editorController.saveNode();
-          },
-          child: const Text('Save'),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            ElevatedButton(
+              onPressed: () {
+                editorController.saveNode();
+              },
+              child: const Text('Save'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                editorController.cancelEdit();
+              },
+              child: const Text('Cancel'),
+            ),
+          ],
         ),
       ],
     );
