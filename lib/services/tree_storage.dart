@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
+import 'package:todotreev2/services/yaml_tree_deserializer.dart';
 import 'package:todotreev2/services/yaml_tree_serializer.dart';
 
 import '../model/tree_node.dart';
@@ -39,8 +40,7 @@ class TreeStorage {
 
   Future<TreeNode> readDbTree() async {
     final String content = await readDbString();
-    final node = TreeNode.rootNode();
-    node.add(TreeNode.textNode("dupa"));
+    final node = YamlTreeDeserializer().deserializeTree(content);
     return node;
   }
 
