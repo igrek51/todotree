@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 
 import '../services/info_service.dart';
 import '../services/logger.dart';
+import '../services/tree_storage.dart';
+import '../services/tree_traverser.dart';
 import '../views/editor/editor_controller.dart';
 import '../views/home/home_controller.dart';
 import '../views/tree_browser/browser_controller.dart';
@@ -28,6 +30,7 @@ class _AppWidgetState extends State<AppWidget> with WidgetsBindingObserver {
       Provider<HomeController>(create: (context) => widget.appFactory.homeController),
       Provider<BrowserController>(create: (context) => widget.appFactory.browserController),
       Provider<EditorController>(create: (context) => widget.appFactory.editorController),
+      Provider<TreeTraverser>(create: (context) => widget.appFactory.treeTraverser),
     ];
 
     return MultiProvider(

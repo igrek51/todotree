@@ -8,7 +8,7 @@ class AppLifecycle {
   AppLifecycle(this.treeStorage, this.treeTraverser);
 
   void onInactive() {
-    treeStorage.writeDbTree(treeTraverser.rootNode);
+    treeTraverser.save();
   }
 
 }

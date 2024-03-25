@@ -31,6 +31,6 @@ void kickstartApp(AppFactory app) {
   if (kickstartVar != '1') return;
   logger.debug('Kickstarting app...');
 
-  app.treeTraverser.addChildToCurrent(TreeNode.textNode('Item 1'));
-  app.browserController.renderItems();
+  // app.treeTraverser.addChildToCurrent(TreeNode.textNode('Item 1'));
+  // app.browserController.renderItems();
 }

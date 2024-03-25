@@ -25,6 +25,10 @@ class TreeTraverser {
     currentParent = value;
   }
 
+  Future<void> save() async {
+    await treeStorage.writeDbTree(rootNode);
+  }
+
   List<TreeNode> get childNodes => currentParent.children;
 
   bool isPositionBeyond(int position) => position >= currentParent.children.length;

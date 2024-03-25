@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
+import '../../services/tree_traverser.dart';
 import '../tree_browser/browser_controller.dart';
 import '../../services/info_service.dart';
 import '../../services/logger.dart';
@@ -19,6 +20,7 @@ class TitleBar extends StatelessWidget {
     final browserState = context.watch<BrowserState>();
     final browserController = Provider.of<BrowserController>(context);
     final homeController = Provider.of<HomeController>(context);
+    final treeTraverser = Provider.of<TreeTraverser>(context);
 
     final menuActions = <ActionMenuItem>[
       ActionMenuItem(
@@ -32,6 +34,12 @@ class TitleBar extends StatelessWidget {
           name: 'Snackbar',
           action: () {
             InfoService.showInfo('Hello, Snackbar!');
+          }),
+      ActionMenuItem(
+          id: 'save',
+          name: 'Save',
+          action: () {
+            treeTraverser.save();
           }),
       ActionMenuItem(
           id: 'exit',

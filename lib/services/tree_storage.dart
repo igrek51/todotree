@@ -10,7 +10,6 @@ class TreeStorage {
 
   Future<String> get _localPath async {
     final Directory directory = await getApplicationSupportDirectory();
-    logger.debug('local directory: ${directory.absolute.path}');
     return directory.path;
   }
 
@@ -47,7 +46,7 @@ class TreeStorage {
   Future<void> writeDbTree(TreeNode root) async {
     logger.debug('saving local database...');
     final String content = '';
-    await writeDbString(content);
-    logger.info('local database saved');
+    final file = await writeDbString(content);
+    logger.info('local database saved to ${file.absolute.path}');
   }
 }
