@@ -40,14 +40,14 @@ class TreeStorage {
   Future<TreeNode> readDbTree() async {
     final String content = await readDbString();
     final node = TreeNode.rootNode();
-    sleep(Duration(seconds:1));
     node.add(TreeNode.textNode("dupa"));
     return node;
   }
 
   Future<void> writeDbTree(TreeNode root) async {
+    logger.debug('saving local database...');
     final String content = '';
     await writeDbString(content);
-    logger.debug('local database saved');
+    logger.info('local database saved');
   }
 }

@@ -2,26 +2,32 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../services/info_service.dart';
+import '../services/logger.dart';
 import '../views/editor/editor_controller.dart';
 import '../views/home/home_controller.dart';
 import '../views/tree_browser/browser_controller.dart';
 import 'factory.dart';
 import '../views/home/home_widget.dart';
 
-class AppWidget extends StatelessWidget {
+class AppWidget extends StatefulWidget {
   AppWidget({super.key, required this.appFactory});
 
   final AppFactory appFactory;
 
   @override
+  State<AppWidget> createState() => _AppWidgetState();
+}
+
+class _AppWidgetState extends State<AppWidget> with WidgetsBindingObserver {
+  @override
   Widget build(BuildContext context) {
     final providers = [
-      ChangeNotifierProvider(create: (context) => appFactory.homeState),
-      ChangeNotifierProvider(create: (context) => appFactory.browserState),
-      ChangeNotifierProvider(create: (context) => appFactory.editorState),
-      Provider<HomeController>(create: (context) => appFactory.homeController),
-      Provider<BrowserController>(create: (context) => appFactory.browserController),
-      Provider<EditorController>(create: (context) => appFactory.editorController),
+      ChangeNotifierProvider(create: (context) => widget.appFactory.homeState),
+      ChangeNotifierProvider(create: (context) => widget.appFactory.browserState),
+      ChangeNotifierProvider(create: (context) => widget.appFactory.editorState),
+      Provider<HomeController>(create: (context) => widget.appFactory.homeController),
+      Provider<BrowserController>(create: (context) => widget.appFactory.browserController),
+      Provider<EditorController>(create: (context) => widget.appFactory.editorController),
     ];
 
     return MultiProvider(
@@ -44,5 +50,36 @@ class AppWidget extends StatelessWidget {
         debugShowCheckedModeBanner: false,
       ),
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    logger.debug('App state created');
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    switch(state) {
+      case AppLifecycleState.resumed:
+        logger.debug('App resumed');
+      case AppLifecycleState.inactive:
+        logger.debug('App inactive');
+        widget.appFactory.appLifecycle.onInactive();
+      case AppLifecycleState.paused:
+        logger.debug('App paused');
+      case AppLifecycleState.detached:
+        logger.debug('App detached');
+      case AppLifecycleState.hidden:
+        logger.debug('App hidden');
+    }
   }
 }

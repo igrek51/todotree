@@ -11,6 +11,9 @@ run-flutter:
 run-linux:
 	flutter run --device-id linux
 
+run-linux-kickstart:
+	flutter run --device-id linux --dart-define=KICKSTART=1
+
 run-chrome:
 	flutter run --device-id chrome --web-renderer html
 
