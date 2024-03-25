@@ -23,7 +23,7 @@ class EditorWidget extends StatelessWidget {
         ),
         ElevatedButton(
           onPressed: () {
-            editorController.saveEditedNode();
+            editorController.saveNode();
           },
           child: const Text('Save'),
         ),

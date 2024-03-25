@@ -6,6 +6,7 @@ class EditorState extends ChangeNotifier {
 
   TextEditingController editTextController = TextEditingController();
   TreeNode? editedNode;
+  int? newItemPosition;
 
   void notify() {
     notifyListeners();

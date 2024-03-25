@@ -5,14 +5,12 @@ class TreeTraverser {
   TreeNode rootNode = cRootNode;
   TreeNode currentParent = cRootNode;
   bool changesMade = false;
-  int? newItemPosition;
   TreeNode? focusNode;
 
   void reset() {
     rootNode = cRootNode;
     currentParent = rootNode;
     changesMade = false;
-    newItemPosition = null;
     focusNode = null;
   }
 
@@ -24,7 +22,7 @@ class TreeTraverser {
 
   TreeNode getChild(int position) => currentParent.getChild(position);
 
-  void addChild(TreeNode item, {int? position}) {
+  void addChildToCurrent(TreeNode item, {int? position}) {
     final nPosision = position ?? currentParent.size;
     item.parent = currentParent;
     changesMade = true;

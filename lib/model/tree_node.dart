@@ -35,6 +35,7 @@ class TreeNode {
 
   int get size => children.length;
   bool get isEmpty => children.isEmpty;
+  bool get isLeaf => children.isEmpty;
 
   TreeNode getChild(int index) {
     if (index < 0) throw Exception('Invalid position: index < 0');

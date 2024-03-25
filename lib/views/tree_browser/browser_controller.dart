@@ -1,3 +1,4 @@
+import '../../services/logger.dart';
 import '../editor/editor_controller.dart';
 import '../editor/editor_state.dart';
 import '../../services/tree_traverser.dart';
@@ -34,7 +35,7 @@ class BrowserController {
 
   void addRandomItem() {
     final name = randomName();
-    treeTraverser.addChild(TreeNode.textNode(name));
+    treeTraverser.addChildToCurrent(TreeNode.textNode(name));
     print('Added item: $name');
     renderItems();
   }
@@ -46,8 +47,9 @@ class BrowserController {
   }
 
   void editNode(TreeNode node) {
-    editorState.editTextController.text = node.name;
+    editorState.newItemPosition = null;
     editorState.editedNode = node;
+    editorState.editTextController.text = node.name;
     editorState.notify();
     homeState.pageView = HomePageView.itemEditor;
     homeState.notify();
@@ -59,7 +61,7 @@ class BrowserController {
       renderItems();
       renderTitle();
     } on NoSuperItemException {
-      // Can't go higher than root
+      logger.debug("Can't go higher than root");
     }
   }
 
@@ -68,4 +70,28 @@ class BrowserController {
     renderItems();
     renderTitle();
   }
+
+  void cancelSelectionMode() {
+    if (browserState.selectionMode) {
+      browserState.selectionMode = false;
+      browserState.notify();
+    }
+  }
+
+  void addNodeAt(int position) {
+    cancelSelectionMode();
+    if (position < 0) position = treeTraverser.currentParent.size; // last
+    if (position > treeTraverser.currentParent.size) position = treeTraverser.currentParent.size;
+    editorState.newItemPosition = position;
+    editorState.editedNode = null;
+    editorState.editTextController.text = '';
+    editorState.notify();
+    homeState.pageView = HomePageView.itemEditor;
+    homeState.notify();
+  }
+
+  void addNodeToTheEnd() {
+    addNodeAt(treeTraverser.currentParent.size);
+  }
+
 }

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../components/rounded_badge.dart';
 import 'browser_controller.dart';
 import 'browser_state.dart';
-import '../../services/logger.dart';
 import '../../model/tree_node.dart';
 
 class BrowserWidget extends StatelessWidget {
@@ -42,6 +42,46 @@ class TreeListItemWidget extends StatelessWidget {
   final int index;
   final TreeNode treeItem;
 
+  Widget buildMiddleText() {
+    if (treeItem.isLeaf) {
+      return Expanded(
+        child: Text(treeItem.name),
+      );
+    }
+    return Expanded(
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(treeItem.name),
+          ),
+          SizedBox(width: 5),
+          RoundedBadge(text: treeItem.size.toString()),
+        ],
+      ),
+    );
+  }
+
+  Widget buildMiddleActionButton(BuildContext context) {
+    final browserController = Provider.of<BrowserController>(context);
+    if (treeItem.isLeaf) {
+      return IconButton(
+        iconSize: 30,
+        icon: const Icon(Icons.arrow_right, size: 26),
+        onPressed: () {
+          browserController.goIntoNode(treeItem);
+        },
+      );
+    } else {
+      return IconButton(
+        iconSize: 30,
+        icon: const Icon(Icons.edit, size: 26),
+        onPressed: () {
+          browserController.editNode(treeItem);
+        },
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final browserController = Provider.of<BrowserController>(context);
@@ -50,7 +90,11 @@ class TreeListItemWidget extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: () {
-          browserController.editNode(treeItem);
+          if (treeItem.isLeaf) {
+            browserController.editNode(treeItem);
+          } else {
+            browserController.goIntoNode(treeItem);
+          }
         },
         child: Row(
           children: [
@@ -64,26 +108,21 @@ class TreeListItemWidget extends StatelessWidget {
               ),
             ),
             
-            Expanded(
-              child: Text(treeItem.name),
-            ),
+            buildMiddleText(),
+
             IconButton(
               iconSize: 30,
               icon: const Icon(Icons.more_vert, size: 26),
               onPressed: () {
+
               },
             ),
-            IconButton(
-              iconSize: 30,
-              icon: const Icon(Icons.arrow_right, size: 26),
-              onPressed: () {
-                browserController.goIntoNode(treeItem);
-              },
-            ),
+            buildMiddleActionButton(context),
             IconButton(
               iconSize: 30,
               icon: const Icon(Icons.add, size: 26),
               onPressed: () {
+                browserController.addNodeAt(index);
               },
             ),
           ],
@@ -98,11 +137,12 @@ class PlusItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final browserController = Provider.of<BrowserController>(context);
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: () {
-          logger.debug('InkWell tap');
+          browserController.addNodeToTheEnd();
         },
         child: SizedBox(
           height: 50,
