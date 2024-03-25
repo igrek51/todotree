@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
+import 'package:todotreev2/services/yaml_tree_serializer.dart';
 
 import '../model/tree_node.dart';
 import 'logger.dart';
@@ -45,8 +46,9 @@ class TreeStorage {
 
   Future<void> writeDbTree(TreeNode root) async {
     logger.debug('saving local database...');
-    final String content = '';
+    final String content = YamlTreeSerializer().serializeTree(root);
     final file = await writeDbString(content);
     logger.info('local database saved to ${file.absolute.path}');
+    logger.debug('content:\n$content');
   }
 }

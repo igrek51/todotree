@@ -15,11 +15,13 @@ dependencies:
   window_manager: ^0.3.8
   collection: ^1.18.0
   path_provider: ^2.1.2
+  yaml_writer: ^2.0.0
+  yaml: ^3.1.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^2.0.0
+  flutter_lints: ^3.0.1
 
 flutter:
   uses-material-design: true
