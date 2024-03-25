@@ -6,7 +6,6 @@ class YamlTreeDeserializer {
 
   TreeNode deserializeTree(String data) {
     final YamlMap yamlDoc = loadYaml(data) as YamlMap;
-    // throw Exception('Root node is not a map');
     return mapNodeToTreeItem(yamlDoc);
   }
 
@@ -32,7 +31,7 @@ class YamlTreeDeserializer {
     }
 
     if (node['items'] != null) {
-      final List<YamlMap> items = node['items'] as List<YamlMap>;
+      final YamlList items = node['items'] as YamlList;
       for (var child in items) {
         treeItem.add(mapNodeToTreeItem(child));
       }

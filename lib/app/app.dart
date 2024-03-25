@@ -37,7 +37,9 @@ class _AppWidgetState extends State<AppWidget> with WidgetsBindingObserver {
       providers: providers,
       child: MaterialApp(
         title: 'ToDo Tree',
+        debugShowCheckedModeBanner: false,
         scaffoldMessengerKey: scaffoldMessengerKey,
+        navigatorKey: navigatorKey,
         theme: ThemeData(
           useMaterial3: true,
           colorScheme: ColorScheme.fromSeed(
@@ -48,9 +50,8 @@ class _AppWidgetState extends State<AppWidget> with WidgetsBindingObserver {
             secondary: Color(0xFF6E9AE9),
           ),
         ),
-        home: HomeWidget(),
         themeMode: ThemeMode.dark,
-        debugShowCheckedModeBanner: false,
+        home: HomeWidget(),
       ),
     );
   }

@@ -4,18 +4,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:window_manager/window_manager.dart';
 
-import '../model/tree_node.dart';
+import '../services/info_service.dart';
 import '../services/logger.dart';
 import 'factory.dart';
 
 void startupApp(AppFactory app) async {
-  _resizeWindow();
-  await app.treeTraverser.load();
-  app.homeController.init();
-  app.browserController.init();
-  app.editorController.init();
-  kickstartApp(app);
-  logger.info('App initialized');
+  try {
+    _resizeWindow();
+    await app.treeTraverser.load();
+    app.homeController.init();
+    app.browserController.init();
+    app.editorController.init();
+    kickstartApp(app);
+    logger.info('App initialized');
+  } on Exception catch (e, s) {
+    print('Stack trace:\n $s');
+    InfoService.showError(e, 'Startup failed');
+  } catch (e, s) {
+    print('Stack trace:\n $s');
+    InfoService.showError(Exception(e.toString()), 'Startup failed');
+  }
 }
 
 void _resizeWindow() async {
