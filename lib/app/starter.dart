@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:window_manager/window_manager.dart';
 
+import '../services/logger.dart';
 import 'factory.dart';
 
 void startupApp(AppFactory app) async {
@@ -11,7 +12,7 @@ void startupApp(AppFactory app) async {
   app.homeController.init();
   app.browserController.init();
   app.editorController.init();
-  print('App initialized');
+  logger.info('App initialized');
 }
 
 void _resizeWindow() async {

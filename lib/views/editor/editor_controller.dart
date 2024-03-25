@@ -6,10 +6,12 @@ import '../tree_browser/browser_controller.dart';
 class EditorController {
   HomeState homeState;
   EditorState editorState;
-  TreeTraverser treeTraverser;
-  BrowserController Function() browserControllerProvider;
+
+  late BrowserController browserController;
   
-  EditorController(this.homeState, this.editorState, this.treeTraverser, this.browserControllerProvider);
+  TreeTraverser treeTraverser;
+  
+  EditorController(this.homeState, this.editorState, this.treeTraverser);
 
   void init() {
   }
@@ -21,6 +23,6 @@ class EditorController {
     editorState.notify();
     homeState.pageView = HomePageView.treeBrowser;
     homeState.notify();
-    browserControllerProvider().renderItems();
+    browserController.renderItems();
   }
 }

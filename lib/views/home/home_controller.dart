@@ -5,9 +5,11 @@ import 'home_state.dart';
 
 class HomeController {
   HomeState homeState;
-  TreeTraverser treeTraverser;
+
   BrowserController browserController;
   EditorController editorController;
+  
+  TreeTraverser treeTraverser;
   
   HomeController(this.homeState, this.treeTraverser, this.browserController, this.editorController);
 

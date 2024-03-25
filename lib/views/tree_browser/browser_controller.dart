@@ -1,3 +1,4 @@
+import '../editor/editor_controller.dart';
 import '../editor/editor_state.dart';
 import '../../services/tree_traverser.dart';
 import '../../model/tree_node.dart';
@@ -9,6 +10,9 @@ class BrowserController {
   HomeState homeState;
   BrowserState browserState;
   EditorState editorState;
+
+  late EditorController editorController;
+
   TreeTraverser treeTraverser;
   
   BrowserController(this.homeState, this.browserState, this.editorState, this.treeTraverser);

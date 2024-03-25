@@ -1,5 +1,6 @@
 import 'package:todotreev2/views/editor/editor_controller.dart';
 
+import '../services/logger.dart';
 import '../services/tree_traverser.dart';
 import '../views/home/home_state.dart';
 import '../views/tree_browser/browser_controller.dart';
@@ -24,8 +25,10 @@ class AppFactory {
     editorState = EditorState();
     treeTraverser = TreeTraverser();
     browserController = BrowserController(homeState, browserState, editorState, treeTraverser);
-    editorController = EditorController(homeState, editorState, treeTraverser, () => browserController);
+    editorController = EditorController(homeState, editorState, treeTraverser);
+    browserController.editorController = editorController;
+    editorController.browserController = browserController;
     homeController = HomeController(homeState, treeTraverser, browserController, editorController);
-    print('AppFactory created');
+    logger.debug('AppFactory created');
   }
 }
