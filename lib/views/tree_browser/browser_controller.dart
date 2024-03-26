@@ -60,7 +60,17 @@ class BrowserController {
     homeState.notify();
   }
 
-  void goUp() {
+  void goBack() {
+    ensureNoSelectionMode();
+    try {
+      treeTraverser.goBack();
+      renderAll();
+    } on NoSuperItemException {
+      logger.debug("Can't go any higher");
+    }
+  }
+
+  void goStepUp() {
     ensureNoSelectionMode();
     try {
       treeTraverser.goUp();

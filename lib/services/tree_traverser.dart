@@ -10,6 +10,7 @@ class TreeTraverser {
   bool unsavedChanges = false;
   TreeNode? focusNode;
   Set<int> selectedIndexes = {};
+  Map<TreeNode, TreeNode> target2link = {}; // history of opened links
 
   TreeTraverser(this.treeStorage);
 
@@ -19,6 +20,7 @@ class TreeTraverser {
     unsavedChanges = false;
     focusNode = null;
     selectedIndexes.clear();
+    target2link.clear();
   }
 
   Future<void> load() async {
@@ -76,6 +78,7 @@ class TreeTraverser {
   }
 
   void goUp() {
+    target2link.remove(currentParent);
     focusNode = currentParent;
     if (currentParent == rootNode) {
       throw NoSuperItemException();
@@ -85,6 +88,20 @@ class TreeTraverser {
       } else {
         throw ArgumentError('null parent');
       }
+    }
+  }
+
+  void goBack() { // go back to the previous node, taking links into account
+    // if item was reached from link - go back to link parent
+    if (target2link.containsKey(currentParent)) {
+      final link = target2link[currentParent]!;
+      target2link.remove(currentParent);
+      if (link.parent != null) {
+        goTo(link.parent!);
+      }
+    } else {
+      target2link.remove(currentParent);
+      goUp();
     }
   }
 
@@ -101,6 +118,7 @@ class TreeTraverser {
   void goToRoot() {
     currentParent = rootNode;
     focusNode = null;
+    target2link.clear();
   }
 
   void goToLinkTarget(TreeNode link) {
@@ -108,6 +126,7 @@ class TreeTraverser {
     if (target == null) {
       InfoService.showInfo('Link is broken: ${link.displayTargetPath}');
     } else {
+      target2link[target] = link;
       goTo(target);
     }
   }

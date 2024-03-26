@@ -143,13 +143,14 @@ class ClipboardManager {
     InfoService.showInfo('Text copied: $text');
   }
 
-  TreeNode buildLinkItem(TreeNode clipboardItem, TreeNode parent) {
-    if (clipboardItem.isLink) {
-      return clipboardItem.clone(); // shorten link to a link
+  TreeNode buildLinkItem(TreeNode targetNode) {
+    if (targetNode.isLink) {
+      var clone = targetNode.clone(); // shorten link to a link
+      clone.parent = null;
+      return clone;
     }
     final link = TreeNode.linkNode('');
-    link.setLinkTarget(parent, clipboardItem);
-    link.parent = parent;
+    link.setLinkTarget(targetNode);
     return link;
   }
 
@@ -159,8 +160,7 @@ class ClipboardManager {
       return InfoService.showInfo('Clipboard is empty');
     }
     for (var clipboardNode in clipboardNodes) {
-      final linkItem =
-          buildLinkItem(clipboardNode, treeTraverser.currentParent);
+      final linkItem = buildLinkItem(clipboardNode);
       treeTraverser.addChildToCurrent(linkItem, position: position);
       position++;
     }

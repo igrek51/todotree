@@ -67,6 +67,7 @@ class MainMenuRunner {
         id: 'go-step-up',
         name: '⬆️ Go up',
         action: () {
+          browserController.goStepUp();
         },
       ),
       ActionMenuItem(

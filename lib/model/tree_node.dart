@@ -46,6 +46,16 @@ class TreeNode {
   bool get isEmpty => children.isEmpty;
   bool get isLeaf => children.isEmpty;
 
+  int get depth { // root depth is 0
+    int depth = 0;
+    TreeNode? currentNode = this;
+    while (currentNode?.parent != null) {
+      depth++;
+      currentNode = currentNode?.parent;
+    }
+    return depth;
+  }
+
   TreeNode getChild(int index) {
     if (index < 0) throw Exception('Invalid position: index < 0');
     if (index >= children.length) throw Exception('Invalid position: index >= items size ($index >= ${children.length})');
@@ -117,8 +127,7 @@ class TreeNode {
       names.add(currentNode.name);
       currentNode = currentNode.parent;
     }
-    names.reversed;
-    return names;
+    return names.reversed.toList();
   }
 
   @override
@@ -135,9 +144,8 @@ class TreeNode {
     return name;
   }
 
-  void setLinkTarget(TreeNode targetParent, TreeNode targetNode) {
-    final paths = targetParent.pathNames();
-    paths.add(targetNode.displayName);
+  void setLinkTarget(TreeNode targetTextNode) {
+    final paths = targetTextNode.pathNames();
     name = paths.join('\t');
   }
 }
