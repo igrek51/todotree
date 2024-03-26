@@ -22,7 +22,7 @@ class TreeStorage {
 
   Future<File> writeDbString(String content) async {
     final file = await localDbFile;
-    return file.writeAsString(content);
+    return file.writeAsString(content, flush: true);
   }
 
   Future<String> readDbString() async {
@@ -32,6 +32,7 @@ class TreeStorage {
         logger.warning('database file $file does not exist, loading empty');
         return '';
       }
+      logger.debug('reading local database from ${file.absolute.path}');
       return await file.readAsString();
     } catch (e) {
       throw Exception('Failed to read file: $e');
@@ -40,6 +41,10 @@ class TreeStorage {
 
   Future<TreeNode> readDbTree() async {
     final String content = await readDbString();
+    if (content.isEmpty) {
+      logger.warning('empty database file, returning empty tree');
+      return TreeNode.rootNode();
+    }
     final node = YamlTreeDeserializer().deserializeTree(content);
     return node;
   }

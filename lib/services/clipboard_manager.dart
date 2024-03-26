@@ -94,7 +94,7 @@ class ClipboardManager {
     InfoService.showInfo('Marked for cut: ${itemPositions.length}');
   }
 
-  void pasteItems(TreeTraverser treeTraverser, int atPosition) async {
+  Future<void> pasteItems(TreeTraverser treeTraverser, int atPosition) async {
     var position = atPosition;
     if (clipboardNodes.isEmpty) {
       // recover by taking text from system clipboard
@@ -110,15 +110,17 @@ class ClipboardManager {
     if (markForCut) {
       for (var clipboardNode in clipboardNodes) {
         final newItem = clipboardNode.clone();
-        final oldParent = clipboardNode.parent;
-        if (oldParent == null) {
-          logger.warning('item doesn\'t have a parent');
-          continue;
-        }
-        treeTraverser.removeFromParent(clipboardNode, oldParent);
         newItem.parent = treeTraverser.currentParent;
         treeTraverser.addChildToCurrent(newItem, position: position);
         position++;
+      }
+      for (var clipboardNode in clipboardNodes) {
+        final oldParent = clipboardNode.parent;
+        if (oldParent == null) {
+          logger.warning('item $clipboardNode doesn\'t have a parent');
+          continue;
+        }
+        treeTraverser.removeFromParent(clipboardNode, oldParent);
       }
       InfoService.showInfo('Items moved: ${clipboardNodes.length}');
       markForCut = false;

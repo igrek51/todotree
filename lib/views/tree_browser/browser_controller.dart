@@ -217,9 +217,11 @@ class BrowserController {
     renderItems();
   }
 
-  void pasteAbove(int position) {
-    clipboardManager.pasteItems(treeTraverser, position);
-    renderItems();
+  void pasteAbove(int position) async {
+    handleError(() async {
+      await clipboardManager.pasteItems(treeTraverser, position);
+      renderItems();
+    });
   }
 
   void pasteAboveAsLink(int position) {
