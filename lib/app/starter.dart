@@ -2,11 +2,11 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:todotree/app/factory.dart';
 import 'package:window_manager/window_manager.dart';
 
-import '../services/info_service.dart';
-import '../services/logger.dart';
-import 'factory.dart';
+import 'package:todotree/services/info_service.dart';
+import 'package:todotree/services/logger.dart';
 
 void startupApp(AppFactory app) async {
   try {

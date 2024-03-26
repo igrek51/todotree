@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:todotreev2/app/starter.dart';
 
-import 'app/app.dart';
-import 'app/factory.dart';
+import 'package:todotree/app/starter.dart';
+import 'package:todotree/app/app.dart';
+import 'package:todotree/app/factory.dart';
 
 void main() async {
   final appFactory = AppFactory();

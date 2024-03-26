@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'logger.dart';
+import 'package:todotree/services/logger.dart';
 
 final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 final navigatorKey = GlobalKey<NavigatorState>();

@@ -8,8 +8,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:todotreev2/app/app.dart';
-import 'package:todotreev2/app/factory.dart';
+import 'package:todotree/app/app.dart';
+import 'package:todotree/app/factory.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {

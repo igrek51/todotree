@@ -1,12 +1,11 @@
 import 'package:flutter/services.dart';
-import 'package:todotreev2/services/info_service.dart';
-import 'package:todotreev2/services/tree_traverser.dart';
 
-import '../model/tree_node.dart';
-import 'logger.dart';
+import 'package:todotree/services/info_service.dart';
+import 'package:todotree/services/logger.dart';
+import 'package:todotree/services/tree_traverser.dart';
+import 'package:todotree/model/tree_node.dart';
 
 class ClipboardManager {
-
   List<TreeNode> clipboardNodes = [];
   TreeNode? copiedFrom;
   bool markForCut = false;
@@ -42,11 +41,14 @@ class ClipboardManager {
   }
 
   void copySelectedItems(TreeTraverser treeTraverser) {
-    if (!treeTraverser.selectionMode) return InfoService.showInfo('Nothing selected');
+    if (!treeTraverser.selectionMode) {
+      return InfoService.showInfo('Nothing selected');
+    }
     copyItems(treeTraverser, treeTraverser.selectedIndexes, info: true);
   }
 
-  void copyItems(TreeTraverser treeTraverser, Set<int> itemPositions, {bool info = true, bool cut = false}) {
+  void copyItems(TreeTraverser treeTraverser, Set<int> itemPositions,
+      {bool info = true, bool cut = false}) {
     if (itemPositions.isEmpty) {
       if (info) InfoService.showInfo('Nothing selected');
       return;
@@ -55,7 +57,7 @@ class ClipboardManager {
     final currentNode = treeTraverser.currentParent;
     copiedFrom = currentNode;
     markForCut = cut;
-    for (var position in itemPositions) {
+    for (var position in itemPositions.toList()..sort()) {
       final childNode = currentNode.getChild(position);
       addToClipboard(childNode);
     }
@@ -80,7 +82,9 @@ class ClipboardManager {
   }
 
   void cutSelectedItems(TreeTraverser treeTraverser) {
-    if (!treeTraverser.selectionMode) return InfoService.showInfo('Nothing selected');
+    if (!treeTraverser.selectionMode) {
+      return InfoService.showInfo('Nothing selected');
+    }
     cutItems(treeTraverser, treeTraverser.selectedIndexes);
   }
 
@@ -95,8 +99,11 @@ class ClipboardManager {
     if (clipboardNodes.isEmpty) {
       // recover by taking text from system clipboard
       final systemClipboard = await readSystemClipboard();
-      if (systemClipboard == null) return InfoService.showInfo('Clipboard is empty');
-      treeTraverser.addChildToCurrent(TreeNode.textNode(systemClipboard), position: position);
+      if (systemClipboard == null) {
+        return InfoService.showInfo('Clipboard is empty');
+      }
+      treeTraverser.addChildToCurrent(TreeNode.textNode(systemClipboard),
+          position: position);
       InfoService.showInfo('Pasted from system clipboard: $systemClipboard');
       return;
     }
@@ -116,7 +123,6 @@ class ClipboardManager {
       InfoService.showInfo('Items moved: ${clipboardNodes.length}');
       markForCut = false;
       clearClipboardNodes();
-
     } else {
       for (var clipboardNode in clipboardNodes) {
         final newItem = clipboardNode.clone();
@@ -136,7 +142,9 @@ class ClipboardManager {
   }
 
   TreeNode buildLinkItem(TreeNode clipboardItem, TreeNode parent) {
-    if (clipboardItem.isLink) return clipboardItem.clone(); // shorten link to a link
+    if (clipboardItem.isLink) {
+      return clipboardItem.clone(); // shorten link to a link
+    }
     final link = TreeNode.linkNode('');
     link.setLinkTarget(parent, clipboardItem);
     link.parent = parent;
@@ -145,9 +153,12 @@ class ClipboardManager {
 
   void pasteItemsAsLink(TreeTraverser treeTraverser, int atPosition) {
     var position = atPosition;
-    if (clipboardNodes.isEmpty) return InfoService.showInfo('Clipboard is empty');
+    if (clipboardNodes.isEmpty) {
+      return InfoService.showInfo('Clipboard is empty');
+    }
     for (var clipboardNode in clipboardNodes) {
-      final linkItem = buildLinkItem(clipboardNode, treeTraverser.currentParent);
+      final linkItem =
+          buildLinkItem(clipboardNode, treeTraverser.currentParent);
       treeTraverser.addChildToCurrent(linkItem, position: position);
       position++;
     }

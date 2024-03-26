@@ -1,6 +1,6 @@
 import 'package:collection/collection.dart';
 
-import '../util/strings.dart';
+import 'package:todotree/util/strings.dart';
 
 class TreeNode {
   TreeNode({

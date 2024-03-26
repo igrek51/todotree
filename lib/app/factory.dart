@@ -1,18 +1,17 @@
-import 'package:todotreev2/views/editor/editor_controller.dart';
-
-import '../services/clipboard_manager.dart';
-import '../services/lifecycle.dart';
-import '../services/logger.dart';
-import '../services/main_menu_runner.dart';
-import '../services/tree_storage.dart';
-import '../services/tree_traverser.dart';
-import '../services/yaml_tree_deserializer.dart';
-import '../services/yaml_tree_serializer.dart';
-import '../views/home/home_state.dart';
-import '../views/tree_browser/browser_controller.dart';
-import '../views/tree_browser/browser_state.dart';
-import '../views/home/home_controller.dart';
-import '../views/editor/editor_state.dart';
+import 'package:todotree/views/editor/editor_controller.dart';
+import 'package:todotree/services/clipboard_manager.dart';
+import 'package:todotree/services/lifecycle.dart';
+import 'package:todotree/services/logger.dart';
+import 'package:todotree/services/main_menu_runner.dart';
+import 'package:todotree/services/tree_storage.dart';
+import 'package:todotree/services/tree_traverser.dart';
+import 'package:todotree/services/yaml_tree_deserializer.dart';
+import 'package:todotree/services/yaml_tree_serializer.dart';
+import 'package:todotree/views/home/home_state.dart';
+import 'package:todotree/views/tree_browser/browser_controller.dart';
+import 'package:todotree/views/tree_browser/browser_state.dart';
+import 'package:todotree/views/home/home_controller.dart';
+import 'package:todotree/views/editor/editor_state.dart';
 
 class AppFactory {
   late final HomeState homeState;

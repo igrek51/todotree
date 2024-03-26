@@ -1,7 +1,7 @@
 import 'package:flutter/services.dart';
 
-import '../../services/tree_traverser.dart';
-import '../views/tree_browser/browser_controller.dart';
+import 'package:todotree/services/tree_traverser.dart';
+import 'package:todotree/views/tree_browser/browser_controller.dart';
 
 class MainMenuRunner {
   final BrowserController browserController;

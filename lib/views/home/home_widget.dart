@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
-import '../editor/editor_widget.dart';
-import '../tree_browser/browser_widget.dart';
-import 'title_bar.dart';
-import 'home_state.dart';
+import 'package:todotree/views/editor/editor_widget.dart';
+import 'package:todotree/views/home/home_state.dart';
+import 'package:todotree/views/home/title_bar.dart';
+import 'package:todotree/views/tree_browser/browser_widget.dart';
 
 class HomeWidget extends StatelessWidget {
   const HomeWidget({super.key});

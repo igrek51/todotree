@@ -1,7 +1,6 @@
-import 'package:todotreev2/services/info_service.dart';
-
-import '../model/tree_node.dart';
-import 'tree_storage.dart';
+import 'package:todotree/services/info_service.dart';
+import 'package:todotree/model/tree_node.dart';
+import 'package:todotree/services/tree_storage.dart';
 
 class TreeTraverser {
   TreeStorage treeStorage;

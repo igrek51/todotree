@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../services/error_handler.dart';
-import '../../services/tree_traverser.dart';
-import '../components/node_menu_dialog.dart';
-import '../components/rounded_badge.dart';
-import 'browser_controller.dart';
-import 'browser_state.dart';
-import '../../model/tree_node.dart';
+import 'package:todotree/services/error_handler.dart';
+import 'package:todotree/services/tree_traverser.dart';
+import 'package:todotree/model/tree_node.dart';
+import 'package:todotree/views/components/node_menu_dialog.dart';
+import 'package:todotree/views/components/rounded_badge.dart';
+import 'package:todotree/views/tree_browser/browser_controller.dart';
+import 'package:todotree/views/tree_browser/browser_state.dart';
 
 class BrowserWidget extends StatelessWidget {
   const BrowserWidget({super.key});

@@ -1,14 +1,14 @@
-import '../../services/clipboard_manager.dart';
-import '../../services/error_handler.dart';
-import '../../services/info_service.dart';
-import '../../services/logger.dart';
-import '../editor/editor_controller.dart';
-import '../editor/editor_state.dart';
-import '../../services/tree_traverser.dart';
-import '../../model/tree_node.dart';
-import '../../util/strings.dart';
-import '../home/home_state.dart';
-import '../tree_browser/browser_state.dart';
+import 'package:todotree/services/clipboard_manager.dart';
+import 'package:todotree/services/error_handler.dart';
+import 'package:todotree/services/info_service.dart';
+import 'package:todotree/services/logger.dart';
+import 'package:todotree/views/editor/editor_controller.dart';
+import 'package:todotree/views/editor/editor_state.dart';
+import 'package:todotree/services/tree_traverser.dart';
+import 'package:todotree/model/tree_node.dart';
+import 'package:todotree/util/strings.dart';
+import 'package:todotree/views/home/home_state.dart';
+import 'package:todotree/views/tree_browser/browser_state.dart';
 
 class BrowserController {
   HomeState homeState;

@@ -1,5 +1,5 @@
-import 'tree_storage.dart';
-import 'tree_traverser.dart';
+import 'package:todotree/services/tree_storage.dart';
+import 'package:todotree/services/tree_traverser.dart';
 
 class AppLifecycle {
   final TreeStorage treeStorage;

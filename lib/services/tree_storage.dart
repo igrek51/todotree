@@ -2,11 +2,11 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
-import 'package:todotreev2/services/yaml_tree_deserializer.dart';
-import 'package:todotreev2/services/yaml_tree_serializer.dart';
 
-import '../model/tree_node.dart';
-import 'logger.dart';
+import 'package:todotree/services/yaml_tree_deserializer.dart';
+import 'package:todotree/services/yaml_tree_serializer.dart';
+import 'package:todotree/model/tree_node.dart';
+import 'package:todotree/services/logger.dart';
 
 class TreeStorage {
 

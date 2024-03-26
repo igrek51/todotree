@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:todotreev2/model/tree_node.dart';
 
-import '../../services/clipboard_manager.dart';
+import 'package:todotree/model/tree_node.dart';
+import 'package:todotree/services/clipboard_manager.dart';
 
 class NodeMenuDialog {
   static Widget buildForNode(

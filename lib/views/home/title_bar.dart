@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../services/error_handler.dart';
-import '../../services/main_menu_runner.dart';
-import '../tree_browser/browser_controller.dart';
-import '../tree_browser/browser_state.dart';
-import 'home_controller.dart';
+import 'package:todotree/services/error_handler.dart';
+import 'package:todotree/services/main_menu_runner.dart';
+import 'package:todotree/views/home/home_controller.dart';
+import 'package:todotree/views/tree_browser/browser_controller.dart';
+import 'package:todotree/views/tree_browser/browser_state.dart';
 
 class TitleBar extends StatelessWidget {
   const TitleBar({super.key});

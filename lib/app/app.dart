@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../services/clipboard_manager.dart';
-import '../services/info_service.dart';
-import '../services/logger.dart';
-import '../services/main_menu_runner.dart';
-import '../services/tree_traverser.dart';
-import '../views/editor/editor_controller.dart';
-import '../views/home/home_controller.dart';
-import '../views/tree_browser/browser_controller.dart';
-import 'factory.dart';
-import '../views/home/home_widget.dart';
+import 'package:todotree/app/factory.dart';
+import 'package:todotree/services/clipboard_manager.dart';
+import 'package:todotree/services/info_service.dart';
+import 'package:todotree/services/logger.dart';
+import 'package:todotree/services/main_menu_runner.dart';
+import 'package:todotree/services/tree_traverser.dart';
+import 'package:todotree/views/editor/editor_controller.dart';
+import 'package:todotree/views/home/home_controller.dart';
+import 'package:todotree/views/tree_browser/browser_controller.dart';
+import 'package:todotree/views/home/home_widget.dart';
 
 class AppWidget extends StatefulWidget {
   AppWidget({super.key, required this.appFactory});

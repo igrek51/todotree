@@ -1,4 +1,4 @@
-.PHONY: build run android test web
+.PHONY: build run android test web linux
 
 devices:
 	flutter devices

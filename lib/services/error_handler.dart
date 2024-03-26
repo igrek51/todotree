@@ -1,4 +1,4 @@
-import 'info_service.dart';
+import 'package:todotree/services/info_service.dart';
 
 void handleError(dynamic Function() function) {
   try {
