@@ -4,7 +4,7 @@ class Logger {
     print(message);
   }
 
-  void error(String message, [Error? error]) {
+  void error(String message, [Object? error]) {
     if (error != null) {
       log('[ERROR] $message: $error');
     } else {

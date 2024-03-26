@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
+import '../../services/error_handler.dart';
 import '../../services/tree_traverser.dart';
 import '../tree_browser/browser_controller.dart';
 import '../../services/info_service.dart';
@@ -16,7 +17,7 @@ class TitleBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final style = theme.textTheme.titleMedium;
-    
+
     final browserState = context.watch<BrowserState>();
     final browserController = Provider.of<BrowserController>(context);
     final homeController = Provider.of<HomeController>(context);
@@ -63,29 +64,32 @@ class TitleBar extends StatelessWidget {
                 iconSize: 32,
                 icon: const Icon(Icons.arrow_back, size: 28),
                 onPressed: () {
-                  homeController.goBack();
+                  handleError(() {
+                    homeController.goBack();
+                  });
                 },
               ),
-              
               IconButton(
                 iconSize: 32,
                 icon: const Icon(Icons.save, size: 28),
                 onPressed: () {
-                  browserController.saveAndExit();
+                  handleError(() {
+                    browserController.saveAndExit();
+                  });
                 },
               ),
-
               Expanded(
                 child: Text(browserState.title, style: style),
               ),
-
               PopupMenuButton(
                 iconSize: 32,
                 icon: const Icon(Icons.more_vert, size: 28),
                 onSelected: (value) {
-                  logger.debug('popup menu selected: $value');
-                  final action = menuActions.firstWhere((element) => element.id == value);
-                  action.action();
+                  final action =
+                      menuActions.firstWhere((element) => element.id == value);
+                  handleError(() {
+                    action.action();
+                  });
                 },
                 itemBuilder: (context) {
                   return menuActions.map((action) {

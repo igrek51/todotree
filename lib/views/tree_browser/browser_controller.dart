@@ -1,3 +1,4 @@
+import '../../services/error_handler.dart';
 import '../../services/info_service.dart';
 import '../../services/logger.dart';
 import '../editor/editor_controller.dart';
@@ -35,6 +36,7 @@ class BrowserController {
 
   void renderItems() {
     browserState.items = treeTraverser.currentParent.children.toList();
+    browserState.selectedIndexes = treeTraverser.selectedIndexes.toSet();
     browserState.notify();
   }
 
@@ -52,6 +54,7 @@ class BrowserController {
   }
 
   void editNode(TreeNode node) {
+    ensureNoSelectionMode();
     editorState.newItemPosition = null;
     editorState.editedNode = node;
     editorState.editTextController.text = node.name;
@@ -61,6 +64,7 @@ class BrowserController {
   }
 
   void goUp() {
+    ensureNoSelectionMode();
     try {
       treeTraverser.goUp();
       renderAll();
@@ -70,19 +74,20 @@ class BrowserController {
   }
 
   void goIntoNode(TreeNode node) {
+    ensureNoSelectionMode();
     treeTraverser.goTo(node);
     renderAll();
   }
 
-  void cancelSelectionMode() {
-    if (browserState.selectionMode) {
-      browserState.selectionMode = false;
-      browserState.notify();
+  void ensureNoSelectionMode() {
+    if (treeTraverser.anythingSelected) {
+      treeTraverser.cancelSelection();
+      renderItems();
     }
   }
 
   void addNodeAt(int position) {
-    cancelSelectionMode();
+    ensureNoSelectionMode();
     if (position < 0) position = treeTraverser.currentParent.size; // last
     if (position > treeTraverser.currentParent.size) position = treeTraverser.currentParent.size;
     editorState.newItemPosition = position;
@@ -122,19 +127,26 @@ class BrowserController {
   }
 
   void runNodeMenuAction(String action, TreeNode node) {
-    switch (action) {
-      case 'remove-node':
-        removeNode(node);
-      case 'edit-node':
-        editNode(node);
-      default:
-        logger.debug('Unknown action: $action');
-    }
+    handleError(() {
+      switch (action) {
+        case 'remove-node':
+          removeNode(node);
+        case 'edit-node':
+          editNode(node);
+        default:
+          logger.debug('Unknown action: $action');
+      }
+    });
   }
 
   void saveAndExit() {
     treeTraverser.saveIfChanged();
     treeTraverser.goToRoot();
     renderAll();
+  }
+
+  void onToggleSelectedNode(int position) {
+    treeTraverser.toggleItemSelected(position);
+    renderItems();
   }
 }

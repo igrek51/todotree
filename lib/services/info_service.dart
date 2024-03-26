@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'logger.dart';
+
 final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 final navigatorKey = GlobalKey<NavigatorState>();
 
@@ -17,6 +19,7 @@ class InfoService {
   }
 
   static void showInfo(String message) {
+    logger.info('UI: $message');
     scaffoldMessengerKey.currentState?.clearSnackBars();
     scaffoldMessengerKey.currentState?.showSnackBar(
       SnackBar(
@@ -27,8 +30,9 @@ class InfoService {
     );
   }
 
-  static void showError(Exception error, String contextMessage) {
+  static void showError(Object error, String contextMessage) {
     final fullMessage = '$contextMessage: $error';
+    logger.error(fullMessage);
     scaffoldMessengerKey.currentState?.clearSnackBars();
     scaffoldMessengerKey.currentState?.showSnackBar(
       SnackBar(
@@ -44,7 +48,7 @@ class InfoService {
               builder: (BuildContext context) {
                 return AlertDialog(
                   title: Text('Error Details'),
-                  content: Text('$error'),
+                  content: Text(fullMessage),
                   actions: <Widget>[
                     TextButton(
                       child: Text('CLOSE'),

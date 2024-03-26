@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../services/error_handler.dart';
 import '../components/node_menu_dialog.dart';
 import '../components/rounded_badge.dart';
 import 'browser_controller.dart';
@@ -49,16 +50,21 @@ class TreeListItemWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final browserController = Provider.of<BrowserController>(context);
+    final browserState = context.watch<BrowserState>();
+    final selectionMode = browserState.selectedIndexes.isNotEmpty;
+    final isItemSelected = browserState.selectedIndexes.contains(index);
 
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: () {
-          if (treeItem.isLeaf) {
-            browserController.editNode(treeItem);
-          } else {
-            browserController.goIntoNode(treeItem);
-          }
+          handleError(() {
+            if (treeItem.isLeaf) {
+              browserController.editNode(treeItem);
+            } else {
+              browserController.goIntoNode(treeItem);
+            }
+          });
         },
         child: Container(
           padding: const EdgeInsets.all(0.0),
@@ -74,14 +80,7 @@ class TreeListItemWidget extends StatelessWidget {
           ),
           child: Row(
             children: [
-              ReorderableDragStartListener(
-                index: index,
-                child: IconButton(
-                  iconSize: 30,
-                  icon: const Icon(Icons.reorder, size: 26),
-                  onPressed: () {},
-                ),
-              ),
+              buildLeftIcon(selectionMode, isItemSelected, browserController),
               buildMiddleText(),
               buildMoreActionButton(context),
               buildMiddleActionButton(context),
@@ -89,7 +88,9 @@ class TreeListItemWidget extends StatelessWidget {
                 iconSize: 30,
                 icon: const Icon(Icons.add, size: 26),
                 onPressed: () {
-                  browserController.addNodeAt(index);
+                  handleError(() {
+                    browserController.addNodeAt(index);
+                  });
                 },
               ),
             ],
@@ -97,6 +98,31 @@ class TreeListItemWidget extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget buildLeftIcon(bool selectionMode, bool isItemSelected,
+      BrowserController browserController) {
+    if (selectionMode) {
+      return Checkbox(
+        value: isItemSelected,
+        onChanged: (bool? value) {
+          handleError(() {
+            browserController.onToggleSelectedNode(index);
+          });
+        },
+      );
+    } else {
+      return ReorderableDragStartListener(
+        index: index,
+        child: IconButton(
+          iconSize: 30,
+          icon: const Icon(Icons.reorder, size: 26),
+          onPressed: () {
+            browserController.onToggleSelectedNode(index);
+          },
+        ),
+      );
+    }
   }
 
   Widget buildMiddleText() {
@@ -131,7 +157,9 @@ class TreeListItemWidget extends StatelessWidget {
         iconSize: 30,
         icon: const Icon(Icons.arrow_right, size: 26),
         onPressed: () {
-          browserController.goIntoNode(treeItem);
+          handleError(() {
+            browserController.goIntoNode(treeItem);
+          });
         },
       );
     } else {
@@ -139,7 +167,9 @@ class TreeListItemWidget extends StatelessWidget {
         iconSize: 30,
         icon: const Icon(Icons.edit, size: 26),
         onPressed: () {
-          browserController.editNode(treeItem);
+          handleError(() {
+            browserController.editNode(treeItem);
+          });
         },
       );
     }
@@ -176,7 +206,9 @@ class PlusItemWidget extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: () {
-          browserController.addNodeToTheEnd();
+          handleError(() {
+            browserController.addNodeToTheEnd();
+          });
         },
         child: SizedBox(
           height: 50,

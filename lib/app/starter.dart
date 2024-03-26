@@ -17,12 +17,13 @@ void startupApp(AppFactory app) async {
     app.editorController.init();
     kickstartApp(app);
     logger.info('App initialized');
+
   } on Exception catch (e, s) {
-    print('Stack trace:\n $s');
     InfoService.showError(e, 'Startup failed');
-  } catch (e, s) {
     print('Stack trace:\n $s');
+  } catch (e, s) {
     InfoService.showError(Exception(e.toString()), 'Startup failed');
+    print('Stack trace:\n $s');
   }
 }
 

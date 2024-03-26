@@ -1,12 +1,16 @@
 import 'package:yaml/yaml.dart';
 
 import '../model/tree_node.dart';
+import 'logger.dart';
 
 class YamlTreeDeserializer {
 
   TreeNode deserializeTree(String data) {
+    final stopwatch = Stopwatch()..start();
     final YamlMap yamlDoc = loadYaml(data) as YamlMap;
-    return mapNodeToTreeItem(yamlDoc);
+    final rootNode = mapNodeToTreeItem(yamlDoc);
+    logger.debug('Tree deserialized in ${stopwatch.elapsed}');
+    return rootNode;
   }
 
   TreeNode mapNodeToTreeItem(YamlMap node) {

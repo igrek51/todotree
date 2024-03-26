@@ -49,6 +49,5 @@ class TreeStorage {
     final String content = YamlTreeSerializer().serializeTree(root);
     final file = await writeDbString(content);
     logger.info('local database saved to ${file.absolute.path}');
-    logger.debug('content:\n$content');
   }
 }

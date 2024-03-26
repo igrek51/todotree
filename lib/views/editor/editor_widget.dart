@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../services/error_handler.dart';
 import 'editor_controller.dart';
 import 'editor_state.dart';
 
@@ -29,13 +30,17 @@ class EditorWidget extends StatelessWidget {
           children: [
             ElevatedButton(
               onPressed: () {
-                editorController.saveNode();
+                handleError(() {
+                  editorController.saveNode();
+                });
               },
               child: const Text('Save'),
             ),
             ElevatedButton(
               onPressed: () {
-                editorController.cancelEdit();
+                handleError(() {
+                  editorController.cancelEdit();
+                });
               },
               child: const Text('Cancel'),
             ),

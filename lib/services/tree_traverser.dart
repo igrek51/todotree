@@ -9,6 +9,7 @@ class TreeTraverser {
   TreeNode currentParent = cRootNode;
   bool unsavedChanges = false;
   TreeNode? focusNode;
+  Set<int> selectedIndexes = {};
 
   TreeTraverser(this.treeStorage);
 
@@ -17,9 +18,11 @@ class TreeTraverser {
     currentParent = rootNode;
     unsavedChanges = false;
     focusNode = null;
+    selectedIndexes.clear();
   }
 
   Future<void> load() async {
+    reset();
     final value = await treeStorage.readDbTree();
     rootNode = value;
     currentParent = value;
@@ -96,6 +99,33 @@ class TreeTraverser {
   void goToRoot() {
     currentParent = rootNode;
     focusNode = null;
+  }
+
+  bool get anythingSelected => selectedIndexes.isNotEmpty;
+
+  void cancelSelection() {
+    selectedIndexes.clear();
+  }
+
+  void setItemSelected(int position, bool selected) {
+    if (selected) {
+      selectedIndexes.add(position);
+    } else {
+      selectedIndexes.remove(position);
+    }
+  }
+
+  bool isItemSelected(int position) => selectedIndexes.contains(position);
+
+  void toggleItemSelected(int position) {
+    setItemSelected(position, !isItemSelected(position));
+  }
+
+  void selectAll() {
+    selectedIndexes.clear();
+    for (var i = 0; i < currentParent.size; i++) {
+      selectedIndexes.add(i);
+    }
   }
 }
 

@@ -6,7 +6,7 @@ class BrowserState extends ChangeNotifier {
 
   String title = '';
   List<TreeNode> items = [];
-  bool selectionMode = false;
+  Set<int> selectedIndexes = {};
 
   void notify() {
     notifyListeners();

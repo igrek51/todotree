@@ -8,13 +8,25 @@ class TreeNode {
     this.parent,
     this.type = TreeNodeType.text,
     this.targetData = '',
-  });
+    List<TreeNode>? children,
+  }) : children = children ?? [];
 
   String name;
   TreeNode? parent;
-  List<TreeNode> children = [];
+  List<TreeNode> children;
   TreeNodeType type;
   String targetData;
+
+  TreeNode clone() {
+    final newChildren = children.map((child) => child.clone()).toList();
+    return TreeNode(
+      name: name,
+      parent: parent,
+      children: newChildren,
+      type: type,
+      targetData: targetData,
+    );
+  }
 
   static TreeNode rootNode() {
     return TreeNode(name: '/', type: TreeNodeType.text);
@@ -24,8 +36,8 @@ class TreeNode {
     return TreeNode(name: text, type: TreeNodeType.text);
   }
 
-  static TreeNode linkNode(String targetData, String name) {
-    return TreeNode(name: name, targetData: targetData, type: TreeNodeType.link);
+  static TreeNode linkNode(String targetData, String customName) {
+    return TreeNode(name: customName, targetData: targetData, type: TreeNodeType.link);
   }
 
   bool get isText => type == TreeNodeType.text;
@@ -100,7 +112,7 @@ class TreeNode {
     return indexInParent;
   }
 
-  List<String> pathNames() { // parent names except root
+  List<String> pathNames() { // path names except root
     final names = <String>[];
     TreeNode? currentNode = this;
     while (true) {
@@ -115,6 +127,20 @@ class TreeNode {
   @override
   String toString() {
     return 'TreeNode{name: $name, type: $type, children: ${children.length}}';
+  }
+
+  String get displayName {
+    if (type == TreeNodeType.link) {
+      if (name != '') return name;
+      return targetData;
+    }
+    return name;
+  }
+
+  void setLinkTarget(TreeNode targetParent, TreeNode targetNode) {
+    final paths = targetParent.pathNames();
+    paths.add(targetNode.displayName);
+    targetData = paths.join('\t');
   }
 }
 

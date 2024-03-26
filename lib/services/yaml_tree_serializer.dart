@@ -1,13 +1,16 @@
 import 'package:yaml_writer/yaml_writer.dart';
 
 import '../model/tree_node.dart';
+import 'logger.dart';
 
 class YamlTreeSerializer {
 
   String serializeTree(TreeNode root) {
-    var yamlWriter = YamlWriter();
+    final stopwatch = Stopwatch()..start();
+    final yamlWriter = YamlWriter();
     final serializable = convertToSerializableItem(root);
-    var yamlDoc = yamlWriter.write(serializable);
+    final yamlDoc = yamlWriter.write(serializable);
+    logger.debug('Tree serialized in ${stopwatch.elapsed}');
     return yamlDoc;
   }
 
