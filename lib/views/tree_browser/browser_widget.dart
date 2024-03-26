@@ -62,13 +62,7 @@ class TreeListItemWidget extends StatelessWidget {
       child: InkWell(
         onTap: () {
           handleError(() {
-            if (selectionMode) {
-              browserController.onToggleSelectedNode(index);
-            } else if (treeItem.isLeaf) {
-              browserController.editNode(treeItem);
-            } else {
-              browserController.goIntoNode(treeItem);
-            }
+            browserController.handleNodeTap(treeItem, index);
           });
         },
         onLongPress: () {

@@ -113,7 +113,7 @@ class TreeTraverser {
     }
   }
 
-  bool get anythingSelected => selectedIndexes.isNotEmpty;
+  bool get selectionMode => selectedIndexes.isNotEmpty;
 
   void cancelSelection() {
     selectedIndexes.clear();

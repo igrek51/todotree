@@ -66,7 +66,7 @@ class BrowserController {
       treeTraverser.goUp();
       renderAll();
     } on NoSuperItemException {
-      logger.debug("Can't go higher than root");
+      logger.debug("Can't go any higher");
     }
   }
 
@@ -81,7 +81,7 @@ class BrowserController {
   }
 
   void ensureNoSelectionMode() {
-    if (treeTraverser.anythingSelected) {
+    if (treeTraverser.selectionMode) {
       treeTraverser.cancelSelection();
       renderItems();
     }
@@ -130,7 +130,7 @@ class BrowserController {
   }
 
   void removeNodesAt(int position) {
-    if (treeTraverser.anythingSelected) {
+    if (treeTraverser.selectionMode) {
       final nodes = treeTraverser.selectedIndexes
           .map((index) => treeTraverser.getChild(index))
           .toList();
@@ -225,5 +225,17 @@ class BrowserController {
   void pasteAboveAsLink(int position) {
     clipboardManager.pasteItemsAsLink(treeTraverser, position);
     renderItems();
+  }
+
+  void handleNodeTap(TreeNode node, int index) {
+    if (treeTraverser.selectionMode) {
+      onToggleSelectedNode(index);
+    } else if (node.isLink) {
+      goIntoNode(node);
+    } else if (node.isLeaf) {
+      editNode(node);
+    } else {
+      goIntoNode(node);
+    }
   }
 }

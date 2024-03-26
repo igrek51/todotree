@@ -42,7 +42,7 @@ class ClipboardManager {
   }
 
   void copySelectedItems(TreeTraverser treeTraverser) {
-    if (!treeTraverser.anythingSelected) return InfoService.showInfo('Nothing selected');
+    if (!treeTraverser.selectionMode) return InfoService.showInfo('Nothing selected');
     copyItems(treeTraverser, treeTraverser.selectedIndexes, info: true);
   }
 
@@ -74,13 +74,13 @@ class ClipboardManager {
       }
     }
 
-    if (treeTraverser.anythingSelected) {
+    if (treeTraverser.selectionMode) {
       treeTraverser.cancelSelection();
     }
   }
 
   void cutSelectedItems(TreeTraverser treeTraverser) {
-    if (!treeTraverser.anythingSelected) return InfoService.showInfo('Nothing selected');
+    if (!treeTraverser.selectionMode) return InfoService.showInfo('Nothing selected');
     cutItems(treeTraverser, treeTraverser.selectedIndexes);
   }
 
