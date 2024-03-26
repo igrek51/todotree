@@ -137,7 +137,7 @@ class ClipboardManager {
 
   TreeNode buildLinkItem(TreeNode clipboardItem, TreeNode parent) {
     if (clipboardItem.isLink) return clipboardItem.clone(); // shorten link to a link
-    final link = TreeNode.linkNode('', '');
+    final link = TreeNode.linkNode('');
     link.setLinkTarget(parent, clipboardItem);
     link.parent = parent;
     return link;

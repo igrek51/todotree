@@ -1,8 +1,9 @@
+import 'package:todotreev2/services/info_service.dart';
+
 import '../model/tree_node.dart';
 import 'tree_storage.dart';
 
 class TreeTraverser {
-
   TreeStorage treeStorage;
 
   TreeNode rootNode = cRootNode;
@@ -40,9 +41,11 @@ class TreeTraverser {
 
   List<TreeNode> get childNodes => currentParent.children;
 
-  bool isPositionBeyond(int position) => position >= currentParent.children.length;
+  bool isPositionBeyond(int position) =>
+      position >= currentParent.children.length;
 
-  bool isItemAtPosition(int position) => position >= 0 && position < currentParent.size;
+  bool isItemAtPosition(int position) =>
+      position >= 0 && position < currentParent.size;
 
   TreeNode getChild(int position) => currentParent.getChild(position);
 
@@ -101,6 +104,15 @@ class TreeTraverser {
     focusNode = null;
   }
 
+  void goToLinkTarget(TreeNode link) {
+    final target = findLinkTarget(link.name);
+    if (target == null) {
+      InfoService.showInfo('Link is broken: ${link.displayTargetPath}');
+    } else {
+      goTo(target);
+    }
+  }
+
   bool get anythingSelected => selectedIndexes.isNotEmpty;
 
   void cancelSelection() {
@@ -125,6 +137,26 @@ class TreeTraverser {
     selectedIndexes.clear();
     for (var i = 0; i < currentParent.size; i++) {
       selectedIndexes.add(i);
+    }
+  }
+
+  TreeNode? findLinkTarget(String targetPath) {
+    final paths = targetPath.split('\t');
+    TreeNode current = rootNode;
+    for (final path in paths) {
+      final found = current.findChildByName(path, lenient: true);
+      if (found == null) return null;
+      current = found;
+    }
+    return current;
+  }
+
+  String displayLinkName(TreeNode link) {
+    final target = findLinkTarget(link.name);
+    if (target == null) {
+      return link.displayTargetPath;
+    } else {
+      return target.name;
     }
   }
 }

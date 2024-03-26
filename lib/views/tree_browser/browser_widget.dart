@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../services/error_handler.dart';
+import '../../services/tree_traverser.dart';
 import '../components/node_menu_dialog.dart';
 import '../components/rounded_badge.dart';
 import 'browser_controller.dart';
@@ -14,7 +15,8 @@ class BrowserWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final browserState = context.watch<BrowserState>();
-    final browserController = Provider.of<BrowserController>(context, listen: false);
+    final browserController =
+        Provider.of<BrowserController>(context, listen: false);
 
     final reorderableList = ReorderableListView(
       onReorder: (int oldIndex, int newIndex) {
@@ -49,7 +51,8 @@ class TreeListItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final browserController = Provider.of<BrowserController>(context, listen: false);
+    final browserController =
+        Provider.of<BrowserController>(context, listen: false);
     final browserState = context.watch<BrowserState>();
     final selectionMode = browserState.selectedIndexes.isNotEmpty;
     final isItemSelected = browserState.selectedIndexes.contains(index);
@@ -86,18 +89,10 @@ class TreeListItemWidget extends StatelessWidget {
           child: Row(
             children: [
               buildLeftIcon(selectionMode, isItemSelected, browserController),
-              buildMiddleText(),
+              buildMiddleText(context),
               buildMoreActionButton(context),
               buildMiddleActionButton(context),
-              IconButton(
-                iconSize: 30,
-                icon: const Icon(Icons.add, size: 26),
-                onPressed: () {
-                  handleError(() {
-                    browserController.addNodeAt(index);
-                  });
-                },
-              ),
+              buildAddAction(browserController),
             ],
           ),
         ),
@@ -130,33 +125,49 @@ class TreeListItemWidget extends StatelessWidget {
     }
   }
 
-  Widget buildMiddleText() {
-    if (treeItem.isLeaf) {
+  Widget buildMiddleText(BuildContext context) {
+    if (treeItem.isLink) {
+      final treeTraverser = Provider.of<TreeTraverser>(context, listen: false);
+      return Expanded(
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Text(
+            treeTraverser.displayLinkName(treeItem),
+            style: TextStyle(
+              color: Color(0xFFD2D2D2),
+              decoration: TextDecoration.underline,
+            ),
+          ),
+        ),
+      );
+    } else if (treeItem.isLeaf) {
       return Expanded(
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 8),
           child: Text(treeItem.name),
         ),
       );
-    }
-    return Expanded(
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              treeItem.name,
-              style: TextStyle(fontWeight: FontWeight.bold),
+    } else {
+      return Expanded(
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                treeItem.name,
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
             ),
-          ),
-          SizedBox(width: 5),
-          RoundedBadge(text: treeItem.size.toString()),
-        ],
-      ),
-    );
+            SizedBox(width: 5),
+            RoundedBadge(text: treeItem.size.toString()),
+          ],
+        ),
+      );
+    }
   }
 
   Widget buildMiddleActionButton(BuildContext context) {
-    final browserController = Provider.of<BrowserController>(context, listen: false);
+    final browserController =
+        Provider.of<BrowserController>(context, listen: false);
     if (treeItem.isLeaf) {
       return IconButton(
         iconSize: 30,
@@ -190,8 +201,21 @@ class TreeListItemWidget extends StatelessWidget {
     );
   }
 
+  Widget buildAddAction(BrowserController browserController) {
+    return IconButton(
+      iconSize: 30,
+      icon: const Icon(Icons.add, size: 26),
+      onPressed: () {
+        handleError(() {
+          browserController.addNodeAt(index);
+        });
+      },
+    );
+  }
+
   void showNodeOptionsDialog(BuildContext context) {
-    final browserController = Provider.of<BrowserController>(context, listen: false);
+    final browserController =
+        Provider.of<BrowserController>(context, listen: false);
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -199,7 +223,8 @@ class TreeListItemWidget extends StatelessWidget {
       },
     ).then((value) {
       if (value != null) {
-        browserController.runNodeMenuAction(value, node: treeItem, position: index);
+        browserController.runNodeMenuAction(value,
+            node: treeItem, position: index);
       }
     });
   }
@@ -210,7 +235,9 @@ class PlusItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final browserController = Provider.of<BrowserController>(context, listen: false);
+    final browserController =
+        Provider.of<BrowserController>(context, listen: false);
+    final treeTraverser = Provider.of<TreeTraverser>(context, listen: false);
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -227,7 +254,9 @@ class PlusItemWidget extends StatelessWidget {
             },
           ).then((value) {
             if (value != null) {
-              browserController.runNodeMenuAction(value);
+              final plusPosition = treeTraverser.currentParent.size;
+              browserController.runNodeMenuAction(value,
+                  position: plusPosition);
             }
           });
         },

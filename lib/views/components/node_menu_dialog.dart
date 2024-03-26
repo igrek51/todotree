@@ -4,7 +4,6 @@ import 'package:todotreev2/model/tree_node.dart';
 
 import '../../services/clipboard_manager.dart';
 
-// actions handled by BrowserController.runNodeMenuAction
 class NodeMenuDialog {
   static Widget buildForNode(
       BuildContext context, TreeNode item, int position) {
@@ -32,6 +31,7 @@ class NodeMenuDialog {
   }
 }
 
+// actions handled by BrowserController.runNodeMenuAction
 List<Widget> buildNodeActions(
     BuildContext context, TreeNode item, int position) {
   final clipboardManager = Provider.of<ClipboardManager>(context, listen: false);
@@ -41,7 +41,7 @@ List<Widget> buildNodeActions(
     actions.add(ListTile(
       title: Text('❌ Remove'),
       onTap: () {
-        Navigator.pop(context, 'remove-node');
+        Navigator.pop(context, 'remove-nodes');
       },
     ));
   }
@@ -57,7 +57,7 @@ List<Widget> buildNodeActions(
     actions.add(ListTile(
       title: Text('🗑️ Remove link and target'),
       onTap: () {
-        Navigator.pop(context, 'remove link and target');
+        Navigator.pop(context, 'remove-link-and-target');
       },
     ));
   }

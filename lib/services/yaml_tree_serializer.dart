@@ -39,10 +39,7 @@ class YamlTreeSerializer {
     } else if (node.type == TreeNodeType.text) {
       content['name'] = node.name;
     } else if (node.type == TreeNodeType.link) {
-      content['target'] = node.targetData;
-      if (node.name != '') {
-        content['name'] = node.name;
-      }
+      content['target'] = node.name;
     }
   }
 }

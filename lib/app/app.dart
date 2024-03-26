@@ -5,7 +5,6 @@ import '../services/clipboard_manager.dart';
 import '../services/info_service.dart';
 import '../services/logger.dart';
 import '../services/main_menu_runner.dart';
-import '../services/tree_storage.dart';
 import '../services/tree_traverser.dart';
 import '../views/editor/editor_controller.dart';
 import '../views/home/home_controller.dart';

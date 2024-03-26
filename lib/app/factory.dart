@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:todotreev2/views/editor/editor_controller.dart';
 
 import '../services/clipboard_manager.dart';
@@ -42,7 +41,7 @@ class AppFactory {
     clipboardManager = ClipboardManager();
     treeTraverser = TreeTraverser(treeStorage);
     appLifecycle = AppLifecycle(treeStorage, treeTraverser);
-    browserController = BrowserController(homeState, browserState, editorState, treeTraverser);
+    browserController = BrowserController(homeState, browserState, editorState, treeTraverser, clipboardManager);
     editorController = EditorController(homeState, editorState, treeTraverser);
     browserController.editorController = editorController;
     editorController.browserController = browserController;

@@ -27,11 +27,13 @@ class MainMenuRunner {
         id: 'save-and-exit',
         name: '💾 Save and exit',
         action: () {
+          treeTraverser.save();
+          SystemNavigator.pop();
         },
       ),
       ActionMenuItem(
         id: 'save',
-        name: 'Save',
+        name: '💾 Save',
         action: () {
           treeTraverser.save();
         },
@@ -56,7 +58,7 @@ class MainMenuRunner {
       ),
       ActionMenuItem(
         id: 'select-all',
-        name: 'Select All',
+        name: '☑️ Select all',
         action: () {
           browserController.selectAll();
         },

@@ -7,15 +7,13 @@ class TreeNode {
     required this.name,
     this.parent,
     this.type = TreeNodeType.text,
-    this.targetData = '',
     List<TreeNode>? children,
   }) : children = children ?? [];
 
-  String name;
+  String name; // text content or link's target path
   TreeNode? parent;
   List<TreeNode> children;
   TreeNodeType type;
-  String targetData;
 
   TreeNode clone() {
     final newChildren = children.map((child) => child.clone()).toList();
@@ -24,7 +22,6 @@ class TreeNode {
       parent: parent,
       children: newChildren,
       type: type,
-      targetData: targetData,
     );
   }
 
@@ -36,8 +33,8 @@ class TreeNode {
     return TreeNode(name: text, type: TreeNodeType.text);
   }
 
-  static TreeNode linkNode(String targetData, String customName) {
-    return TreeNode(name: customName, targetData: targetData, type: TreeNodeType.link);
+  static TreeNode linkNode(String targetData) {
+    return TreeNode(name: targetData, type: TreeNodeType.link);
   }
 
   bool get isText => type == TreeNodeType.text;
@@ -51,7 +48,7 @@ class TreeNode {
 
   TreeNode getChild(int index) {
     if (index < 0) throw Exception('Invalid position: index < 0');
-    if (index >= children.length) throw Exception('Invalid position: index >= items size (${children.length})');
+    if (index >= children.length) throw Exception('Invalid position: index >= items size ($index >= ${children.length})');
     return children[index];
   }
 
@@ -74,7 +71,7 @@ class TreeNode {
     return children.last;
   }
 
-  TreeNode? findChildByName(String name, {bool lenient = false}) {
+  TreeNode? findChildByName(String name, {bool lenient = true}) {
     for (final child in children) { // find by exact name
       if (child.isText && child.name == name) return child;
     }
@@ -129,10 +126,11 @@ class TreeNode {
     return 'TreeNode{name: $name, type: $type, children: ${children.length}}';
   }
 
+  String get displayTargetPath => '/${name.replaceAll('\t', '/')}';
+
   String get displayName {
     if (type == TreeNodeType.link) {
-      if (name != '') return name;
-      return targetData;
+      return displayTargetPath;
     }
     return name;
   }
@@ -140,7 +138,7 @@ class TreeNode {
   void setLinkTarget(TreeNode targetParent, TreeNode targetNode) {
     final paths = targetParent.pathNames();
     paths.add(targetNode.displayName);
-    targetData = paths.join('\t');
+    name = paths.join('\t');
   }
 }
 

@@ -27,9 +27,8 @@ class YamlTreeDeserializer {
         final name = node['name'] as String;
         treeItem = TreeNode.textNode(name);
       case 'link':
-        final name = node['name'] as String? ?? '';
         final target = node['target'] as String;
-        treeItem = TreeNode.linkNode(target, name);
+        treeItem = TreeNode.linkNode(target);
       default:
         throw Exception('Unknown item type: $type');
     }

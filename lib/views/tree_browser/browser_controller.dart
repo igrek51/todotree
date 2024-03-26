@@ -1,3 +1,4 @@
+import '../../services/clipboard_manager.dart';
 import '../../services/error_handler.dart';
 import '../../services/info_service.dart';
 import '../../services/logger.dart';
@@ -17,9 +18,10 @@ class BrowserController {
   late EditorController editorController;
 
   TreeTraverser treeTraverser;
+  ClipboardManager clipboardManager;
 
-  BrowserController(
-      this.homeState, this.browserState, this.editorState, this.treeTraverser);
+  BrowserController(this.homeState, this.browserState, this.editorState,
+      this.treeTraverser, this.clipboardManager);
 
   void init() {
     renderAll();
@@ -41,17 +43,11 @@ class BrowserController {
     browserState.notify();
   }
 
-  void addRandomItem() {
-    final name = randomName();
-    treeTraverser.addChildToCurrent(TreeNode.textNode(name));
-    print('Added item: $name');
-    renderItems();
-  }
-
   void populateItems() {
     for (int i = 0; i < 10; i++) {
-      addRandomItem();
+      treeTraverser.addChildToCurrent(TreeNode.textNode(randomName()));
     }
+    renderItems();
   }
 
   void editNode(TreeNode node) {
@@ -76,7 +72,11 @@ class BrowserController {
 
   void goIntoNode(TreeNode node) {
     ensureNoSelectionMode();
-    treeTraverser.goTo(node);
+    if (node.type == TreeNodeType.link) {
+      treeTraverser.goToLinkTarget(node);
+    } else {
+      treeTraverser.goTo(node);
+    }
     renderAll();
   }
 
@@ -129,10 +129,27 @@ class BrowserController {
     InfoService.showInfo('Node removed: ${node.name}');
   }
 
-  void runNodeMenuAction(String action, {TreeNode? node, int? position}) {
+  void removeNodesAt(int position) {
+    if (treeTraverser.anythingSelected) {
+      final nodes = treeTraverser.selectedIndexes
+          .map((index) => treeTraverser.getChild(index))
+          .toList();
+      for (final node in nodes) {
+        treeTraverser.removeFromCurrent(node);
+      }
+      treeTraverser.cancelSelection();
+      renderItems();
+      InfoService.showInfo('Nodes removed: ${nodes.length}');
+    } else {
+      final node = treeTraverser.getChild(position);
+      removeNode(node);
+    }
+  }
+
+  void runNodeMenuAction(String action, {TreeNode? node, int ?position}) {
     handleError(() {
-      if (action == 'remove-node' && node != null) {
-        removeNode(node);
+      if (action == 'remove-nodes' && position != null) {
+        removeNodesAt(position);
       } else if (action == 'edit-node' && node != null) {
         editNode(node);
       } else if (action == 'add-above' && position != null) {
@@ -141,6 +158,20 @@ class BrowserController {
         selectNodeAt(position);
       } else if (action == 'select-all') {
         selectAll();
+      } else if (action == 'remove-remote-node' && node != null) {
+      } else if (action == 'remove-link-and-target' && node != null) {
+      } else if (action == 'add-above' && position != null) {
+        addNodeAt(position);
+      } else if (action == 'cut' && position != null) {
+        cutItemsAt(position);
+      } else if (action == 'copy' && position != null) {
+        copyItemsAt(position);
+      } else if (action == 'paste-above' && position != null) {
+        pasteAbove(position);
+      } else if (action == 'paste-as-link' && position != null) {
+        pasteAboveAsLink(position);
+      } else if (action == 'split' && node != null) {
+      } else if (action == 'push-to-remote' && node != null) {
       } else {
         logger.error('Unknown action: $action');
       }
@@ -165,6 +196,34 @@ class BrowserController {
 
   void selectNodeAt(int position) {
     treeTraverser.setItemSelected(position, true);
+    renderItems();
+  }
+
+  void cutItemsAt(int position) {
+    final positions = treeTraverser.selectedIndexes.toSet();
+    if (positions.isEmpty) {
+      positions.add(position); // if nothing selected - include current item
+    }
+    clipboardManager.cutItems(treeTraverser, positions);
+    renderItems();
+  }
+
+  void copyItemsAt(int position) {
+    final positions = treeTraverser.selectedIndexes.toSet();
+    if (positions.isEmpty) {
+      positions.add(position); // if nothing selected - include current item
+    }
+    clipboardManager.copyItems(treeTraverser, positions, info: true);
+    renderItems();
+  }
+
+  void pasteAbove(int position) {
+    clipboardManager.pasteItems(treeTraverser, position);
+    renderItems();
+  }
+
+  void pasteAboveAsLink(int position) {
+    clipboardManager.pasteItemsAsLink(treeTraverser, position);
     renderItems();
   }
 }
