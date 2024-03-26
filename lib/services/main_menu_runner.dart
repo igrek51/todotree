@@ -17,7 +17,7 @@ class MainMenuRunner {
     _menuActions = <ActionMenuItem>[
       ActionMenuItem(
         id: 'exit-without-saving',
-        name: '❌ Exit without saving',
+        name: '❌ Exit discarding changes',
         action: () {
           treeTraverser.exitDiscardingChanges();
         },

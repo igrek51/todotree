@@ -7,6 +7,7 @@ import 'package:todotree/services/yaml_tree_deserializer.dart';
 import 'package:todotree/services/yaml_tree_serializer.dart';
 import 'package:todotree/model/tree_node.dart';
 import 'package:todotree/services/logger.dart';
+import 'package:todotree/util/errors.dart';
 
 class TreeStorage {
 
@@ -34,8 +35,8 @@ class TreeStorage {
       }
       logger.debug('reading local database from ${file.absolute.path}');
       return await file.readAsString();
-    } catch (e) {
-      throw Exception('Failed to read file: $e');
+    } catch (error, stack) {
+      throw ContextError('Failed to read file', error, stackTrace: stack);
     }
   }
 
