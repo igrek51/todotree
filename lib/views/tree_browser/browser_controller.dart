@@ -188,10 +188,10 @@ class BrowserController {
     });
   }
 
-  void saveAndExit() {
-    treeTraverser.saveIfChanged();
+  Future<void> saveAndExit() async {
     treeTraverser.goToRoot();
     renderAll();
+    await treeTraverser.saveAndExit();
   }
 
   void onToggleSelectedNode(int position) {

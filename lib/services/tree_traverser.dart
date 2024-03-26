@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:todotree/services/info_service.dart';
 import 'package:todotree/model/tree_node.dart';
 import 'package:todotree/services/tree_storage.dart';
@@ -8,6 +9,7 @@ class TreeTraverser {
   TreeNode rootNode = cRootNode;
   TreeNode currentParent = cRootNode;
   bool unsavedChanges = false;
+  bool discardingChanges = false;
   TreeNode? focusNode;
   Set<int> selectedIndexes = {};
   Map<TreeNode, TreeNode> target2link = {}; // history of opened links
@@ -37,7 +39,18 @@ class TreeTraverser {
 
   Future<void> saveIfChanged() async {
     if (!unsavedChanges) return;
-    save();
+    if (discardingChanges) return;
+    await save();
+  }
+
+  Future<void> saveAndExit() async {
+    await saveIfChanged();
+    SystemNavigator.pop();
+  }
+
+  void exitDiscardingChanges() {
+    discardingChanges = true;
+    SystemNavigator.pop();
   }
 
   List<TreeNode> get childNodes => currentParent.children;

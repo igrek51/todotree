@@ -19,23 +19,21 @@ class MainMenuRunner {
         id: 'exit-without-saving',
         name: '❌ Exit without saving',
         action: () {
-          // exit discarding changes
-          SystemNavigator.pop();
+          treeTraverser.exitDiscardingChanges();
         },
       ),
       ActionMenuItem(
         id: 'save-and-exit',
         name: '💾 Save and exit',
-        action: () {
-          treeTraverser.save();
-          SystemNavigator.pop();
+        action: () async {
+          await treeTraverser.saveAndExit();
         },
       ),
       ActionMenuItem(
         id: 'save',
         name: '💾 Save',
-        action: () {
-          treeTraverser.save();
+        action: () async {
+          await treeTraverser.save();
         },
       ),
       ActionMenuItem(
