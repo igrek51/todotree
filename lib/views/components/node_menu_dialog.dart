@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+// actions handled by BrowserController.runNodeMenuAction
 class NodeMenuDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -19,6 +20,24 @@ class NodeMenuDialog extends StatelessWidget {
             title: Text('Edit'),
             onTap: () {
               Navigator.pop(context, 'edit-node');
+            },
+          ),
+          ListTile(
+            title: Text('Select'),
+            onTap: () {
+              Navigator.pop(context, 'select-node');
+            },
+          ),
+          ListTile(
+            title: Text('Select all'),
+            onTap: () {
+              Navigator.pop(context, 'select-all');
+            },
+          ),
+          ListTile(
+            title: Text('Add above'),
+            onTap: () {
+              Navigator.pop(context, 'add-above');
             },
           ),
         ],

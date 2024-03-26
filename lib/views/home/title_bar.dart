@@ -6,7 +6,6 @@ import '../../services/error_handler.dart';
 import '../../services/tree_traverser.dart';
 import '../tree_browser/browser_controller.dart';
 import '../../services/info_service.dart';
-import '../../services/logger.dart';
 import '../tree_browser/browser_state.dart';
 import 'home_controller.dart';
 
@@ -25,16 +24,10 @@ class TitleBar extends StatelessWidget {
 
     final menuActions = <ActionMenuItem>[
       ActionMenuItem(
-          id: 'populate',
-          name: 'Populate',
+          id: 'select-all',
+          name: 'Select All',
           action: () {
-            browserController.populateItems();
-          }),
-      ActionMenuItem(
-          id: 'snackbar',
-          name: 'Snackbar',
-          action: () {
-            InfoService.showInfo('Hello, Snackbar!');
+            browserController.selectAll();
           }),
       ActionMenuItem(
           id: 'save',
@@ -47,6 +40,18 @@ class TitleBar extends StatelessWidget {
           name: 'Exit',
           action: () {
             SystemNavigator.pop();
+          }),
+      ActionMenuItem(
+          id: 'populate',
+          name: 'Populate',
+          action: () {
+            browserController.populateItems();
+          }),
+      ActionMenuItem(
+          id: 'snackbar',
+          name: 'Snackbar',
+          action: () {
+            InfoService.showInfo('Hello, Snackbar!');
           }),
     ];
 

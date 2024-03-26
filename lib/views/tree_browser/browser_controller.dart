@@ -1,3 +1,5 @@
+import 'package:collection/collection.dart';
+
 import '../../services/error_handler.dart';
 import '../../services/info_service.dart';
 import '../../services/logger.dart';
@@ -133,6 +135,12 @@ class BrowserController {
           removeNode(node);
         case 'edit-node':
           editNode(node);
+        case 'add-above':
+          addNodeAt(treeTraverser.currentParent.children.indexOf(node));
+        case 'select-node':
+          selectNodeAt(treeTraverser.currentParent.children.indexOf(node));
+        case 'select-all':
+          selectAll();
         default:
           logger.debug('Unknown action: $action');
       }
@@ -147,6 +155,16 @@ class BrowserController {
 
   void onToggleSelectedNode(int position) {
     treeTraverser.toggleItemSelected(position);
+    renderItems();
+  }
+
+  void selectAll() {
+    treeTraverser.selectAll();
+    renderItems();
+  }
+
+  void selectNodeAt(int position) {
+    treeTraverser.setItemSelected(position, true);
     renderItems();
   }
 }
