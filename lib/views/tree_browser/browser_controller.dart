@@ -20,6 +20,10 @@ class BrowserController {
   BrowserController(this.homeState, this.browserState, this.editorState, this.treeTraverser);
 
   void init() {
+    renderAll();
+  }
+
+  void renderAll() {
     renderItems();
     renderTitle();
   }
@@ -59,8 +63,7 @@ class BrowserController {
   void goUp() {
     try {
       treeTraverser.goUp();
-      renderItems();
-      renderTitle();
+      renderAll();
     } on NoSuperItemException {
       logger.debug("Can't go higher than root");
     }
@@ -68,8 +71,7 @@ class BrowserController {
 
   void goIntoNode(TreeNode node) {
     treeTraverser.goTo(node);
-    renderItems();
-    renderTitle();
+    renderAll();
   }
 
   void cancelSelectionMode() {
@@ -108,7 +110,7 @@ class BrowserController {
       newList.insert(newIndex, node);
     }
     treeTraverser.currentParent.children = newList;
-    treeTraverser.changesMade = true;
+    treeTraverser.unsavedChanges = true;
     renderItems();
     logger.debug('Reordered nodes: $oldIndex -> $newIndex');
   }
@@ -128,5 +130,11 @@ class BrowserController {
       default:
         logger.debug('Unknown action: $action');
     }
+  }
+
+  void saveAndExit() {
+    treeTraverser.saveIfChanged();
+    treeTraverser.goToRoot();
+    renderAll();
   }
 }

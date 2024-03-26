@@ -71,6 +71,7 @@ class TitleBar extends StatelessWidget {
                 iconSize: 32,
                 icon: const Icon(Icons.save, size: 28),
                 onPressed: () {
+                  browserController.saveAndExit();
                 },
               ),
 

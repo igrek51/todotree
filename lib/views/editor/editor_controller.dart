@@ -23,7 +23,7 @@ class EditorController {
     } else if (editorState.newItemPosition != null) {
       saveNewNode();
     }
-    treeTraverser.changesMade = true;
+    treeTraverser.unsavedChanges = true;
   }
 
   void saveEditedNode() {

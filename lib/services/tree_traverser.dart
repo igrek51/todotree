@@ -7,7 +7,7 @@ class TreeTraverser {
 
   TreeNode rootNode = cRootNode;
   TreeNode currentParent = cRootNode;
-  bool changesMade = false;
+  bool unsavedChanges = false;
   TreeNode? focusNode;
 
   TreeTraverser(this.treeStorage);
@@ -15,7 +15,7 @@ class TreeTraverser {
   void reset() {
     rootNode = cRootNode;
     currentParent = rootNode;
-    changesMade = false;
+    unsavedChanges = false;
     focusNode = null;
   }
 
@@ -27,6 +27,12 @@ class TreeTraverser {
 
   Future<void> save() async {
     await treeStorage.writeDbTree(rootNode);
+    unsavedChanges = false;
+  }
+
+  Future<void> saveIfChanged() async {
+    if (!unsavedChanges) return;
+    save();
   }
 
   List<TreeNode> get childNodes => currentParent.children;
@@ -40,7 +46,7 @@ class TreeTraverser {
   void addChildToCurrent(TreeNode item, {int? position}) {
     final nPosision = position ?? currentParent.size;
     item.parent = currentParent;
-    changesMade = true;
+    unsavedChanges = true;
     currentParent.insertAt(nPosision, item);
     focusNode = item;
   }
@@ -48,20 +54,20 @@ class TreeTraverser {
   void removeFromCurrentAt(int position) {
     if (isItemAtPosition(position)) {
       currentParent.removeAt(position);
-      changesMade = true;
+      unsavedChanges = true;
       focusNode = null;
     }
   }
 
   void removeFromCurrent(TreeNode item) {
     currentParent.remove(item);
-    changesMade = true;
+    unsavedChanges = true;
     focusNode = null;
   }
 
   void removeFromParent(TreeNode item, TreeNode parent) {
     parent.remove(item);
-    changesMade = true;
+    unsavedChanges = true;
   }
 
   void goUp() {
@@ -85,6 +91,11 @@ class TreeTraverser {
   void goTo(TreeNode child) {
     focusNode = currentParent;
     currentParent = child;
+  }
+
+  void goToRoot() {
+    currentParent = rootNode;
+    focusNode = null;
   }
 }
 

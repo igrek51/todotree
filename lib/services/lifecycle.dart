@@ -8,7 +8,6 @@ class AppLifecycle {
   AppLifecycle(this.treeStorage, this.treeTraverser);
 
   void onInactive() {
-    treeTraverser.save();
+    treeTraverser.saveIfChanged();
   }
-
 }

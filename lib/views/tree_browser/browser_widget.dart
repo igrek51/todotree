@@ -60,28 +60,40 @@ class TreeListItemWidget extends StatelessWidget {
             browserController.goIntoNode(treeItem);
           }
         },
-        child: Row(
-          children: [
-            ReorderableDragStartListener(
-              index: index,
-              child: IconButton(
-                iconSize: 30,
-                icon: const Icon(Icons.reorder, size: 26),
-                onPressed: () {
-                },
+        child: Container(
+          padding: const EdgeInsets.all(0.0),
+          decoration: BoxDecoration(
+            border: Border.symmetric(
+              horizontal: BorderSide(
+                color: const Color(0x55AAAAAA),
+                width: 0.5,
+                style: BorderStyle.solid,
+                strokeAlign: BorderSide.strokeAlignInside,
               ),
             ),
-            buildMiddleText(),
-            buildMoreActionButton(context),
-            buildMiddleActionButton(context),
-            IconButton(
-              iconSize: 30,
-              icon: const Icon(Icons.add, size: 26),
-              onPressed: () {
-                browserController.addNodeAt(index);
-              },
-            ),
-          ],
+          ),
+          child: Row(
+            children: [
+              ReorderableDragStartListener(
+                index: index,
+                child: IconButton(
+                  iconSize: 30,
+                  icon: const Icon(Icons.reorder, size: 26),
+                  onPressed: () {},
+                ),
+              ),
+              buildMiddleText(),
+              buildMoreActionButton(context),
+              buildMiddleActionButton(context),
+              IconButton(
+                iconSize: 30,
+                icon: const Icon(Icons.add, size: 26),
+                onPressed: () {
+                  browserController.addNodeAt(index);
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -90,7 +102,10 @@ class TreeListItemWidget extends StatelessWidget {
   Widget buildMiddleText() {
     if (treeItem.isLeaf) {
       return Expanded(
-        child: Text(treeItem.name),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Text(treeItem.name),
+        ),
       );
     }
     return Expanded(
