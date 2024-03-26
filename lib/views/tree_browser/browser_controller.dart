@@ -1,5 +1,3 @@
-import 'package:collection/collection.dart';
-
 import '../../services/error_handler.dart';
 import '../../services/info_service.dart';
 import '../../services/logger.dart';
@@ -19,8 +17,9 @@ class BrowserController {
   late EditorController editorController;
 
   TreeTraverser treeTraverser;
-  
-  BrowserController(this.homeState, this.browserState, this.editorState, this.treeTraverser);
+
+  BrowserController(
+      this.homeState, this.browserState, this.editorState, this.treeTraverser);
 
   void init() {
     renderAll();
@@ -91,7 +90,9 @@ class BrowserController {
   void addNodeAt(int position) {
     ensureNoSelectionMode();
     if (position < 0) position = treeTraverser.currentParent.size; // last
-    if (position > treeTraverser.currentParent.size) position = treeTraverser.currentParent.size;
+    if (position > treeTraverser.currentParent.size) {
+      position = treeTraverser.currentParent.size;
+    }
     editorState.newItemPosition = position;
     editorState.editedNode = null;
     editorState.editTextController.text = '';
@@ -128,21 +129,20 @@ class BrowserController {
     InfoService.showInfo('Node removed: ${node.name}');
   }
 
-  void runNodeMenuAction(String action, TreeNode node) {
+  void runNodeMenuAction(String action, {TreeNode? node, int? position}) {
     handleError(() {
-      switch (action) {
-        case 'remove-node':
-          removeNode(node);
-        case 'edit-node':
-          editNode(node);
-        case 'add-above':
-          addNodeAt(treeTraverser.currentParent.children.indexOf(node));
-        case 'select-node':
-          selectNodeAt(treeTraverser.currentParent.children.indexOf(node));
-        case 'select-all':
-          selectAll();
-        default:
-          logger.debug('Unknown action: $action');
+      if (action == 'remove-node' && node != null) {
+        removeNode(node);
+      } else if (action == 'edit-node' && node != null) {
+        editNode(node);
+      } else if (action == 'add-above' && position != null) {
+        addNodeAt(position);
+      } else if (action == 'select-node' && position != null) {
+        selectNodeAt(position);
+      } else if (action == 'select-all') {
+        selectAll();
+      } else {
+        logger.error('Unknown action: $action');
       }
     });
   }

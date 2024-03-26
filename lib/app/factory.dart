@@ -1,7 +1,10 @@
+import 'package:flutter/material.dart';
 import 'package:todotreev2/views/editor/editor_controller.dart';
 
+import '../services/clipboard_manager.dart';
 import '../services/lifecycle.dart';
 import '../services/logger.dart';
+import '../services/main_menu_runner.dart';
 import '../services/tree_storage.dart';
 import '../services/tree_traverser.dart';
 import '../services/yaml_tree_deserializer.dart';
@@ -26,6 +29,8 @@ class AppFactory {
   late final YamlTreeDeserializer yamlTreeDeserializer;
   late final TreeStorage treeStorage;
   late final AppLifecycle appLifecycle;
+  late final ClipboardManager clipboardManager;
+  late final MainMenuRunner mainMenuRunner;
 
   AppFactory() {
     homeState = HomeState();
@@ -34,6 +39,7 @@ class AppFactory {
     yamlTreeSerializer = YamlTreeSerializer();
     yamlTreeDeserializer = YamlTreeDeserializer();
     treeStorage = TreeStorage();
+    clipboardManager = ClipboardManager();
     treeTraverser = TreeTraverser(treeStorage);
     appLifecycle = AppLifecycle(treeStorage, treeTraverser);
     browserController = BrowserController(homeState, browserState, editorState, treeTraverser);
@@ -41,6 +47,7 @@ class AppFactory {
     browserController.editorController = editorController;
     editorController.browserController = browserController;
     homeController = HomeController(homeState, treeTraverser, browserController, editorController);
+    mainMenuRunner = MainMenuRunner(browserController, treeTraverser);
     logger.debug('AppFactory created');
   }
 }

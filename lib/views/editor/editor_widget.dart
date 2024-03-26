@@ -11,7 +11,7 @@ class EditorWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final editorState = context.watch<EditorState>();
-    final editorController = Provider.of<EditorController>(context);
+    final editorController = Provider.of<EditorController>(context, listen: false);
 
     return Column(
       children: [

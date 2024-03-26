@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../services/clipboard_manager.dart';
 import '../services/info_service.dart';
 import '../services/logger.dart';
+import '../services/main_menu_runner.dart';
 import '../services/tree_storage.dart';
 import '../services/tree_traverser.dart';
 import '../views/editor/editor_controller.dart';
@@ -31,6 +33,8 @@ class _AppWidgetState extends State<AppWidget> with WidgetsBindingObserver {
       Provider<BrowserController>(create: (context) => widget.appFactory.browserController),
       Provider<EditorController>(create: (context) => widget.appFactory.editorController),
       Provider<TreeTraverser>(create: (context) => widget.appFactory.treeTraverser),
+      Provider<ClipboardManager>(create: (context) => widget.appFactory.clipboardManager),
+      Provider<MainMenuRunner>(create: (context) => widget.appFactory.mainMenuRunner),
     ];
 
     return MultiProvider(

@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../../services/error_handler.dart';
-import '../../services/tree_traverser.dart';
+import '../../services/main_menu_runner.dart';
 import '../tree_browser/browser_controller.dart';
-import '../../services/info_service.dart';
 import '../tree_browser/browser_state.dart';
 import 'home_controller.dart';
 
@@ -18,42 +16,9 @@ class TitleBar extends StatelessWidget {
     final style = theme.textTheme.titleMedium;
 
     final browserState = context.watch<BrowserState>();
-    final browserController = Provider.of<BrowserController>(context);
-    final homeController = Provider.of<HomeController>(context);
-    final treeTraverser = Provider.of<TreeTraverser>(context);
-
-    final menuActions = <ActionMenuItem>[
-      ActionMenuItem(
-          id: 'select-all',
-          name: 'Select All',
-          action: () {
-            browserController.selectAll();
-          }),
-      ActionMenuItem(
-          id: 'save',
-          name: 'Save',
-          action: () {
-            treeTraverser.save();
-          }),
-      ActionMenuItem(
-          id: 'exit',
-          name: 'Exit',
-          action: () {
-            SystemNavigator.pop();
-          }),
-      ActionMenuItem(
-          id: 'populate',
-          name: 'Populate',
-          action: () {
-            browserController.populateItems();
-          }),
-      ActionMenuItem(
-          id: 'snackbar',
-          name: 'Snackbar',
-          action: () {
-            InfoService.showInfo('Hello, Snackbar!');
-          }),
-    ];
+    final browserController = Provider.of<BrowserController>(context, listen: false);
+    final homeController = Provider.of<HomeController>(context, listen: false);
+    final mainMenuRunner = Provider.of<MainMenuRunner>(context, listen: false);
 
     return Material(
       elevation: 20,
@@ -90,14 +55,14 @@ class TitleBar extends StatelessWidget {
                 iconSize: 32,
                 icon: const Icon(Icons.more_vert, size: 28),
                 onSelected: (value) {
-                  final action =
-                      menuActions.firstWhere((element) => element.id == value);
+                  final action = mainMenuRunner.menuActions
+                      .firstWhere((element) => element.id == value);
                   handleError(() {
                     action.action();
                   });
                 },
                 itemBuilder: (context) {
-                  return menuActions.map((action) {
+                  return mainMenuRunner.menuActions.map((action) {
                     return PopupMenuItem(
                       value: action.id,
                       child: Text(action.name),
@@ -111,12 +76,4 @@ class TitleBar extends StatelessWidget {
       ),
     );
   }
-}
-
-class ActionMenuItem {
-  ActionMenuItem({required this.id, required this.name, required this.action});
-
-  String id;
-  String name;
-  VoidCallback action;
 }
