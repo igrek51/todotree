@@ -45,7 +45,7 @@ class AppFactory {
     browserController.editorController = editorController;
     editorController.browserController = browserController;
     homeController = HomeController(homeState, treeTraverser, browserController, editorController);
-    mainMenuRunner = MainMenuRunner(browserController, treeTraverser);
+    mainMenuRunner = MainMenuRunner(browserController, treeTraverser, homeController);
     logger.debug('AppFactory created');
   }
 }

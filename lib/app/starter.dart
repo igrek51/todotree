@@ -12,9 +12,7 @@ void startupApp(AppFactory app) async {
   try {
     _resizeWindow();
     await app.treeTraverser.load();
-    app.homeController.init();
     app.browserController.init();
-    app.editorController.init();
     kickstartApp(app);
     logger.info('App initialized');
 

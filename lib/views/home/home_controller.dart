@@ -13,9 +13,6 @@ class HomeController {
   
   HomeController(this.homeState, this.treeTraverser, this.browserController, this.editorController);
 
-  void init() {
-  }
-  
   void goBack() {
     if (homeState.pageView == HomePageView.treeBrowser) {
       browserController.goBack();
@@ -26,12 +23,21 @@ class HomeController {
 
   Future<void> goBackOrExit() async {
     if (homeState.pageView == HomePageView.treeBrowser) {
-      final gone = browserController.goBack();
-      if (!gone) {
+      final goneBack = browserController.goBack();
+      if (!goneBack) {
         await browserController.saveAndExit();
       }
     } else if (homeState.pageView == HomePageView.itemEditor) {
       editorController.cancelEdit();
+    }
+  }
+
+  Future<void> saveAndExit() async {
+    if (homeState.pageView == HomePageView.treeBrowser) {
+      browserController.saveAndExit();
+    } else if (homeState.pageView == HomePageView.itemEditor) {
+      editorController.saveNode();
+      browserController.saveAndExit();
     }
   }
 }

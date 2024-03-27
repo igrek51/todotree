@@ -260,9 +260,9 @@ class BrowserController {
 
   Future<void> saveAndExit() async {
     minimizeApp();
+    await treeTraverser.saveIfChanged();
     treeTraverser.goToRoot();
     renderAll();
-    await treeTraverser.saveIfChanged();
   }
 
   void minimizeApp() {

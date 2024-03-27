@@ -14,9 +14,6 @@ class EditorController {
   
   EditorController(this.homeState, this.editorState, this.treeTraverser);
 
-  void init() {
-  }
-
   void saveNode() {
     if (editorState.editedNode != null) {
       saveEditedNode();

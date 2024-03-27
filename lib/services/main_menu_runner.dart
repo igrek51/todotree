@@ -1,15 +1,17 @@
 import 'package:flutter/services.dart';
 
 import 'package:todotree/services/tree_traverser.dart';
+import 'package:todotree/views/home/home_controller.dart';
 import 'package:todotree/views/tree_browser/browser_controller.dart';
 
 class MainMenuRunner {
   final BrowserController browserController;
+  final HomeController homeController;
   final TreeTraverser treeTraverser;
 
   List<ActionMenuItem> _menuActions = [];
 
-  MainMenuRunner(this.browserController, this.treeTraverser);
+  MainMenuRunner(this.browserController, this.treeTraverser, this.homeController);
 
   List<ActionMenuItem> get menuActions {
     if (_menuActions.isNotEmpty) return _menuActions;
@@ -26,7 +28,7 @@ class MainMenuRunner {
         id: 'save-and-exit',
         name: '💾 Save and exit',
         action: () async {
-          await browserController.saveAndExit();
+          await homeController.saveAndExit();
         },
       ),
       ActionMenuItem(
