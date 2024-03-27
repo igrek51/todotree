@@ -90,6 +90,14 @@ class TreeTraverser {
     unsavedChanges = true;
   }
 
+  void removeLinkAndTarget(TreeNode link) {
+    final target = findLinkTarget(link.name);
+    if (target != null && target.parent != null) {
+      removeFromParent(target, target.parent!);
+    }
+    removeFromCurrent(link);
+  }
+
   void goUp() {
     target2link.remove(currentParent);
     focusNode = currentParent;

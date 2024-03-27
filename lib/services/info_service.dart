@@ -30,8 +30,13 @@ class InfoService {
     );
   }
 
-  static void showError(Object error, String contextMessage) {
-    final fullMessage = '$contextMessage: $error';
+  static void showError(Object error, [String? contextMessage]) {
+    final String fullMessage;
+    if (contextMessage != null) {
+      fullMessage = '$contextMessage: $error';
+    } else {
+      fullMessage = error.toString();
+    }
     logger.error(fullMessage);
     scaffoldMessengerKey.currentState?.clearSnackBars();
     scaffoldMessengerKey.currentState?.showSnackBar(
@@ -53,7 +58,7 @@ class InfoService {
                     TextButton(
                       child: Text('CLOSE'),
                       onPressed: () {
-                        // Navigator.of(context).pop();
+                        Navigator.of(context).pop();
                       },
                     ),
                   ],

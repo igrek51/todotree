@@ -169,6 +169,12 @@ class BrowserController {
     }
   }
 
+  void removeLinkAndTarget(TreeNode node) {
+    treeTraverser.removeLinkAndTarget(node);
+    renderItems();
+    InfoService.showInfo('Link & target removed: ${node.name}');
+  }
+
   void runNodeMenuAction(String action, {TreeNode? node, int ?position}) {
     handleError(() {
       if (action == 'remove-nodes' && position != null) {
@@ -183,6 +189,7 @@ class BrowserController {
         selectAll();
       } else if (action == 'remove-remote-node' && node != null) {
       } else if (action == 'remove-link-and-target' && node != null) {
+        removeLinkAndTarget(node);
       } else if (action == 'add-above' && position != null) {
         addNodeAt(position);
       } else if (action == 'cut' && position != null) {
@@ -194,6 +201,7 @@ class BrowserController {
       } else if (action == 'paste-as-link' && position != null) {
         pasteAboveAsLink(position);
       } else if (action == 'split' && node != null) {
+        InfoService.showError('Not implemented yet');
       } else if (action == 'push-to-remote' && node != null) {
       } else {
         logger.error('Unknown action: $action');
