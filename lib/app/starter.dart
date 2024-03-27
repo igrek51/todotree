@@ -6,7 +6,6 @@ import 'package:window_manager/window_manager.dart';
 
 import 'package:todotree/app/factory.dart';
 import 'package:todotree/util/errors.dart';
-import 'package:todotree/services/info_service.dart';
 import 'package:todotree/services/logger.dart';
 
 void startupApp(AppFactory app) async {
@@ -18,13 +17,9 @@ void startupApp(AppFactory app) async {
     app.editorController.init();
     kickstartApp(app);
     logger.info('App initialized');
-  } catch (e, s) {
-    InfoService.error(Exception(e.toString()), 'Startup failed');
-    if (e is ContextError && e.stackTrace != null) {
-      print('ContextError Stack trace:\n${e.stackTrace}');
-    } else {
-      print('Stack trace:\n$s');
-    }
+
+  } catch (error, stackTrace) {
+    reportError(error, stackTrace, 'Startup failed');
   }
 }
 
@@ -40,6 +35,5 @@ void kickstartApp(AppFactory app) {
   const kickstartVar = String.fromEnvironment('KICKSTART', defaultValue: '0');
   if (kickstartVar != '1') return;
   logger.debug('Kickstarting app...');
-  // app.treeTraverser.addChildToCurrent(TreeNode.textNode('Item 1'));
-  // app.browserController.renderItems();
+  // Initialization steps go here
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'package:todotree/services/error_handler.dart';
+import 'package:todotree/util/errors.dart';
 import 'package:todotree/services/main_menu_runner.dart';
 import 'package:todotree/views/home/home_controller.dart';
 import 'package:todotree/views/tree_browser/browser_controller.dart';
@@ -34,7 +34,7 @@ class TitleBar extends StatelessWidget {
                 iconSize: 32,
                 icon: const Icon(Icons.arrow_back, size: 28),
                 onPressed: () {
-                  handleError(() {
+                  safeExecute(() {
                     homeController.goBack();
                   });
                 },
@@ -43,7 +43,7 @@ class TitleBar extends StatelessWidget {
                 iconSize: 32,
                 icon: const Icon(Icons.save, size: 28),
                 onPressed: () {
-                  handleError(() async {
+                  safeExecute(() async {
                     await browserController.saveAndExit();
                   });
                 },
@@ -57,7 +57,7 @@ class TitleBar extends StatelessWidget {
                 onSelected: (value) {
                   final action = mainMenuRunner.menuActions
                       .firstWhere((element) => element.id == value);
-                  handleError(() {
+                  safeExecute(() {
                     action.action();
                   });
                 },

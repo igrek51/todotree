@@ -43,11 +43,6 @@ class TreeTraverser {
     await save();
   }
 
-  Future<void> saveAndExit() async {
-    await saveIfChanged();
-    SystemNavigator.pop();
-  }
-
   void exitDiscardingChanges() {
     discardingChanges = true;
     SystemNavigator.pop();

@@ -26,7 +26,7 @@ class MainMenuRunner {
         id: 'save-and-exit',
         name: '💾 Save and exit',
         action: () async {
-          await treeTraverser.saveAndExit();
+          await browserController.saveAndExit();
         },
       ),
       ActionMenuItem(

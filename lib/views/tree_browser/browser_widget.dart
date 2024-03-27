@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'package:todotree/services/error_handler.dart';
+import 'package:todotree/util/errors.dart';
 import 'package:todotree/services/tree_traverser.dart';
 import 'package:todotree/model/tree_node.dart';
 import 'package:todotree/views/components/node_menu_dialog.dart';
@@ -96,7 +96,7 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
       color: Colors.transparent,
       child: InkWell(
         onTap: () {
-          handleError(() {
+          safeExecute(() {
             browserController.handleNodeTap(widget.treeItem, widget.index);
           });
         },
@@ -139,7 +139,7 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
       return Checkbox(
         value: isItemSelected,
         onChanged: (bool? value) {
-          handleError(() {
+          safeExecute(() {
             browserController.onToggleSelectedNode(widget.index);
           });
         },
@@ -206,7 +206,7 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
         iconSize: 30,
         icon: const Icon(Icons.arrow_right, size: 26),
         onPressed: () {
-          handleError(() {
+          safeExecute(() {
             browserController.goIntoNode(widget.treeItem);
           });
         },
@@ -216,7 +216,7 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
         iconSize: 30,
         icon: const Icon(Icons.edit, size: 26),
         onPressed: () {
-          handleError(() {
+          safeExecute(() {
             browserController.editNode(widget.treeItem);
           });
         },
@@ -239,7 +239,7 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
       iconSize: 30,
       icon: const Icon(Icons.add, size: 26),
       onPressed: () {
-        handleError(() {
+        safeExecute(() {
           browserController.addNodeAt(widget.index);
         });
       },
@@ -275,7 +275,7 @@ class PlusItemWidget extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: () {
-          handleError(() {
+          safeExecute(() {
             browserController.addNodeToTheEnd();
           });
         },

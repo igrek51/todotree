@@ -1,6 +1,10 @@
-import 'package:collection/collection.dart';
+import 'dart:io';
+
+import 'package:flutter/services.dart';
+
+import 'package:move_to_background/move_to_background.dart';
 import 'package:todotree/services/clipboard_manager.dart';
-import 'package:todotree/services/error_handler.dart';
+import 'package:todotree/util/errors.dart';
 import 'package:todotree/services/info_service.dart';
 import 'package:todotree/services/logger.dart';
 import 'package:todotree/util/collections.dart';
@@ -173,8 +177,8 @@ class BrowserController {
     treeTraverser.cancelSelection();
     renderItems();
 
-    InfoService.snackbarAction('Nodes removed: ${sortedPositions.length}', 'UNDO',
-        () {
+    InfoService.snackbarAction(
+        'Nodes removed: ${sortedPositions.length}', 'UNDO', () {
       for (final pair in originalNodePositions) {
         treeTraverser.addChildToCurrent(pair.second, position: pair.first);
       }
@@ -200,15 +204,19 @@ class BrowserController {
     final targetParent = target?.parent;
     int? originalTargetPosition;
     if (target != null && targetParent != null) {
-      originalTargetPosition = targetParent.children.indexOf(target).nonNegative();
+      originalTargetPosition =
+          targetParent.children.indexOf(target).nonNegative();
       treeTraverser.removeFromParent(target, targetParent);
     }
     treeTraverser.removeFromCurrent(link);
     renderItems();
 
-    InfoService.snackbarAction('Link & target removed: ${link.name}', 'UNDO', () {
+    InfoService.snackbarAction('Link & target removed: ${link.name}', 'UNDO',
+        () {
       treeTraverser.addChildToCurrent(link, position: originalLinkPosition);
-      if (target != null && targetParent != null && originalTargetPosition != null) {
+      if (target != null &&
+          targetParent != null &&
+          originalTargetPosition != null) {
         targetParent.insertAt(originalTargetPosition, target);
       }
       renderItems();
@@ -217,7 +225,7 @@ class BrowserController {
   }
 
   void runNodeMenuAction(String action, {TreeNode? node, int? position}) {
-    handleError(() {
+    safeExecute(() {
       if (action == 'remove-nodes' && position != null) {
         removeNodesAt(position);
       } else if (action == 'edit-node' && node != null) {
@@ -251,9 +259,29 @@ class BrowserController {
   }
 
   Future<void> saveAndExit() async {
+    minimizeApp();
     treeTraverser.goToRoot();
     renderAll();
-    await treeTraverser.saveAndExit();
+    await treeTraverser.saveIfChanged();
+  }
+
+  void minimizeApp() {
+    if (Platform.isAndroid || Platform.isIOS) {
+      try {
+        MoveToBackground.moveTaskToBack();
+        logger.info('app minimized');
+      } on MissingPluginException catch (e) {
+        logger.error('MissingPluginException: $e');
+        exitNow();
+      }
+    } else {
+      exitNow();
+    }
+  }
+
+  void exitNow() {
+    logger.debug('Exiting...');
+    SystemNavigator.pop();
   }
 
   void onToggleSelectedNode(int position) {
@@ -290,7 +318,7 @@ class BrowserController {
   }
 
   void pasteAbove(int position) async {
-    handleError(() async {
+    safeExecute(() async {
       await clipboardManager.pasteItems(treeTraverser, position);
       renderItems();
     });
