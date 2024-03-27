@@ -48,11 +48,11 @@ class HomeWidget extends StatelessWidget {
     
     return PopScope(
       canPop: false,
-      onPopInvoked: (bool didPop) {
+      onPopInvoked: (bool didPop) async {
         if (didPop) {
           return;
         }
-        aHomeController.goBack();
+        await aHomeController.goBackOrExit();
       },
       child: SafeArea(
         child: AnnotatedRegion(

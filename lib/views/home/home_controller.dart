@@ -23,4 +23,15 @@ class HomeController {
       editorController.cancelEdit();
     }
   }
+
+  Future<void> goBackOrExit() async {
+    if (homeState.pageView == HomePageView.treeBrowser) {
+      final gone = browserController.goBack();
+      if (!gone) {
+        await browserController.saveAndExit();
+      }
+    } else if (homeState.pageView == HomePageView.itemEditor) {
+      editorController.cancelEdit();
+    }
+  }
 }

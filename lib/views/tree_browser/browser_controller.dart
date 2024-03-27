@@ -60,13 +60,14 @@ class BrowserController {
     homeState.notify();
   }
 
-  void goBack() {
+  bool goBack() {
     ensureNoSelectionMode();
     try {
       treeTraverser.goBack();
       renderAll();
+      return true;
     } on NoSuperItemException {
-      logger.debug("Can't go any higher");
+      return false; // Can't go any higher
     }
   }
 
