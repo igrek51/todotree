@@ -1,3 +1,4 @@
+import 'package:todotree/services/backup_manager.dart';
 import 'package:todotree/views/editor/editor_controller.dart';
 import 'package:todotree/services/clipboard_manager.dart';
 import 'package:todotree/services/lifecycle.dart';
@@ -29,6 +30,7 @@ class AppFactory {
   late final AppLifecycle appLifecycle;
   late final ClipboardManager clipboardManager;
   late final MainMenuRunner mainMenuRunner;
+  late final BackupManager backupManager;
 
   AppFactory() {
     homeState = HomeState();
@@ -36,7 +38,8 @@ class AppFactory {
     editorState = EditorState();
     yamlTreeSerializer = YamlTreeSerializer();
     yamlTreeDeserializer = YamlTreeDeserializer();
-    treeStorage = TreeStorage();
+    backupManager = BackupManager();
+    treeStorage = TreeStorage(backupManager);
     clipboardManager = ClipboardManager();
     treeTraverser = TreeTraverser(treeStorage);
     appLifecycle = AppLifecycle(treeStorage, treeTraverser);
