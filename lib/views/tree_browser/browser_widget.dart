@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -18,7 +20,7 @@ class BrowserWidget extends StatelessWidget {
     final browserController =
         Provider.of<BrowserController>(context, listen: false);
 
-    final reorderableList = ReorderableListView(
+    return ReorderableListView(
       onReorder: (int oldIndex, int newIndex) {
         browserController.reorderNodes(oldIndex, newIndex);
       },
@@ -36,11 +38,10 @@ class BrowserWidget extends StatelessWidget {
         ),
       ],
     );
-    return reorderableList;
   }
 }
 
-class TreeListItemWidget extends StatelessWidget {
+class TreeListItemWidget extends StatefulWidget {
   const TreeListItemWidget({
     super.key,
     required this.index,
@@ -51,27 +52,64 @@ class TreeListItemWidget extends StatelessWidget {
   final TreeNode treeItem;
 
   @override
+  State<TreeListItemWidget> createState() => _TreeListItemWidgetState();
+}
+
+class _TreeListItemWidgetState extends State<TreeListItemWidget> {
+  bool highlighted = false;
+  bool animationStarted = false;
+  Timer? _timer;
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  void _startAnimation() {
+    setState(() {
+      highlighted = true;
+      animationStarted = true;
+    });
+    _timer = Timer(Duration(milliseconds: 100), () {
+      setState(() {
+        highlighted = false;
+      });
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final browserController =
         Provider.of<BrowserController>(context, listen: false);
+    final treeTraverser = Provider.of<TreeTraverser>(context, listen: false);
     final browserState = context.watch<BrowserState>();
     final selectionMode = browserState.selectedIndexes.isNotEmpty;
-    final isItemSelected = browserState.selectedIndexes.contains(index);
+    final isItemSelected = browserState.selectedIndexes.contains(widget.index);
+    final shouldBeHighlighted = treeTraverser.focusNode == widget.treeItem;
+
+    if (shouldBeHighlighted && !animationStarted) {
+      _startAnimation();
+    }
 
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: () {
           handleError(() {
-            browserController.handleNodeTap(treeItem, index);
+            browserController.handleNodeTap(widget.treeItem, widget.index);
           });
         },
         onLongPress: () {
           showNodeOptionsDialog(context);
         },
-        child: Container(
+        child: AnimatedContainer(
+          duration: const Duration(seconds: 1),
           padding: const EdgeInsets.all(0.0),
           decoration: BoxDecoration(
+            color: highlighted
+                ? Color.fromARGB(199, 53, 156, 240)
+                : Colors.transparent,
             border: Border.symmetric(
               horizontal: BorderSide(
                 color: const Color(0x55AAAAAA),
@@ -102,18 +140,18 @@ class TreeListItemWidget extends StatelessWidget {
         value: isItemSelected,
         onChanged: (bool? value) {
           handleError(() {
-            browserController.onToggleSelectedNode(index);
+            browserController.onToggleSelectedNode(widget.index);
           });
         },
       );
     } else {
       return ReorderableDragStartListener(
-        index: index,
+        index: widget.index,
         child: IconButton(
           iconSize: 30,
           icon: const Icon(Icons.reorder, size: 26),
           onPressed: () {
-            browserController.onToggleSelectedNode(index);
+            browserController.onToggleSelectedNode(widget.index);
           },
         ),
       );
@@ -121,13 +159,13 @@ class TreeListItemWidget extends StatelessWidget {
   }
 
   Widget buildMiddleText(BuildContext context) {
-    if (treeItem.isLink) {
+    if (widget.treeItem.isLink) {
       final treeTraverser = Provider.of<TreeTraverser>(context, listen: false);
       return Expanded(
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 8),
           child: Text(
-            treeTraverser.displayLinkName(treeItem),
+            treeTraverser.displayLinkName(widget.treeItem),
             style: TextStyle(
               color: Color(0xFFD2D2D2),
               decoration: TextDecoration.underline,
@@ -135,11 +173,11 @@ class TreeListItemWidget extends StatelessWidget {
           ),
         ),
       );
-    } else if (treeItem.isLeaf) {
+    } else if (widget.treeItem.isLeaf) {
       return Expanded(
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Text(treeItem.name),
+          child: Text(widget.treeItem.name),
         ),
       );
     } else {
@@ -148,12 +186,12 @@ class TreeListItemWidget extends StatelessWidget {
           children: [
             Expanded(
               child: Text(
-                treeItem.name,
+                widget.treeItem.name,
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
             SizedBox(width: 5),
-            RoundedBadge(text: treeItem.size.toString()),
+            RoundedBadge(text: widget.treeItem.size.toString()),
           ],
         ),
       );
@@ -163,13 +201,13 @@ class TreeListItemWidget extends StatelessWidget {
   Widget buildMiddleActionButton(BuildContext context) {
     final browserController =
         Provider.of<BrowserController>(context, listen: false);
-    if (treeItem.isLeaf) {
+    if (widget.treeItem.isLeaf) {
       return IconButton(
         iconSize: 30,
         icon: const Icon(Icons.arrow_right, size: 26),
         onPressed: () {
           handleError(() {
-            browserController.goIntoNode(treeItem);
+            browserController.goIntoNode(widget.treeItem);
           });
         },
       );
@@ -179,7 +217,7 @@ class TreeListItemWidget extends StatelessWidget {
         icon: const Icon(Icons.edit, size: 26),
         onPressed: () {
           handleError(() {
-            browserController.editNode(treeItem);
+            browserController.editNode(widget.treeItem);
           });
         },
       );
@@ -202,7 +240,7 @@ class TreeListItemWidget extends StatelessWidget {
       icon: const Icon(Icons.add, size: 26),
       onPressed: () {
         handleError(() {
-          browserController.addNodeAt(index);
+          browserController.addNodeAt(widget.index);
         });
       },
     );
@@ -214,12 +252,12 @@ class TreeListItemWidget extends StatelessWidget {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return NodeMenuDialog.buildForNode(context, treeItem, index);
+        return NodeMenuDialog.buildForNode(context, widget.treeItem, widget.index);
       },
     ).then((value) {
       if (value != null) {
         browserController.runNodeMenuAction(value,
-            node: treeItem, position: index);
+            node: widget.treeItem, position: widget.index);
       }
     });
   }

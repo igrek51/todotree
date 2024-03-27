@@ -29,6 +29,7 @@ class EditorController {
   void saveEditedNode() {
     final newName = editorState.editTextController.text;
     editorState.editedNode?.name = newName;
+    treeTraverser.focusNode = editorState.editedNode;
     browserController.renderItems();
     homeState.pageView = HomePageView.treeBrowser;
     homeState.notify();
@@ -48,6 +49,7 @@ class EditorController {
   }
 
   void cancelEdit() {
+    treeTraverser.focusNode = null;
     homeState.pageView = HomePageView.treeBrowser;
     homeState.notify();
     editorState.editTextController.clear();

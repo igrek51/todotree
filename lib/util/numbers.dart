@@ -3,4 +3,14 @@ extension IntExtension on int {
     if (this < 0) return null;
     return this;
   }
+
+  int clampMin(int lowerLimit) {
+    if (this < lowerLimit) return lowerLimit;
+    return this;
+  }
+
+  int clampMax(int upperLimit) {
+    if (this > upperLimit) return upperLimit;
+    return this;
+  }
 }
