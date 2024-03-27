@@ -7,6 +7,7 @@ class BrowserState extends ChangeNotifier {
   String title = '';
   List<TreeNode> items = [];
   Set<int> selectedIndexes = {};
+  ScrollController scrollController = ScrollController();
 
   void notify() {
     notifyListeners();

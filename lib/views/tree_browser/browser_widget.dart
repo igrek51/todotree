@@ -23,6 +23,7 @@ class BrowserWidget extends StatelessWidget {
         browserController.reorderNodes(oldIndex, newIndex);
       },
       buildDefaultDragHandles: false,
+      scrollController: browserState.scrollController,
       children: <Widget>[
         for (final (index, item) in browserState.items.indexed)
           TreeListItemWidget(

@@ -19,6 +19,7 @@ class BrowserController {
 
   TreeTraverser treeTraverser;
   ClipboardManager clipboardManager;
+  Map<TreeNode, double> scrollCache = {};
 
   BrowserController(this.homeState, this.browserState, this.editorState,
       this.treeTraverser, this.clipboardManager);
@@ -64,6 +65,7 @@ class BrowserController {
     ensureNoSelectionMode();
     try {
       treeTraverser.goBack();
+      restoreScrollOffset();
       renderAll();
       return true;
     } on NoSuperItemException {
@@ -71,17 +73,27 @@ class BrowserController {
     }
   }
 
-  void goStepUp() {
+  bool goStepUp() {
     ensureNoSelectionMode();
     try {
       treeTraverser.goUp();
+      restoreScrollOffset();
       renderAll();
+      return true;
     } on NoSuperItemException {
-      logger.debug("Can't go any higher");
+      return false;
+    }
+  }
+
+  void restoreScrollOffset() {
+    if (scrollCache.containsKey(treeTraverser.currentParent)) {
+      browserState.scrollController.jumpTo(scrollCache[treeTraverser.currentParent]!);
+      scrollCache.remove(treeTraverser.currentParent);
     }
   }
 
   void goIntoNode(TreeNode node) {
+    rememberScrollOffset();
     ensureNoSelectionMode();
     if (node.type == TreeNodeType.link) {
       treeTraverser.goToLinkTarget(node);
@@ -250,5 +262,9 @@ class BrowserController {
     } else {
       goIntoNode(node);
     }
+  }
+
+  void rememberScrollOffset() {
+    scrollCache[treeTraverser.currentParent] = browserState.scrollController.offset;
   }
 }
