@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:todotree/services/logger.dart';
 
 import 'package:todotree/views/editor/editor_widget.dart';
+import 'package:todotree/views/home/home_controller.dart';
 import 'package:todotree/views/home/home_state.dart';
 import 'package:todotree/views/home/title_bar.dart';
 import 'package:todotree/views/tree_browser/browser_widget.dart';
@@ -14,6 +16,7 @@ class HomeWidget extends StatelessWidget {
   Widget build(BuildContext context) {
 
     final homeState = context.watch<HomeState>();
+    final aHomeController = Provider.of<HomeController>(context, listen: false);
     Widget bodyContent;
     if (homeState.pageView == HomePageView.treeBrowser) {
       bodyContent = BrowserWidget();
@@ -43,13 +46,22 @@ class HomeWidget extends StatelessWidget {
     );
     final statusBarColor = Theme.of(context).colorScheme.inversePrimary;
     
-    return SafeArea(
-      child: AnnotatedRegion(
-        value: SystemUiOverlayStyle(
-          statusBarColor: statusBarColor,
-          statusBarIconBrightness: Brightness.light,
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (bool didPop) {
+        if (didPop) {
+          return;
+        }
+        aHomeController.goBack();
+      },
+      child: SafeArea(
+        child: AnnotatedRegion(
+          value: SystemUiOverlayStyle(
+            statusBarColor: statusBarColor,
+            statusBarIconBrightness: Brightness.light,
+          ),
+          child: scaffold,
         ),
-        child: scaffold,
       ),
     );
   }
