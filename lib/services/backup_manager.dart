@@ -5,20 +5,25 @@ import 'package:collection/collection.dart';
 import 'package:intl/intl.dart';
 
 import 'package:path_provider/path_provider.dart';
+import 'package:todotree/services/info_service.dart';
 import 'package:todotree/services/logger.dart';
+import 'package:todotree/services/tree_traverser.dart';
 import 'package:todotree/util/collections.dart';
+import 'package:todotree/views/components/options_dialog.dart';
+import 'package:todotree/views/tree_browser/browser_controller.dart';
 
 const int _localBackupLastVersions = 10;
 const int _localBackupLastDays = 14;
 
 class BackupManager {
 
-  final DateFormat formatter = DateFormat('yyyy-MM-dd_HH_mm_ss');
+  final DateFormat fileDateFormat = DateFormat('yyyy-MM-dd_HH_mm_ss');
+  final DateFormat displayDateFormat = DateFormat('yyyy-MM-dd HH:mm:ss');
   final RegExp localBackupRegex = RegExp('backup_(\\d{4}-\\d{2}-\\d{2}_\\d{2}_\\d{2}_\\d{2})\\.yaml');
 
   Future<void> saveLocalBackup(File srcFile) async {
     Directory localBackupsDir = await _localBackupsDir;
-    final timestamp = formatter.format(DateTime.now());
+    final timestamp = fileDateFormat.format(DateTime.now());
     final String backupFileName = '${localBackupsDir.path}/backup_$timestamp.yaml';
     await srcFile.copy(backupFileName);
     await _removeOldBackups(localBackupsDir);
@@ -35,12 +40,12 @@ class BackupManager {
   }
 
   Future<void> _removeOldBackups(Directory localBackupsDir) async {
-    List<_LocalBackup> removalBackups = await _getLocalBackups(localBackupsDir);
-    removalBackups = removalBackups.dropLast(_localBackupLastVersions);
+    List<LocalBackup> removalBackups = await listLocalBackups(localBackupsDir);
+    removalBackups = removalBackups.dropFirst(_localBackupLastVersions);
     
     for (int i = 0; i < _localBackupLastDays; i++) {
       final DateTime saveDay = DateTime.now().subtract(Duration(days: i));
-      // retain newest backup from that day
+      // retain latest backup from that day
       for (int j = 0; j < removalBackups.length; j++) {
         final backup = removalBackups[j];
         if (_isSameDay(backup.time, saveDay)) {
@@ -57,32 +62,51 @@ class BackupManager {
     }
   }
 
-  Future<List<_LocalBackup>> _getLocalBackups(Directory localBackupsDir) async {
+  Future<List<LocalBackup>> listLocalBackups(Directory localBackupsDir) async {
     return localBackupsDir
         .listSync()
         .map((e) => File(e.path))
         .where((f) => f.name.startsWith('backup_') && _parseBackupTime(f.name) != null)
-        .map((f) => _LocalBackup(f, _parseBackupTime(f.name)!))
+        .map((f) => LocalBackup(f, _parseBackupTime(f.name)!))
         .sortedBy((e) => e.time)
+        .reversed
         .toList();
   }
 
   DateTime? _parseBackupTime(String name) {
     final match = localBackupRegex.firstMatch(name);
     if (match == null) return null;
-    return formatter.parse(match.group(1)!);
+    return fileDateFormat.parse(match.group(1)!);
   }
 
   bool _isSameDay(DateTime a, DateTime b) {
     return a.year == b.year && a.month == b.month && a.day == b.day;
   }
+
+  Future<void> restoreBackupUi(TreeTraverser treeTraverser, BrowserController browserController) async {
+    final backups = await listLocalBackups(await _localBackupsDir);
+    List<OptionItem> options = backups.map((e) => OptionItem(
+      id: e.file.path,
+      name: displayDateFormat.format(e.time),
+      action: () async {
+        await restoreBackup(treeTraverser, browserController, e.file);
+      },
+    )).toList();
+    OptionsDialog.show('Choose backup', options);
+  }
+
+  Future<void> restoreBackup(TreeTraverser treeTraverser, BrowserController browserController, File backupFile) async {
+    await treeTraverser.loadFromFile(backupFile);
+    browserController.renderAll();
+    InfoService.info('Backup restored from ${backupFile.absolute.path}');
+  }
 }
 
-class _LocalBackup {
+class LocalBackup {
   final File file;
   final DateTime time;
 
-  _LocalBackup(this.file, this.time);
+  LocalBackup(this.file, this.time);
 }
 
 extension FileExtention on FileSystemEntity {

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/services.dart';
 import 'package:todotree/services/info_service.dart';
 import 'package:todotree/model/tree_node.dart';
@@ -28,6 +30,13 @@ class TreeTraverser {
   Future<void> load() async {
     reset();
     final value = await treeStorage.readDbTree();
+    rootNode = value;
+    currentParent = value;
+  }
+
+  Future<void> loadFromFile(File file) async {
+    reset();
+    final value = await treeStorage.readDbTree(file: file);
     rootNode = value;
     currentParent = value;
   }

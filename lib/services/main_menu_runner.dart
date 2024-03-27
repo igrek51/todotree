@@ -1,4 +1,5 @@
 import 'package:flutter/services.dart';
+import 'package:todotree/services/backup_manager.dart';
 
 import 'package:todotree/services/tree_traverser.dart';
 import 'package:todotree/views/home/home_controller.dart';
@@ -8,10 +9,11 @@ class MainMenuRunner {
   final BrowserController browserController;
   final HomeController homeController;
   final TreeTraverser treeTraverser;
+  final BackupManager backupManager;
 
   List<ActionMenuItem> _menuActions = [];
 
-  MainMenuRunner(this.browserController, this.treeTraverser, this.homeController);
+  MainMenuRunner(this.browserController, this.treeTraverser, this.homeController, this.backupManager);
 
   List<ActionMenuItem> get menuActions {
     if (_menuActions.isNotEmpty) return _menuActions;
@@ -47,7 +49,8 @@ class MainMenuRunner {
       ActionMenuItem(
         id: 'restore-backup',
         name: '⏮️ Restore backup',
-        action: () {
+        action: () async {
+          await backupManager.restoreBackupUi(treeTraverser, browserController);
         },
       ),
       ActionMenuItem(

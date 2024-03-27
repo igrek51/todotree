@@ -15,8 +15,9 @@ class TreeStorage {
 
   TreeStorage(this.backupManager);
 
-  Future<TreeNode> readDbTree() async {
-    final String content = await _readDbString();
+  Future<TreeNode> readDbTree({File? file}) async {
+    File nFile = file ?? await _localDbFile;
+    final String content = await _readDbString(nFile);
     if (content.isEmpty) {
       logger.warning('empty database file, returning empty tree');
       return TreeNode.rootNode();
@@ -48,9 +49,8 @@ class TreeStorage {
     return file.writeAsString(content, flush: true);
   }
 
-  Future<String> _readDbString() async {
+  Future<String> _readDbString(File file) async {
     try {
-      final file = await _localDbFile;
       if (!file.existsSync()) {
         logger.warning('database file $file does not exist, loading empty');
         return '';
