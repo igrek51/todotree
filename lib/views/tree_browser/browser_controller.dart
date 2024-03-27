@@ -4,6 +4,7 @@ import 'package:todotree/services/error_handler.dart';
 import 'package:todotree/services/info_service.dart';
 import 'package:todotree/services/logger.dart';
 import 'package:todotree/util/collections.dart';
+import 'package:todotree/util/numbers.dart';
 import 'package:todotree/views/editor/editor_controller.dart';
 import 'package:todotree/views/editor/editor_state.dart';
 import 'package:todotree/services/tree_traverser.dart';
@@ -150,42 +151,69 @@ class BrowserController {
     logger.debug('Reordered nodes: $oldIndex -> $newIndex');
   }
 
-  void removeNode(TreeNode node) {
+  void removeOneNode(TreeNode node) {
+    final originalPosition = treeTraverser.getChildIndex(node);
     treeTraverser.removeFromCurrent(node);
     renderItems();
-    InfoService.info('Node removed: ${node.name}');
+
+    InfoService.snackbarAction('Node removed: ${node.name}', 'UNDO', () {
+      treeTraverser.addChildToCurrent(node, position: originalPosition);
+      renderItems();
+      InfoService.info('Node restored: ${node.name}');
+    });
+  }
+
+  void removeMultipleNodes(List<int> sortedPositions) {
+    List<Pair<int, TreeNode>> originalNodePositions = sortedPositions
+        .map((index) => Pair(index, treeTraverser.getChild(index)))
+        .toList();
+    for (final pair in originalNodePositions) {
+      treeTraverser.removeFromCurrent(pair.second);
+    }
+    treeTraverser.cancelSelection();
+    renderItems();
+
+    InfoService.snackbarAction('Nodes removed: ${sortedPositions.length}', 'UNDO',
+        () {
+      for (final pair in originalNodePositions) {
+        treeTraverser.addChildToCurrent(pair.second, position: pair.first);
+      }
+      renderItems();
+      InfoService.info('Nodes restored: ${originalNodePositions.length}');
+    });
   }
 
   void removeNodesAt(int position) {
     if (treeTraverser.selectionMode) {
       List<int> sortedPositions = treeTraverser.selectedIndexes.toList()
         ..sort();
-      List<Pair<int, TreeNode>> originalNodePositions = sortedPositions
-          .map((index) => Pair(index, treeTraverser.getChild(index)))
-          .toList();
-      for (final pair in originalNodePositions) {
-        treeTraverser.removeFromCurrent(pair.second);
-      }
-      treeTraverser.cancelSelection();
-      renderItems();
-      InfoService.snackbarAction('Nodes removed: ${sortedPositions.length}', 'UNDO',
-          () {
-        for (final pair in originalNodePositions) {
-          treeTraverser.addChildToCurrent(pair.second, position: pair.first);
-        }
-        renderItems();
-        InfoService.info('Nodes restored: ${originalNodePositions.length}');
-      });
+      removeMultipleNodes(sortedPositions);
     } else {
       final node = treeTraverser.getChild(position);
-      removeNode(node);
+      removeOneNode(node);
     }
   }
 
-  void removeLinkAndTarget(TreeNode node) {
-    treeTraverser.removeLinkAndTarget(node);
+  void removeLinkAndTarget(TreeNode link) {
+    final originalLinkPosition = treeTraverser.getChildIndex(link);
+    final target = treeTraverser.findLinkTarget(link.name);
+    final targetParent = target?.parent;
+    int? originalTargetPosition;
+    if (target != null && targetParent != null) {
+      originalTargetPosition = targetParent.children.indexOf(target).nonNegative();
+      treeTraverser.removeFromParent(target, targetParent);
+    }
+    treeTraverser.removeFromCurrent(link);
     renderItems();
-    InfoService.info('Link & target removed: ${node.name}');
+
+    InfoService.snackbarAction('Link & target removed: ${link.name}', 'UNDO', () {
+      treeTraverser.addChildToCurrent(link, position: originalLinkPosition);
+      if (target != null && targetParent != null && originalTargetPosition != null) {
+        targetParent.insertAt(originalTargetPosition, target);
+      }
+      renderItems();
+      InfoService.info('Link & target restored: ${link.name}');
+    });
   }
 
   void runNodeMenuAction(String action, {TreeNode? node, int? position}) {

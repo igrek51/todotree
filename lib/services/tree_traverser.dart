@@ -63,6 +63,12 @@ class TreeTraverser {
 
   TreeNode getChild(int position) => currentParent.getChild(position);
 
+  int? getChildIndex(TreeNode item) {
+    final index = currentParent.children.indexOf(item);
+    if (index == -1) return null;
+    return index;
+  }
+
   void addChildToCurrent(TreeNode item, {int? position}) {
     final nPosision = position ?? currentParent.size;
     item.parent = currentParent;
@@ -88,14 +94,6 @@ class TreeTraverser {
   void removeFromParent(TreeNode item, TreeNode parent) {
     parent.remove(item);
     unsavedChanges = true;
-  }
-
-  void removeLinkAndTarget(TreeNode link) {
-    final target = findLinkTarget(link.name);
-    if (target != null && target.parent != null) {
-      removeFromParent(target, target.parent!);
-    }
-    removeFromCurrent(link);
   }
 
   void goUp() {
