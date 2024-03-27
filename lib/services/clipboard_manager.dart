@@ -42,7 +42,7 @@ class ClipboardManager {
 
   void copySelectedItems(TreeTraverser treeTraverser) {
     if (!treeTraverser.selectionMode) {
-      return InfoService.showInfo('Nothing selected');
+      return InfoService.info('Nothing selected');
     }
     copyItems(treeTraverser, treeTraverser.selectedIndexes, info: true);
   }
@@ -50,7 +50,7 @@ class ClipboardManager {
   void copyItems(TreeTraverser treeTraverser, Set<int> itemPositions,
       {bool info = true, bool cut = false}) {
     if (itemPositions.isEmpty) {
-      if (info) InfoService.showInfo('Nothing selected');
+      if (info) InfoService.info('Nothing selected');
       return;
     }
     clearClipboardNodes();
@@ -70,9 +70,9 @@ class ClipboardManager {
     if (info) {
       if (clipboardNodes.length == 1) {
         final item = clipboardNodes.first;
-        InfoService.showInfo('Item copied: ${item.displayName}');
+        InfoService.info('Item copied: ${item.displayName}');
       } else {
-        InfoService.showInfo('Items copied: ${clipboardNodes.length}');
+        InfoService.info('Items copied: ${clipboardNodes.length}');
       }
     }
 
@@ -83,7 +83,7 @@ class ClipboardManager {
 
   void cutSelectedItems(TreeTraverser treeTraverser) {
     if (!treeTraverser.selectionMode) {
-      return InfoService.showInfo('Nothing selected');
+      return InfoService.info('Nothing selected');
     }
     cutItems(treeTraverser, treeTraverser.selectedIndexes);
   }
@@ -91,7 +91,7 @@ class ClipboardManager {
   void cutItems(TreeTraverser treeTraverser, Set<int> itemPositions) {
     if (itemPositions.isEmpty) return;
     copyItems(treeTraverser, itemPositions, info: false, cut: true);
-    InfoService.showInfo('Marked for cut: ${itemPositions.length}');
+    InfoService.info('Marked for cut: ${itemPositions.length}');
   }
 
   Future<void> pasteItems(TreeTraverser treeTraverser, int atPosition) async {
@@ -100,11 +100,11 @@ class ClipboardManager {
       // recover by taking text from system clipboard
       final systemClipboard = await readSystemClipboard();
       if (systemClipboard == null) {
-        return InfoService.showInfo('Clipboard is empty');
+        return InfoService.info('Clipboard is empty');
       }
       treeTraverser.addChildToCurrent(TreeNode.textNode(systemClipboard),
           position: position);
-      InfoService.showInfo('Pasted from system clipboard: $systemClipboard');
+      InfoService.info('Pasted from system clipboard: $systemClipboard');
       return;
     }
     if (markForCut) {
@@ -122,7 +122,7 @@ class ClipboardManager {
         }
         treeTraverser.removeFromParent(clipboardNode, oldParent);
       }
-      InfoService.showInfo('Items moved: ${clipboardNodes.length}');
+      InfoService.info('Items moved: ${clipboardNodes.length}');
       markForCut = false;
       clearClipboardNodes();
     } else {
@@ -132,7 +132,7 @@ class ClipboardManager {
         treeTraverser.addChildToCurrent(newItem, position: position);
         position++;
       }
-      InfoService.showInfo('Items pasted: ${clipboardNodes.length}');
+      InfoService.info('Items pasted: ${clipboardNodes.length}');
       recopyClipboard();
     }
   }
@@ -140,7 +140,7 @@ class ClipboardManager {
   void copyAsText(String text) {
     copyToSystemClipboard(text);
     clearClipboardNodes();
-    InfoService.showInfo('Text copied: $text');
+    InfoService.info('Text copied: $text');
   }
 
   TreeNode buildLinkItem(TreeNode targetNode) {
@@ -157,7 +157,7 @@ class ClipboardManager {
   void pasteItemsAsLink(TreeTraverser treeTraverser, int atPosition) {
     var position = atPosition;
     if (clipboardNodes.isEmpty) {
-      return InfoService.showInfo('Clipboard is empty');
+      return InfoService.info('Clipboard is empty');
     }
     for (var clipboardNode in clipboardNodes) {
       final linkItem = buildLinkItem(clipboardNode);
@@ -165,6 +165,6 @@ class ClipboardManager {
       position++;
     }
     markForCut = false;
-    InfoService.showInfo('Items pasted as links: ${clipboardNodes.length}');
+    InfoService.info('Items pasted as links: ${clipboardNodes.length}');
   }
 }

@@ -7,18 +7,7 @@ final navigatorKey = GlobalKey<NavigatorState>();
 
 class InfoService {
 
-  static void showSnackbar(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        showCloseIcon: true,
-        dismissDirection: DismissDirection.horizontal,
-      ),
-    );
-  }
-
-  static void showInfo(String message) {
+  static void info(String message) {
     logger.info('UI: $message');
     scaffoldMessengerKey.currentState?.clearSnackBars();
     scaffoldMessengerKey.currentState?.showSnackBar(
@@ -30,7 +19,24 @@ class InfoService {
     );
   }
 
-  static void showError(Object error, [String? contextMessage]) {
+  static void snackbarAction(String message, String actionLabel, VoidCallback action) {
+    logger.info('UI: $message');
+    scaffoldMessengerKey.currentState?.clearSnackBars();
+    scaffoldMessengerKey.currentState?.showSnackBar(
+      SnackBar(
+        content: Text(message),
+        showCloseIcon: false,
+        dismissDirection: DismissDirection.horizontal,
+        duration: const Duration(milliseconds: 5000),
+        action: SnackBarAction(
+          label: actionLabel,
+          onPressed: action,
+        ),
+      ),
+    );
+  }
+
+  static void error(Object error, [String? contextMessage]) {
     final String fullMessage;
     if (contextMessage != null) {
       fullMessage = '$contextMessage: $error';

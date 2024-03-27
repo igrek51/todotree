@@ -145,7 +145,7 @@ class TreeTraverser {
   void goToLinkTarget(TreeNode link) {
     final target = findLinkTarget(link.name);
     if (target == null) {
-      InfoService.showInfo('Link is broken: ${link.displayTargetPath}');
+      InfoService.info('Link is broken: ${link.displayTargetPath}');
     } else {
       target2link[target] = link;
       goTo(target);

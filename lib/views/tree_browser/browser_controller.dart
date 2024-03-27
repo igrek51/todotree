@@ -1,7 +1,9 @@
+import 'package:collection/collection.dart';
 import 'package:todotree/services/clipboard_manager.dart';
 import 'package:todotree/services/error_handler.dart';
 import 'package:todotree/services/info_service.dart';
 import 'package:todotree/services/logger.dart';
+import 'package:todotree/util/collections.dart';
 import 'package:todotree/views/editor/editor_controller.dart';
 import 'package:todotree/views/editor/editor_state.dart';
 import 'package:todotree/services/tree_traverser.dart';
@@ -46,7 +48,8 @@ class BrowserController {
 
   void populateItems() {
     for (int i = 0; i < 10; i++) {
-      treeTraverser.addChildToCurrent(TreeNode.textNode(randomName()));
+      final name = '$i. ${randomName()}';
+      treeTraverser.addChildToCurrent(TreeNode.textNode(name));
     }
     renderItems();
   }
@@ -87,7 +90,8 @@ class BrowserController {
 
   void restoreScrollOffset() {
     if (scrollCache.containsKey(treeTraverser.currentParent)) {
-      browserState.scrollController.jumpTo(scrollCache[treeTraverser.currentParent]!);
+      browserState.scrollController
+          .jumpTo(scrollCache[treeTraverser.currentParent]!);
       scrollCache.remove(treeTraverser.currentParent);
     }
   }
@@ -149,20 +153,29 @@ class BrowserController {
   void removeNode(TreeNode node) {
     treeTraverser.removeFromCurrent(node);
     renderItems();
-    InfoService.showInfo('Node removed: ${node.name}');
+    InfoService.info('Node removed: ${node.name}');
   }
 
   void removeNodesAt(int position) {
     if (treeTraverser.selectionMode) {
-      final nodes = treeTraverser.selectedIndexes
-          .map((index) => treeTraverser.getChild(index))
+      List<int> sortedPositions = treeTraverser.selectedIndexes.toList()
+        ..sort();
+      List<Pair<int, TreeNode>> originalNodePositions = sortedPositions
+          .map((index) => Pair(index, treeTraverser.getChild(index)))
           .toList();
-      for (final node in nodes) {
-        treeTraverser.removeFromCurrent(node);
+      for (final pair in originalNodePositions) {
+        treeTraverser.removeFromCurrent(pair.second);
       }
       treeTraverser.cancelSelection();
       renderItems();
-      InfoService.showInfo('Nodes removed: ${nodes.length}');
+      InfoService.snackbarAction('Nodes removed: ${sortedPositions.length}', 'UNDO',
+          () {
+        for (final pair in originalNodePositions) {
+          treeTraverser.addChildToCurrent(pair.second, position: pair.first);
+        }
+        renderItems();
+        InfoService.info('Nodes restored: ${originalNodePositions.length}');
+      });
     } else {
       final node = treeTraverser.getChild(position);
       removeNode(node);
@@ -172,10 +185,10 @@ class BrowserController {
   void removeLinkAndTarget(TreeNode node) {
     treeTraverser.removeLinkAndTarget(node);
     renderItems();
-    InfoService.showInfo('Link & target removed: ${node.name}');
+    InfoService.info('Link & target removed: ${node.name}');
   }
 
-  void runNodeMenuAction(String action, {TreeNode? node, int ?position}) {
+  void runNodeMenuAction(String action, {TreeNode? node, int? position}) {
     handleError(() {
       if (action == 'remove-nodes' && position != null) {
         removeNodesAt(position);
@@ -201,7 +214,7 @@ class BrowserController {
       } else if (action == 'paste-as-link' && position != null) {
         pasteAboveAsLink(position);
       } else if (action == 'split' && node != null) {
-        InfoService.showError('Not implemented yet');
+        InfoService.error('Not implemented yet');
       } else if (action == 'push-to-remote' && node != null) {
       } else {
         logger.error('Unknown action: $action');
@@ -273,6 +286,7 @@ class BrowserController {
   }
 
   void rememberScrollOffset() {
-    scrollCache[treeTraverser.currentParent] = browserState.scrollController.offset;
+    scrollCache[treeTraverser.currentParent] =
+        browserState.scrollController.offset;
   }
 }

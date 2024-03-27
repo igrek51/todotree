@@ -19,7 +19,7 @@ void startupApp(AppFactory app) async {
     kickstartApp(app);
     logger.info('App initialized');
   } catch (e, s) {
-    InfoService.showError(Exception(e.toString()), 'Startup failed');
+    InfoService.error(Exception(e.toString()), 'Startup failed');
     if (e is ContextError && e.stackTrace != null) {
       print('ContextError Stack trace:\n${e.stackTrace}');
     } else {
