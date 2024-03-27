@@ -42,6 +42,7 @@ class BrowserController {
 
   void renderTitle() {
     browserState.title = treeTraverser.currentParent.name;
+    browserState.atRoot = treeTraverser.currentParent.isRoot;
     browserState.notify();
   }
 
@@ -259,8 +260,8 @@ class BrowserController {
   }
 
   Future<void> saveAndExit() async {
-    minimizeApp();
     await treeTraverser.saveIfChanged();
+    minimizeApp();
     treeTraverser.goToRoot();
     renderAll();
   }

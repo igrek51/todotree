@@ -75,14 +75,16 @@ class _AppWidgetState extends State<AppWidget> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
+    // on Android's activity stop: inactive, hidden, paused
+    // on Android's notification bar swipe: inactive
     switch(state) {
       case AppLifecycleState.resumed:
         logger.debug('App resumed');
       case AppLifecycleState.inactive:
         logger.debug('App inactive');
-        widget.appFactory.appLifecycle.onInactive();
       case AppLifecycleState.paused:
         logger.debug('App paused');
+        widget.appFactory.appLifecycle.onInactive();
       case AppLifecycleState.detached:
         logger.debug('App detached');
       case AppLifecycleState.hidden:

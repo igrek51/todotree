@@ -28,14 +28,20 @@ class TitleBar extends StatelessWidget {
           padding: const EdgeInsets.all(12.0),
           child: Row(
             children: [
-              IconButton(
-                iconSize: 32,
-                icon: const Icon(Icons.arrow_back, size: 28),
-                onPressed: () {
-                  safeExecute(() {
-                    homeController.goBack();
-                  });
-                },
+              Visibility(
+                maintainSize: true,
+                maintainAnimation: true,
+                maintainState: true,
+                visible: !browserState.atRoot,
+                child: IconButton(
+                  iconSize: 32,
+                  icon: const Icon(Icons.arrow_back, size: 28),
+                  onPressed: () {
+                    safeExecute(() {
+                      homeController.goBack();
+                    });
+                  },
+                ),
               ),
               IconButton(
                 iconSize: 32,

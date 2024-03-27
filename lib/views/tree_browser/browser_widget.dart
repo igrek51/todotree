@@ -71,7 +71,7 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
       highlighted = true;
       animationStarted = true;
     });
-    _timer = Timer(Duration(milliseconds: 100), () {
+    _timer = Timer(Duration(milliseconds: 10), () {
       setState(() {
         highlighted = false;
       });
