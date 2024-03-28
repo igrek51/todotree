@@ -11,6 +11,9 @@ import 'package:todotree/views/components/rounded_badge.dart';
 import 'package:todotree/views/tree_browser/browser_controller.dart';
 import 'package:todotree/views/tree_browser/browser_state.dart';
 
+const double _iconButtonInternalSize = 24;
+const double _iconButtonPadding = 8;
+
 class BrowserWidget extends StatelessWidget {
   const BrowserWidget({super.key});
 
@@ -149,10 +152,11 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
       return ReorderableDragStartListener(
         index: widget.index,
         child: IconButton(
-          padding: EdgeInsets.all(6),
+          icon: const Icon(Icons.reorder, size: _iconButtonInternalSize),
+          padding: EdgeInsets.all(_iconButtonPadding),
           constraints: BoxConstraints(),
-          iconSize: 24,
-          icon: const Icon(Icons.reorder, size: 24),
+          style: const ButtonStyle(
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap),
           onPressed: () {
             browserController.onToggleSelectedNode(widget.index);
           },
@@ -166,7 +170,7 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
       final treeTraverser = Provider.of<TreeTraverser>(context, listen: false);
       return Expanded(
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 8),
+          padding: const EdgeInsets.symmetric(vertical: 10),
           child: Text(
             treeTraverser.displayLinkName(widget.treeItem),
             style: TextStyle(
@@ -180,7 +184,7 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
     } else if (widget.treeItem.isLeaf) {
       return Expanded(
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 8),
+          padding: const EdgeInsets.symmetric(vertical: 10),
           child: Text(
             widget.treeItem.name,
             style: TextStyle(
@@ -195,12 +199,15 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
         child: Row(
           children: [
             Expanded(
-              child: Text(
-                widget.treeItem.name,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                child: Text(
+                  widget.treeItem.name,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
@@ -214,10 +221,10 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
 
   Widget buildMoreActionButton(BuildContext context) {
     return IconButton(
-      padding: EdgeInsets.all(6),
+      icon: const Icon(Icons.more_vert, size: _iconButtonInternalSize),
+      padding: EdgeInsets.all(_iconButtonPadding),
       constraints: BoxConstraints(),
-      iconSize: 24,
-      icon: const Icon(Icons.more_vert, size: 24),
+      style: const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
       onPressed: () {
         showNodeOptionsDialog(context);
       },
@@ -229,10 +236,11 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
         Provider.of<BrowserController>(context, listen: false);
     if (widget.treeItem.isLeaf) {
       return IconButton(
-        padding: EdgeInsets.all(6),
+        icon: const Icon(Icons.arrow_right, size: _iconButtonInternalSize),
+        padding: EdgeInsets.all(_iconButtonPadding),
         constraints: BoxConstraints(),
-        iconSize: 24,
-        icon: const Icon(Icons.arrow_right, size: 24),
+        style:
+            const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
         onPressed: () {
           safeExecute(() {
             browserController.goIntoNode(widget.treeItem);
@@ -241,10 +249,11 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
       );
     } else {
       return IconButton(
-        padding: EdgeInsets.all(6),
+        icon: const Icon(Icons.edit, size: _iconButtonInternalSize),
+        padding: EdgeInsets.all(_iconButtonPadding),
         constraints: BoxConstraints(),
-        iconSize: 24,
-        icon: const Icon(Icons.edit, size: 24),
+        style:
+            const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
         onPressed: () {
           safeExecute(() {
             browserController.editNode(widget.treeItem);
@@ -256,10 +265,10 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
 
   Widget buildAddButton(BrowserController browserController) {
     return IconButton(
-      padding: EdgeInsets.all(6),
+      icon: const Icon(Icons.add, size: _iconButtonInternalSize),
+      padding: EdgeInsets.all(_iconButtonPadding),
       constraints: BoxConstraints(),
-      iconSize: 24,
-      icon: const Icon(Icons.add, size: 24),
+      style: const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
       onPressed: () {
         safeExecute(() {
           browserController.addNodeAt(widget.index);
