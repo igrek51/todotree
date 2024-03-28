@@ -6,7 +6,7 @@ import 'package:window_manager/window_manager.dart';
 
 import 'package:todotree/app/factory.dart';
 import 'package:todotree/util/errors.dart';
-import 'package:todotree/services/logger.dart';
+import 'package:todotree/util/logger.dart';
 
 void startupApp(AppFactory app) async {
   try {

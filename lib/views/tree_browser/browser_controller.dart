@@ -1,15 +1,10 @@
-import 'dart:io';
-
-import 'package:flutter/services.dart';
-
-import 'package:move_to_background/move_to_background.dart';
+import 'package:todotree/services/app_lifecycle.dart';
 import 'package:todotree/services/clipboard_manager.dart';
 import 'package:todotree/util/errors.dart';
 import 'package:todotree/services/info_service.dart';
-import 'package:todotree/services/logger.dart';
+import 'package:todotree/util/logger.dart';
 import 'package:todotree/util/collections.dart';
 import 'package:todotree/util/numbers.dart';
-import 'package:todotree/views/editor/editor_controller.dart';
 import 'package:todotree/views/editor/editor_state.dart';
 import 'package:todotree/services/tree_traverser.dart';
 import 'package:todotree/model/tree_node.dart';
@@ -22,14 +17,14 @@ class BrowserController {
   BrowserState browserState;
   EditorState editorState;
 
-  late EditorController editorController;
-
   TreeTraverser treeTraverser;
   ClipboardManager clipboardManager;
+  AppLifecycle appLifecycle;
+
   Map<TreeNode, double> scrollCache = {};
 
   BrowserController(this.homeState, this.browserState, this.editorState,
-      this.treeTraverser, this.clipboardManager);
+      this.treeTraverser, this.clipboardManager, this.appLifecycle);
 
   void init() {
     renderAll();
@@ -261,28 +256,9 @@ class BrowserController {
 
   Future<void> saveAndExit() async {
     await treeTraverser.saveIfChanged();
-    minimizeApp();
+    appLifecycle.minimizeApp();
     treeTraverser.goToRoot();
     renderAll();
-  }
-
-  void minimizeApp() {
-    if (Platform.isAndroid || Platform.isIOS) {
-      try {
-        MoveToBackground.moveTaskToBack();
-        logger.info('app minimized');
-      } on MissingPluginException catch (e) {
-        logger.error('MissingPluginException: $e');
-        exitNow();
-      }
-    } else {
-      exitNow();
-    }
-  }
-
-  void exitNow() {
-    logger.debug('Exiting...');
-    SystemNavigator.pop();
   }
 
   void onToggleSelectedNode(int position) {

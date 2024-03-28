@@ -1,7 +1,7 @@
 import 'package:yaml/yaml.dart';
 
 import 'package:todotree/model/tree_node.dart';
-import 'package:todotree/services/logger.dart';
+import 'package:todotree/util/logger.dart';
 
 class YamlTreeDeserializer {
 

@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:todotree/services/info_service.dart';
 import 'package:todotree/model/tree_node.dart';
-import 'package:todotree/services/tree_storage.dart';
+import 'package:todotree/services/database/tree_storage.dart';
 
 class TreeTraverser {
   TreeStorage treeStorage;

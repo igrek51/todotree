@@ -6,7 +6,7 @@ import 'package:intl/intl.dart';
 
 import 'package:path_provider/path_provider.dart';
 import 'package:todotree/services/info_service.dart';
-import 'package:todotree/services/logger.dart';
+import 'package:todotree/util/logger.dart';
 import 'package:todotree/services/tree_traverser.dart';
 import 'package:todotree/util/collections.dart';
 import 'package:todotree/views/components/options_dialog.dart';
@@ -92,7 +92,7 @@ class BackupManager {
         await restoreBackup(treeTraverser, browserController, e.file);
       },
     )).toList();
-    OptionsDialog.show('Choose backup', options);
+    OptionsDialog.show('Choose local backup', options);
   }
 
   Future<void> restoreBackup(TreeTraverser treeTraverser, BrowserController browserController, File backupFile) async {
