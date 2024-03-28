@@ -1,5 +1,6 @@
 import 'package:todotree/services/app_lifecycle.dart';
 import 'package:todotree/services/clipboard_manager.dart';
+import 'package:todotree/services/settings_provider.dart';
 import 'package:todotree/util/errors.dart';
 import 'package:todotree/services/info_service.dart';
 import 'package:todotree/util/logger.dart';
@@ -20,11 +21,12 @@ class BrowserController {
   TreeTraverser treeTraverser;
   ClipboardManager clipboardManager;
   AppLifecycle appLifecycle;
+  SettingsProvider settingsProvider;
 
   Map<TreeNode, double> scrollCache = {};
 
   BrowserController(this.homeState, this.browserState, this.editorState,
-      this.treeTraverser, this.clipboardManager, this.appLifecycle);
+      this.treeTraverser, this.clipboardManager, this.appLifecycle, this.settingsProvider);
 
   void init() {
     renderAll();
@@ -306,10 +308,12 @@ class BrowserController {
     renderItems();
   }
 
-  void handleNodeTap(TreeNode node, int index) {
+  Future<void> handleNodeTap(TreeNode node, int index) async {
     if (treeTraverser.selectionMode) {
       onToggleSelectedNode(index);
     } else if (node.isLink) {
+      goIntoNode(node);
+    } else if (node.depth == 1 && await settingsProvider.firstLevelFolders) {
       goIntoNode(node);
     } else if (node.isLeaf) {
       editNode(node);

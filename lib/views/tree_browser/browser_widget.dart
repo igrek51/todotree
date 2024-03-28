@@ -96,8 +96,8 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
       color: Colors.transparent,
       child: InkWell(
         onTap: () {
-          safeExecute(() {
-            browserController.handleNodeTap(widget.treeItem, widget.index);
+          safeExecute(() async {
+            await browserController.handleNodeTap(widget.treeItem, widget.index);
           });
         },
         onLongPress: () {

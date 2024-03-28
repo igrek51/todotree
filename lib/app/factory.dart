@@ -1,4 +1,5 @@
 import 'package:todotree/services/database/backup_manager.dart';
+import 'package:todotree/services/settings_provider.dart';
 import 'package:todotree/views/editor/editor_controller.dart';
 import 'package:todotree/services/clipboard_manager.dart';
 import 'package:todotree/services/app_lifecycle.dart';
@@ -31,10 +32,12 @@ class AppFactory {
   late final ClipboardManager clipboardManager;
   late final MainMenuRunner mainMenuRunner;
   late final BackupManager backupManager;
+  late final SettingsProvider settingsProvider;
 
   AppFactory();
 
   void create() {
+    settingsProvider = SettingsProvider();
     homeState = HomeState();
     browserState = BrowserState();
     editorState = EditorState();
@@ -45,7 +48,7 @@ class AppFactory {
     clipboardManager = ClipboardManager();
     treeTraverser = TreeTraverser(treeStorage);
     appLifecycle = AppLifecycle(treeStorage, treeTraverser);
-    browserController = BrowserController(homeState, browserState, editorState, treeTraverser, clipboardManager, appLifecycle);
+    browserController = BrowserController(homeState, browserState, editorState, treeTraverser, clipboardManager, appLifecycle, settingsProvider);
     editorController = EditorController(homeState, editorState, treeTraverser);
     editorController.browserController = browserController;
     homeController = HomeController(homeState, treeTraverser, browserController, editorController);
