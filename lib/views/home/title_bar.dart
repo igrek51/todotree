@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import 'package:todotree/util/errors.dart';
@@ -14,7 +13,6 @@ class TitleBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final style = theme.textTheme.titleMedium;
 
     final browserState = context.watch<BrowserState>();
     final homeController = Provider.of<HomeController>(context, listen: false);
@@ -23,11 +21,11 @@ class TitleBar extends StatelessWidget {
     return Material(
       elevation: 20,
       child: Container(
-        height: 65,
+        height: 60,
         alignment: Alignment.center,
         color: theme.colorScheme.primary,
         child: Padding(
-          padding: const EdgeInsets.all(12.0),
+          padding: const EdgeInsets.symmetric(vertical: 2.0),
           child: Row(
             children: [
               Visibility(
@@ -37,7 +35,11 @@ class TitleBar extends StatelessWidget {
                 visible: !browserState.atRoot,
                 child: IconButton(
                   iconSize: 32,
-                  icon: const Icon(Icons.arrow_back, size: 28),
+                  icon: const Icon(
+                    Icons.arrow_back,
+                    size: 28,
+                    color: Colors.white,
+                  ),
                   onPressed: () {
                     safeExecute(() {
                       homeController.goBack();
@@ -47,7 +49,11 @@ class TitleBar extends StatelessWidget {
               ),
               IconButton(
                 iconSize: 32,
-                icon: const Icon(Icons.save, size: 28),
+                icon: const Icon(
+                  Icons.save,
+                  size: 28,
+                  color: Colors.white,
+                ),
                 onPressed: () {
                   safeExecute(() async {
                     await homeController.saveAndExit();
@@ -85,19 +91,20 @@ class TitleBar extends StatelessWidget {
   }
 
   Widget _buildTitle(BuildContext context, BrowserState browserState) {
-    final theme = Theme.of(context);
-    final style = theme.textTheme.titleMedium;
     List<Widget> rowChildren = [
       Flexible(
         child: Text(
           browserState.title,
-          style: style,
           overflow: TextOverflow.fade,
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+          ),
         ),
       ),
     ];
     if (browserState.items.isNotEmpty) {
-      rowChildren.add(SizedBox(width: 5));
+      rowChildren.add(SizedBox(width: 4));
       rowChildren.add(RoundedBadge(text: browserState.items.length.toString()));
     }
     return Row(

@@ -97,7 +97,8 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
       child: InkWell(
         onTap: () {
           safeExecute(() async {
-            await browserController.handleNodeTap(widget.treeItem, widget.index);
+            await browserController.handleNodeTap(
+                widget.treeItem, widget.index);
           });
         },
         onLongPress: () {
@@ -125,7 +126,7 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
               buildMiddleText(context),
               buildMoreActionButton(context),
               buildMiddleActionButton(context),
-              buildAddAction(browserController),
+              buildAddButton(browserController),
             ],
           ),
         ),
@@ -148,8 +149,8 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
       return ReorderableDragStartListener(
         index: widget.index,
         child: IconButton(
-          iconSize: 30,
-          icon: const Icon(Icons.reorder, size: 26),
+          iconSize: 24,
+          icon: const Icon(Icons.reorder, size: 24),
           onPressed: () {
             browserController.onToggleSelectedNode(widget.index);
           },
@@ -168,6 +169,7 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
             treeTraverser.displayLinkName(widget.treeItem),
             style: TextStyle(
               color: Color(0xFFD2D2D2),
+              fontSize: 15,
               decoration: TextDecoration.underline,
             ),
           ),
@@ -177,7 +179,13 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
       return Expanded(
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Text(widget.treeItem.name),
+          child: Text(
+            widget.treeItem.name,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 15,
+            ),
+          ),
         ),
       );
     } else {
@@ -187,10 +195,14 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
             Expanded(
               child: Text(
                 widget.treeItem.name,
-                style: TextStyle(fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
-            SizedBox(width: 5),
+            SizedBox(width: 3),
             RoundedBadge(text: widget.treeItem.size.toString()),
           ],
         ),
@@ -198,13 +210,23 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
     }
   }
 
+  Widget buildMoreActionButton(BuildContext context) {
+    return IconButton(
+      iconSize: 24,
+      icon: const Icon(Icons.more_vert, size: 24),
+      onPressed: () {
+        showNodeOptionsDialog(context);
+      },
+    );
+  }
+
   Widget buildMiddleActionButton(BuildContext context) {
     final browserController =
         Provider.of<BrowserController>(context, listen: false);
     if (widget.treeItem.isLeaf) {
       return IconButton(
-        iconSize: 30,
-        icon: const Icon(Icons.arrow_right, size: 26),
+        iconSize: 24,
+        icon: const Icon(Icons.arrow_right, size: 24),
         onPressed: () {
           safeExecute(() {
             browserController.goIntoNode(widget.treeItem);
@@ -213,8 +235,8 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
       );
     } else {
       return IconButton(
-        iconSize: 30,
-        icon: const Icon(Icons.edit, size: 26),
+        iconSize: 24,
+        icon: const Icon(Icons.edit, size: 24),
         onPressed: () {
           safeExecute(() {
             browserController.editNode(widget.treeItem);
@@ -224,20 +246,10 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
     }
   }
 
-  Widget buildMoreActionButton(BuildContext context) {
+  Widget buildAddButton(BrowserController browserController) {
     return IconButton(
-      iconSize: 30,
-      icon: const Icon(Icons.more_vert, size: 26),
-      onPressed: () {
-        showNodeOptionsDialog(context);
-      },
-    );
-  }
-
-  Widget buildAddAction(BrowserController browserController) {
-    return IconButton(
-      iconSize: 30,
-      icon: const Icon(Icons.add, size: 26),
+      iconSize: 24,
+      icon: const Icon(Icons.add, size: 24),
       onPressed: () {
         safeExecute(() {
           browserController.addNodeAt(widget.index);
@@ -252,7 +264,8 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return NodeMenuDialog.buildForNode(context, widget.treeItem, widget.index);
+        return NodeMenuDialog.buildForNode(
+            context, widget.treeItem, widget.index);
       },
     ).then((value) {
       if (value != null) {
@@ -294,7 +307,7 @@ class PlusItemWidget extends StatelessWidget {
           });
         },
         child: SizedBox(
-          height: 50,
+          height: 45,
           child: Center(
             child: const Icon(Icons.add),
           ),
