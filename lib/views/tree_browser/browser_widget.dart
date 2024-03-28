@@ -149,6 +149,8 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
       return ReorderableDragStartListener(
         index: widget.index,
         child: IconButton(
+          padding: EdgeInsets.all(6),
+          constraints: BoxConstraints(),
           iconSize: 24,
           icon: const Icon(Icons.reorder, size: 24),
           onPressed: () {
@@ -212,6 +214,8 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
 
   Widget buildMoreActionButton(BuildContext context) {
     return IconButton(
+      padding: EdgeInsets.all(6),
+      constraints: BoxConstraints(),
       iconSize: 24,
       icon: const Icon(Icons.more_vert, size: 24),
       onPressed: () {
@@ -225,6 +229,8 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
         Provider.of<BrowserController>(context, listen: false);
     if (widget.treeItem.isLeaf) {
       return IconButton(
+        padding: EdgeInsets.all(6),
+        constraints: BoxConstraints(),
         iconSize: 24,
         icon: const Icon(Icons.arrow_right, size: 24),
         onPressed: () {
@@ -235,6 +241,8 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
       );
     } else {
       return IconButton(
+        padding: EdgeInsets.all(6),
+        constraints: BoxConstraints(),
         iconSize: 24,
         icon: const Icon(Icons.edit, size: 24),
         onPressed: () {
@@ -248,6 +256,8 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
 
   Widget buildAddButton(BrowserController browserController) {
     return IconButton(
+      padding: EdgeInsets.all(6),
+      constraints: BoxConstraints(),
       iconSize: 24,
       icon: const Icon(Icons.add, size: 24),
       onPressed: () {
