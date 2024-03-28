@@ -1,5 +1,6 @@
-import 'package:flutter/services.dart';
+import 'package:flutter/material.dart';
 import 'package:todotree/app/factory.dart';
+import 'package:todotree/views/settings/settings_page.dart';
 
 class MainMenuRunner {
   final AppFactory appFactory;
@@ -8,7 +9,7 @@ class MainMenuRunner {
 
   MainMenuRunner(this.appFactory);
 
-  List<ActionMenuItem> get menuActions {
+  List<ActionMenuItem> menuActions(BuildContext context) {
     if (_menuActions.isNotEmpty) return _menuActions;
 
     _menuActions = <ActionMenuItem>[
@@ -36,8 +37,7 @@ class MainMenuRunner {
       ActionMenuItem(
         id: 'reload',
         name: '🔄 Reload',
-        action: () {
-        },
+        action: () {},
       ),
       ActionMenuItem(
         id: 'restore-backup',
@@ -70,7 +70,18 @@ class MainMenuRunner {
       ActionMenuItem(
         id: 'open-drawer',
         name: '🗄️ Open drawer',
+        action: () {},
+      ),
+      ActionMenuItem(
+        id: 'settings',
+        name: 'Settings',
         action: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => SettingsPage(),
+            ),
+          );
         },
       ),
       ActionMenuItem(

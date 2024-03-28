@@ -66,14 +66,14 @@ class TitleBar extends StatelessWidget {
                 iconSize: 32,
                 icon: const Icon(Icons.more_vert, size: 28),
                 onSelected: (value) {
-                  final action = mainMenuRunner.menuActions
+                  final action = mainMenuRunner.menuActions(context)
                       .firstWhere((element) => element.id == value);
                   safeExecute(() {
                     action.action();
                   });
                 },
                 itemBuilder: (context) {
-                  return mainMenuRunner.menuActions.map((action) {
+                  return mainMenuRunner.menuActions(context).map((action) {
                     return PopupMenuItem(
                       value: action.id,
                       child: Text(action.name),
