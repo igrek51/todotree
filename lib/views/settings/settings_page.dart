@@ -43,7 +43,7 @@ class _SettingsPageState extends State<SettingsPage> {
           tiles: <SettingsTile>[
             SettingsTile.navigation(
               leading: Icon(Icons.token),
-              title: Text('External backup location'),
+              title: Text('External backup locations (comma-separated)'),
               value: Text(_externalBackupLocation),
               onPressed: (BuildContext context) {
                 TextFieldDialog.show(

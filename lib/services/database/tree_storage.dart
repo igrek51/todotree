@@ -10,13 +10,15 @@ import 'package:todotree/services/database/yaml_tree_deserializer.dart';
 import 'package:todotree/services/database/yaml_tree_serializer.dart';
 import 'package:todotree/model/tree_node.dart';
 import 'package:todotree/services/info_service.dart';
+import 'package:todotree/services/settings_provider.dart';
 import 'package:todotree/util/logger.dart';
 import 'package:todotree/util/errors.dart';
 
 class TreeStorage {
   BackupManager backupManager;
+  SettingsProvider settingsProvider;
 
-  TreeStorage(this.backupManager);
+  TreeStorage(this.backupManager, this.settingsProvider);
 
   Future<TreeNode> readDbTree({File? file}) async {
     File nFile = file ?? await _localDbFile;
@@ -35,6 +37,7 @@ class TreeStorage {
     final file = await _writeDbString(content);
     logger.info('local database saved to ${file.absolute.path}');
     await backupManager.saveLocalBackup(file);
+    await backupManager.saveExternalBackups(file, await settingsProvider.externalBackupLocation);
   }
 
   Future<String> get _localPath async {

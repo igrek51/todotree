@@ -44,7 +44,7 @@ class AppFactory {
     yamlTreeSerializer = YamlTreeSerializer();
     yamlTreeDeserializer = YamlTreeDeserializer();
     backupManager = BackupManager();
-    treeStorage = TreeStorage(backupManager);
+    treeStorage = TreeStorage(backupManager, settingsProvider);
     clipboardManager = ClipboardManager();
     treeTraverser = TreeTraverser(treeStorage);
     appLifecycle = AppLifecycle(treeStorage, treeTraverser);
