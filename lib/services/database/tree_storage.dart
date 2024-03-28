@@ -78,6 +78,7 @@ class TreeStorage {
     }
     File file = File(fpickResult.files.single.path!);
     await app.treeTraverser.loadFromFile(file);
+    app.treeTraverser.unsavedChanges = true;
     app.browserController.renderAll();
     InfoService.info('Tree loaded from ${file.absolute.path}');
   }

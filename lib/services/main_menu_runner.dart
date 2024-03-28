@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:todotree/app/factory.dart';
+import 'package:todotree/services/info_service.dart';
 import 'package:todotree/views/settings/settings_page.dart';
 
 class MainMenuRunner {
@@ -32,6 +33,7 @@ class MainMenuRunner {
         name: '💾 Save',
         action: () async {
           await appFactory.treeTraverser.save();
+          InfoService.info('Database saved');
         },
       ),
       ActionMenuItem(

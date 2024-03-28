@@ -1,4 +1,5 @@
 import 'package:todotree/model/tree_node.dart';
+import 'package:todotree/services/info_service.dart';
 import 'package:todotree/views/editor/editor_state.dart';
 import 'package:todotree/services/tree_traverser.dart';
 import 'package:todotree/views/home/home_state.dart';
@@ -24,7 +25,7 @@ class EditorController {
   }
 
   void saveEditedNode() {
-    final newName = editorState.editTextController.text;
+    final newName = editorState.editTextController.text.trim();
     editorState.editedNode?.name = newName;
     treeTraverser.focusNode = editorState.editedNode;
     browserController.renderItems();
@@ -35,7 +36,10 @@ class EditorController {
   }
 
   void saveNewNode() {
-    final newName = editorState.editTextController.text;
+    final newName = editorState.editTextController.text.trim();
+    if (newName.isEmpty) {
+      return InfoService.info('Blank node has been dropped.');
+    }
     final newNode = TreeNode.textNode(newName);
     treeTraverser.addChildToCurrent(newNode, position: editorState.newItemPosition);
     browserController.renderItems();
