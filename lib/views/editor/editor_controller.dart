@@ -26,6 +26,12 @@ class EditorController {
 
   void saveEditedNode() {
     final newName = editorState.editTextController.text.trim();
+    if (editorState.editedNode == null) return;
+    if (newName.isEmpty) {
+      browserController.removeOneNode(editorState.editedNode!);
+      cancelEdit();
+      return InfoService.info('Blank node has been deleted.');
+    }
     editorState.editedNode?.name = newName;
     treeTraverser.focusNode = editorState.editedNode;
     browserController.renderItems();
@@ -38,6 +44,7 @@ class EditorController {
   void saveNewNode() {
     final newName = editorState.editTextController.text.trim();
     if (newName.isEmpty) {
+      cancelEdit();
       return InfoService.info('Blank node has been dropped.');
     }
     final newNode = TreeNode.textNode(newName);
@@ -51,6 +58,7 @@ class EditorController {
 
   void cancelEdit() {
     treeTraverser.focusNode = null;
+    browserController.renderItems();
     homeState.pageView = HomePageView.treeBrowser;
     homeState.notify();
     editorState.editTextController.clear();
