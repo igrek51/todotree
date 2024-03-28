@@ -19,6 +19,7 @@ dependencies:
   yaml: ^3.1.2
   move_to_background: ^1.0.2
   intl: ^0.19.0
+  file_picker: ^8.0.0+1
 
 dev_dependencies:
   flutter_test:

@@ -9,7 +9,7 @@ import 'package:todotree/util/errors.dart';
 
 void main() async {
   runZonedGuarded(() {
-    final appFactory = AppFactory();
+    final appFactory = AppFactory()..create();
     startupApp(appFactory);
     runApp(AppWidget(appFactory: appFactory));
 

@@ -5,12 +5,11 @@ import 'package:collection/collection.dart';
 import 'package:intl/intl.dart';
 
 import 'package:path_provider/path_provider.dart';
+import 'package:todotree/app/factory.dart';
 import 'package:todotree/services/info_service.dart';
 import 'package:todotree/util/logger.dart';
-import 'package:todotree/services/tree_traverser.dart';
 import 'package:todotree/util/collections.dart';
 import 'package:todotree/views/components/options_dialog.dart';
-import 'package:todotree/views/tree_browser/browser_controller.dart';
 
 const int _localBackupLastVersions = 10;
 const int _localBackupLastDays = 14;
@@ -83,21 +82,21 @@ class BackupManager {
     return a.year == b.year && a.month == b.month && a.day == b.day;
   }
 
-  Future<void> restoreBackupUi(TreeTraverser treeTraverser, BrowserController browserController) async {
+  Future<void> restoreBackupUi(AppFactory app) async {
     final backups = await listLocalBackups(await _localBackupsDir);
     List<OptionItem> options = backups.map((e) => OptionItem(
       id: e.file.path,
       name: displayDateFormat.format(e.time),
       action: () async {
-        await restoreBackup(treeTraverser, browserController, e.file);
+        await restoreBackup(app, e.file);
       },
     )).toList();
     OptionsDialog.show('Choose local backup', options);
   }
 
-  Future<void> restoreBackup(TreeTraverser treeTraverser, BrowserController browserController, File backupFile) async {
-    await treeTraverser.loadFromFile(backupFile);
-    browserController.renderAll();
+  Future<void> restoreBackup(AppFactory app, File backupFile) async {
+    await app.treeTraverser.loadFromFile(backupFile);
+    app.browserController.renderAll();
     InfoService.info('Backup restored from ${backupFile.absolute.path}');
   }
 }

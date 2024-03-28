@@ -32,7 +32,9 @@ class AppFactory {
   late final MainMenuRunner mainMenuRunner;
   late final BackupManager backupManager;
 
-  AppFactory() {
+  AppFactory();
+
+  void create() {
     homeState = HomeState();
     browserState = BrowserState();
     editorState = EditorState();
@@ -47,7 +49,7 @@ class AppFactory {
     editorController = EditorController(homeState, editorState, treeTraverser);
     editorController.browserController = browserController;
     homeController = HomeController(homeState, treeTraverser, browserController, editorController);
-    mainMenuRunner = MainMenuRunner(browserController, treeTraverser, homeController, backupManager);
+    mainMenuRunner = MainMenuRunner(this);
     logger.debug('AppFactory created');
   }
 }

@@ -1,19 +1,12 @@
 import 'package:flutter/services.dart';
-import 'package:todotree/services/database/backup_manager.dart';
-
-import 'package:todotree/services/tree_traverser.dart';
-import 'package:todotree/views/home/home_controller.dart';
-import 'package:todotree/views/tree_browser/browser_controller.dart';
+import 'package:todotree/app/factory.dart';
 
 class MainMenuRunner {
-  final BrowserController browserController;
-  final HomeController homeController;
-  final TreeTraverser treeTraverser;
-  final BackupManager backupManager;
+  final AppFactory appFactory;
 
   List<ActionMenuItem> _menuActions = [];
 
-  MainMenuRunner(this.browserController, this.treeTraverser, this.homeController, this.backupManager);
+  MainMenuRunner(this.appFactory);
 
   List<ActionMenuItem> get menuActions {
     if (_menuActions.isNotEmpty) return _menuActions;
@@ -23,21 +16,21 @@ class MainMenuRunner {
         id: 'exit-without-saving',
         name: '❌ Exit discarding changes',
         action: () {
-          treeTraverser.exitDiscardingChanges();
+          appFactory.treeTraverser.exitDiscardingChanges();
         },
       ),
       ActionMenuItem(
         id: 'save-and-exit',
         name: '💾 Save and exit',
         action: () async {
-          await homeController.saveAndExit();
+          await appFactory.homeController.saveAndExit();
         },
       ),
       ActionMenuItem(
         id: 'save',
         name: '💾 Save',
         action: () async {
-          await treeTraverser.save();
+          await appFactory.treeTraverser.save();
         },
       ),
       ActionMenuItem(
@@ -50,28 +43,28 @@ class MainMenuRunner {
         id: 'restore-backup',
         name: '⏮️ Restore backup',
         action: () async {
-          await backupManager.restoreBackupUi(treeTraverser, browserController);
+          await appFactory.backupManager.restoreBackupUi(appFactory);
         },
       ),
       ActionMenuItem(
         id: 'import-database',
         name: '📂 Import database',
-        action: () {
-          
+        action: () async {
+          await appFactory.treeStorage.importDatabaseUi(appFactory);
         },
       ),
       ActionMenuItem(
         id: 'select-all',
         name: '☑️ Select all',
         action: () {
-          browserController.selectAll();
+          appFactory.browserController.selectAll();
         },
       ),
       ActionMenuItem(
         id: 'go-step-up',
         name: '⬆️ Go up',
         action: () {
-          browserController.goStepUp();
+          appFactory.browserController.goStepUp();
         },
       ),
       ActionMenuItem(
@@ -84,7 +77,7 @@ class MainMenuRunner {
         id: 'populate',
         name: 'Debug: Populate',
         action: () {
-          browserController.populateItems();
+          appFactory.browserController.populateItems();
         },
       ),
     ];
