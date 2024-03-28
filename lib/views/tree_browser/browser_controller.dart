@@ -59,6 +59,9 @@ class BrowserController {
 
   void editNode(TreeNode node) {
     ensureNoSelectionMode();
+    if (node.type == TreeNodeType.link) {
+      return InfoService.error('Can\'t edit a link');
+    }
     editorState.newItemPosition = null;
     editorState.editedNode = node;
     editorState.editTextController.text = node.name;
