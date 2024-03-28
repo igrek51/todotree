@@ -10,10 +10,8 @@ import 'package:todotree/services/database/yaml_tree_deserializer.dart';
 import 'package:todotree/services/database/yaml_tree_serializer.dart';
 import 'package:todotree/model/tree_node.dart';
 import 'package:todotree/services/info_service.dart';
-import 'package:todotree/services/tree_traverser.dart';
 import 'package:todotree/util/logger.dart';
 import 'package:todotree/util/errors.dart';
-import 'package:todotree/views/tree_browser/browser_controller.dart';
 
 class TreeStorage {
   BackupManager backupManager;

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import 'package:todotree/util/errors.dart';
 import 'package:todotree/services/main_menu_runner.dart';
+import 'package:todotree/views/components/rounded_badge.dart';
 import 'package:todotree/views/home/home_controller.dart';
 import 'package:todotree/views/tree_browser/browser_state.dart';
 
@@ -53,7 +54,13 @@ class TitleBar extends StatelessWidget {
                 },
               ),
               Expanded(
-                child: Text(browserState.title, style: style),
+                child: Row(
+                  children: [
+                    Text(browserState.title, style: style),
+                    SizedBox(width: 5),
+                    RoundedBadge(text: browserState.items.length.toString()),
+                  ],
+                ),
               ),
               PopupMenuButton(
                 iconSize: 32,
