@@ -34,7 +34,7 @@ class HomeWidget extends StatelessWidget {
               TitleBar(),
               Expanded(
                 child: Container(
-                  color: Theme.of(context).colorScheme.onSecondary,
+                  color: const Color(0xFF303030),
                   child: bodyContent,
                 ),
               ),
