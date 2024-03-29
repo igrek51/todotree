@@ -117,7 +117,7 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
                 : Colors.transparent,
             border: Border.symmetric(
               horizontal: BorderSide(
-                color: const Color(0x55AAAAAA),
+                color: const Color(0x44888888),
                 width: 0.5,
                 style: BorderStyle.solid,
                 strokeAlign: BorderSide.strokeAlignInside,

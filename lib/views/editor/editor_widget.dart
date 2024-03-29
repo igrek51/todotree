@@ -11,7 +11,8 @@ class EditorWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final editorState = context.watch<EditorState>();
-    final editorController = Provider.of<EditorController>(context, listen: false);
+    final editorController =
+        Provider.of<EditorController>(context, listen: false);
 
     return Column(
       children: [
@@ -28,19 +29,11 @@ class EditorWidget extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5.0),
-                ),
-              ),
-              onPressed: () {
-                safeExecute(() {
-                  editorController.saveNode();
-                });
-              },
-              child: const Text('Save'),
-            ),
+            FlatButton(label: 'Save', onPressed: () {
+              safeExecute(() {
+                editorController.saveNode();
+              });
+            }),
             ElevatedButton(
               onPressed: () {
                 safeExecute(() {
@@ -52,6 +45,53 @@ class EditorWidget extends StatelessWidget {
           ],
         ),
       ],
+    );
+  }
+}
+
+class FlatButton extends StatelessWidget {
+  const FlatButton({
+    super.key,
+    this.label,
+    this.icon,
+    required this.onPressed,
+  });
+
+  final String? label;
+  final Icon? icon;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    Widget child;
+    if (icon == null && label == null) {
+      throw ArgumentError('icon and label cannot be null at the same time');
+    } else if (icon != null && label != null) {
+      child = Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          icon!,
+          SizedBox(width: 3),
+          Flexible(child: Text(label!))
+        ],
+      );
+    } else if (icon != null) {
+      child = icon!;
+    } else {
+      child = Text(label!);
+    }
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        foregroundColor: Colors.white,
+        backgroundColor: Color.fromARGB(255, 60, 60, 60),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(5.0),
+        ),
+      ),
+      onPressed: () {
+        onPressed();
+      },
+      child: child,
     );
   }
 }
