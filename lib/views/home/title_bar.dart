@@ -98,6 +98,7 @@ class TitleBar extends StatelessWidget {
           overflow: TextOverflow.fade,
           style: TextStyle(
             color: Colors.white,
+            fontWeight: FontWeight.bold,
             fontSize: 16,
           ),
         ),

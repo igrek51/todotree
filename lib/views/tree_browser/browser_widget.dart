@@ -12,7 +12,8 @@ import 'package:todotree/views/tree_browser/browser_controller.dart';
 import 'package:todotree/views/tree_browser/browser_state.dart';
 
 const double _iconButtonInternalSize = 24;
-const double _iconButtonPadding = 8;
+const double _iconButtonPaddingVertical = 8;
+const double _iconButtonPaddingHorizontal = 4;
 
 class BrowserWidget extends StatelessWidget {
   const BrowserWidget({super.key});
@@ -152,8 +153,8 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
       return ReorderableDragStartListener(
         index: widget.index,
         child: IconButton(
-          icon: const Icon(Icons.reorder, size: _iconButtonInternalSize),
-          padding: EdgeInsets.all(_iconButtonPadding),
+          icon: const Icon(Icons.unfold_more, size: _iconButtonInternalSize),
+          padding: EdgeInsets.all(_iconButtonPaddingVertical),
           constraints: BoxConstraints(),
           style: const ButtonStyle(
               tapTargetSize: MaterialTapTargetSize.shrinkWrap),
@@ -222,7 +223,7 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
   Widget buildMoreActionButton(BuildContext context) {
     return IconButton(
       icon: const Icon(Icons.more_vert, size: _iconButtonInternalSize),
-      padding: EdgeInsets.all(_iconButtonPadding),
+      padding: EdgeInsets.symmetric(vertical: _iconButtonPaddingVertical, horizontal: _iconButtonPaddingHorizontal),
       constraints: BoxConstraints(),
       style: const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
       onPressed: () {
@@ -237,7 +238,7 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
     if (widget.treeItem.isLeaf) {
       return IconButton(
         icon: const Icon(Icons.arrow_right, size: _iconButtonInternalSize),
-        padding: EdgeInsets.all(_iconButtonPadding),
+      padding: EdgeInsets.symmetric(vertical: _iconButtonPaddingVertical, horizontal: _iconButtonPaddingHorizontal),
         constraints: BoxConstraints(),
         style:
             const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
@@ -250,7 +251,7 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
     } else {
       return IconButton(
         icon: const Icon(Icons.edit, size: _iconButtonInternalSize),
-        padding: EdgeInsets.all(_iconButtonPadding),
+      padding: EdgeInsets.symmetric(vertical: _iconButtonPaddingVertical, horizontal: _iconButtonPaddingHorizontal),
         constraints: BoxConstraints(),
         style:
             const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
@@ -266,7 +267,7 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
   Widget buildAddButton(BrowserController browserController) {
     return IconButton(
       icon: const Icon(Icons.add, size: _iconButtonInternalSize),
-      padding: EdgeInsets.all(_iconButtonPadding),
+      padding: EdgeInsets.symmetric(vertical: _iconButtonPaddingVertical, horizontal: _iconButtonPaddingHorizontal),
       constraints: BoxConstraints(),
       style: const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
       onPressed: () {

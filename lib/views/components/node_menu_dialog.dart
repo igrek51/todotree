@@ -9,7 +9,6 @@ class NodeMenuDialog {
       BuildContext context, TreeNode item, int position) {
     final actionChildren = buildNodeActions(context, item, position);
     return AlertDialog(
-      title: Text('Choose an action'),
       contentPadding: EdgeInsets.symmetric(horizontal: 2.0, vertical: 16.0),
       content: Column(
         mainAxisSize: MainAxisSize.min,
@@ -21,7 +20,6 @@ class NodeMenuDialog {
   static Widget buildForPlus(BuildContext context) {
     final actionChildren = buildPlusActions(context);
     return AlertDialog(
-      title: Text('Choose an action'),
       contentPadding: EdgeInsets.symmetric(horizontal: 2.0, vertical: 16.0),
       content: Column(
         mainAxisSize: MainAxisSize.min,

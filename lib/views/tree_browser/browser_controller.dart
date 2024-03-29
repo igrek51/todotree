@@ -161,7 +161,7 @@ class BrowserController {
     treeTraverser.removeFromCurrent(node);
     renderItems();
 
-    InfoService.snackbarAction('Node removed: ${node.name}', 'UNDO', () {
+    InfoService.snackbarAction('Removed: ${node.name}', 'UNDO', () {
       treeTraverser.addChildToCurrent(node, position: originalPosition);
       renderItems();
       InfoService.info('Node restored: ${node.name}');
@@ -179,7 +179,7 @@ class BrowserController {
     renderItems();
 
     InfoService.snackbarAction(
-        'Nodes removed: ${sortedPositions.length}', 'UNDO', () {
+        'Removed: ${sortedPositions.length}', 'UNDO', () {
       for (final pair in originalNodePositions) {
         treeTraverser.addChildToCurrent(pair.second, position: pair.first);
       }
