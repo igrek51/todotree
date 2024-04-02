@@ -143,6 +143,7 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
     if (selectionMode) {
       return Checkbox(
         value: isItemSelected,
+        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
         onChanged: (bool? value) {
           safeExecute(() {
             browserController.onToggleSelectedNode(widget.index);

@@ -70,13 +70,8 @@ class MainMenuRunner {
         },
       ),
       ActionMenuItem(
-        id: 'open-drawer',
-        name: '🗄️ Open drawer',
-        action: () {},
-      ),
-      ActionMenuItem(
         id: 'settings',
-        name: 'Settings',
+        name: '⚙️ Settings',
         leading: Icon(Icons.settings),
         action: () {
           Navigator.push(
