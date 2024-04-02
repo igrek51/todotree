@@ -9,7 +9,6 @@ import 'package:todotree/util/numbers.dart';
 import 'package:todotree/views/editor/editor_state.dart';
 import 'package:todotree/services/tree_traverser.dart';
 import 'package:todotree/model/tree_node.dart';
-import 'package:todotree/util/strings.dart';
 import 'package:todotree/views/home/home_state.dart';
 import 'package:todotree/views/tree_browser/browser_state.dart';
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
 import 'package:todotree/util/errors.dart';
@@ -14,6 +15,140 @@ class EditorWidget extends StatelessWidget {
     final editorController =
         Provider.of<EditorController>(context, listen: false);
 
+    final rowSaveBtns = [
+      FlatButton(
+        icon: Icon(Icons.check),
+        label: '& add',
+        onPressed: () {
+          safeExecute(() {});
+        },
+      ),
+      FlatButton(
+        icon: Icon(Icons.check),
+        label: '& enter',
+        onPressed: () {
+          safeExecute(() {});
+        },
+      ),
+    ];
+
+    final rowSave2Btns = [
+      FlatButton(
+        icon: Icon(Icons.check),
+        label: 'Save',
+        onPressed: () {
+          safeExecute(() {
+            editorController.saveNode();
+          });
+        },
+      ),
+      FlatButton(
+        icon: Icon(Icons.cancel),
+        label: 'Cancel',
+        onPressed: () {
+          safeExecute(() {
+            editorController.cancelEdit();
+          });
+        },
+      ),
+    ];
+
+    final row2Btns = [
+      FlatButton(
+        icon: Icon(Icons.skip_previous_rounded),
+        onPressed: () {
+          safeExecute(() {});
+        },
+      ),
+      FlatButton(
+        icon: Icon(Icons.keyboard_arrow_left_rounded),
+        onPressed: () {
+          safeExecute(() {});
+        },
+      ),
+      FlatButton(
+        icon: Icon(Icons.select_all),
+        onPressed: () {
+          safeExecute(() {});
+        },
+      ),
+      FlatButton(
+        icon: Icon(Icons.keyboard_arrow_right_rounded),
+        onPressed: () {
+          safeExecute(() {});
+        },
+      ),
+      FlatButton(
+        icon: Icon(Icons.skip_next_rounded),
+        onPressed: () {
+          safeExecute(() {});
+        },
+      ),
+    ];
+
+    final row3Btns = [
+      FlatButton(
+        icon: Icon(Icons.copy),
+        onPressed: () {
+          safeExecute(() {});
+        },
+      ),
+      FlatButton(
+        icon: Icon(Icons.paste),
+        onPressed: () {
+          safeExecute(() {});
+        },
+      ),
+      FlatButton(
+        icon: Icon(Icons.backspace),
+        onPressed: () {
+          safeExecute(() {});
+        },
+      ),
+      FlatButton(
+        icon: Transform.flip(
+          flipX: true,
+          child: const Icon(Icons.backspace),
+        ),
+        onPressed: () {
+          safeExecute(() {});
+        },
+      ),
+    ];
+
+    final row4Btns = [
+      FlatButton(
+        label: 'HH:mm',
+        onPressed: () {
+          safeExecute(() {});
+        },
+      ),
+      FlatButton(
+        label: 'dd.MM',
+        onPressed: () {
+          safeExecute(() {});
+        },
+      ),
+      FlatButton(
+        label: '-',
+        onPressed: () {
+          safeExecute(() {});
+        },
+      ),
+      FlatButton(
+        label: ':',
+        onPressed: () {
+          safeExecute(() {});
+        },
+      ),
+      FlatButton(
+        label: '123',
+        onPressed: () {
+          safeExecute(() {});
+        },
+      ),
+    ];
+
     return Column(
       children: [
         TextField(
@@ -26,29 +161,11 @@ class EditorWidget extends StatelessWidget {
             hintText: 'Text',
           ),
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            FlatButton(
-              label: 'Save',
-              icon: Icon(Icons.check),
-              onPressed: () {
-                safeExecute(() {
-                  editorController.saveNode();
-                });
-              },
-            ),
-            FlatButton(
-              label: 'Cancel',
-              icon: Icon(Icons.cancel),
-              onPressed: () {
-                safeExecute(() {
-                  editorController.cancelEdit();
-                });
-              },
-            ),
-          ],
-        ),
+        Row(children: row2Btns),
+        Row(children: row3Btns),
+        Row(children: row4Btns),
+        Row(children: rowSaveBtns),
+        Row(children: rowSave2Btns),
       ],
     );
   }
@@ -60,11 +177,13 @@ class FlatButton extends StatelessWidget {
     this.label,
     this.icon,
     required this.onPressed,
+    this.flex = 1,
   });
 
   final String? label;
-  final Icon? icon;
+  final Widget? icon;
   final VoidCallback onPressed;
+  final int flex;
 
   @override
   Widget build(BuildContext context) {
@@ -86,18 +205,24 @@ class FlatButton extends StatelessWidget {
       child = Text(label!);
     }
     return Expanded(
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          foregroundColor: Colors.white,
-          backgroundColor: Color.fromARGB(255, 60, 60, 60),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(5.0),
+      flex: flex,
+      child: Container(
+        margin: const EdgeInsets.all(2.0),
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            foregroundColor: Colors.white,
+            backgroundColor: Color.fromARGB(255, 60, 60, 60),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(5.0),
+            ),
+            padding: EdgeInsets.symmetric(vertical: 10.0),
+            minimumSize: Size.fromHeight(60.0),
           ),
+          onPressed: () {
+            onPressed();
+          },
+          child: child,
         ),
-        onPressed: () {
-          onPressed();
-        },
-        child: child,
       ),
     );
   }
