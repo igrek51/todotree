@@ -27,20 +27,25 @@ class EditorWidget extends StatelessWidget {
           ),
         ),
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            FlatButton(label: 'Save', onPressed: () {
-              safeExecute(() {
-                editorController.saveNode();
-              });
-            }),
-            ElevatedButton(
+            FlatButton(
+              label: 'Save',
+              icon: Icon(Icons.check),
+              onPressed: () {
+                safeExecute(() {
+                  editorController.saveNode();
+                });
+              },
+            ),
+            FlatButton(
+              label: 'Cancel',
+              icon: Icon(Icons.cancel),
               onPressed: () {
                 safeExecute(() {
                   editorController.cancelEdit();
                 });
               },
-              child: const Text('Cancel'),
             ),
           ],
         ),
@@ -80,18 +85,20 @@ class FlatButton extends StatelessWidget {
     } else {
       child = Text(label!);
     }
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        foregroundColor: Colors.white,
-        backgroundColor: Color.fromARGB(255, 60, 60, 60),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(5.0),
+    return Expanded(
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          foregroundColor: Colors.white,
+          backgroundColor: Color.fromARGB(255, 60, 60, 60),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(5.0),
+          ),
         ),
+        onPressed: () {
+          onPressed();
+        },
+        child: child,
       ),
-      onPressed: () {
-        onPressed();
-      },
-      child: child,
     );
   }
 }
