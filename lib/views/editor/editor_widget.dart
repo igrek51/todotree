@@ -149,24 +149,26 @@ class EditorWidget extends StatelessWidget {
       ),
     ];
 
-    return Column(
-      children: [
-        TextField(
-          controller: editorState.editTextController,
-          autofocus: true,
-          keyboardType: TextInputType.multiline,
-          maxLines: null,
-          decoration: InputDecoration(
-            border: OutlineInputBorder(),
-            hintText: 'Text',
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          TextField(
+            controller: editorState.editTextController,
+            autofocus: true,
+            keyboardType: TextInputType.multiline,
+            maxLines: null,
+            decoration: InputDecoration(
+              border: OutlineInputBorder(),
+              hintText: 'Text',
+            ),
           ),
-        ),
-        Row(children: row2Btns),
-        Row(children: row3Btns),
-        Row(children: row4Btns),
-        Row(children: rowSaveBtns),
-        Row(children: rowSave2Btns),
-      ],
+          Row(children: row2Btns),
+          Row(children: row3Btns),
+          Row(children: row4Btns),
+          Row(children: rowSaveBtns),
+          Row(children: rowSave2Btns),
+        ],
+      ),
     );
   }
 }

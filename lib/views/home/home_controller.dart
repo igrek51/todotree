@@ -28,9 +28,13 @@ class HomeController {
 
   Future<void> goBackOrExit() async {
     if (homeState.pageView == HomePageView.treeBrowser) {
-      final goneBack = browserController.goBack();
-      if (!goneBack) {
-        await browserController.saveAndExit();
+      if (browserController.treeTraverser.selectionMode) {
+        browserController.ensureNoSelectionMode();
+      } else {
+        final goneBack = browserController.goBack();
+        if (!goneBack) {
+          await browserController.saveAndExit();
+        }
       }
     } else if (homeState.pageView == HomePageView.itemEditor) {
       editorController.cancelEdit();
