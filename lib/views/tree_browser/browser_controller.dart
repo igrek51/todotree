@@ -49,14 +49,6 @@ class BrowserController {
     browserState.notify();
   }
 
-  void populateItems() {
-    for (int i = 0; i < 10; i++) {
-      final name = '$i. ${randomName()}';
-      treeTraverser.addChildToCurrent(TreeNode.textNode(name));
-    }
-    renderItems();
-  }
-
   void editNode(TreeNode node) {
     ensureNoSelectionMode();
     if (node.type == TreeNodeType.link) {

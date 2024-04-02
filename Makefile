@@ -31,3 +31,7 @@ dart-fix:
 
 doctor:
 	flutter doctor
+
+build-apk:
+	flutter build apk --release
+

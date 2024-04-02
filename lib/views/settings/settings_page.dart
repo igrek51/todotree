@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import 'package:settings_ui/settings_ui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:todotree/services/info_service.dart';
 import 'package:todotree/views/components/textfield_dialog.dart';
 
 class SettingsPage extends StatefulWidget {
-
   @override
   State<SettingsPage> createState() => _SettingsPageState();
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-
   String _externalBackupLocation = '';
   String _userAuthToken = '';
   bool _firstLevelFolders = false;
@@ -22,9 +22,11 @@ class _SettingsPageState extends State<SettingsPage> {
     sharedPreferences = await SharedPreferences.getInstance();
     if (sharedPreferences == null) return;
     setState(() {
-      _externalBackupLocation = sharedPreferences?.getString('externalBackupLocation') ?? '';
+      _externalBackupLocation =
+          sharedPreferences?.getString('externalBackupLocation') ?? '';
       _userAuthToken = sharedPreferences?.getString('userAuthToken') ?? '';
-      _firstLevelFolders = sharedPreferences?.getBool('firstLevelFolders') ?? false;
+      _firstLevelFolders =
+          sharedPreferences?.getBool('firstLevelFolders') ?? false;
     });
   }
 
@@ -42,7 +44,7 @@ class _SettingsPageState extends State<SettingsPage> {
           title: Text('Common'),
           tiles: <SettingsTile>[
             SettingsTile.navigation(
-              leading: Icon(Icons.token),
+              leading: Icon(Icons.backup),
               title: Text('External backup locations (comma-separated)'),
               value: Text(_externalBackupLocation),
               onPressed: (BuildContext context) {
@@ -50,7 +52,8 @@ class _SettingsPageState extends State<SettingsPage> {
                   'External backup location',
                   _externalBackupLocation,
                   (String value) {
-                    sharedPreferences?.setString('externalBackupLocation', value);
+                    sharedPreferences?.setString(
+                        'externalBackupLocation', value);
                     setState(() {
                       _externalBackupLocation = value;
                     });
@@ -85,6 +88,15 @@ class _SettingsPageState extends State<SettingsPage> {
                 setState(() {
                   _firstLevelFolders = value;
                 });
+              },
+            ),
+            SettingsTile.navigation(
+              leading: Icon(Icons.perm_device_info),
+              title: Text('Grant storage permissions'),
+              onPressed: (BuildContext context) async {
+                var result1 = await Permission.manageExternalStorage.request();
+                InfoService.info(
+                    'Storage permission status: $result1');
               },
             ),
           ],

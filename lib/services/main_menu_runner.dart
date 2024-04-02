@@ -77,6 +77,7 @@ class MainMenuRunner {
       ActionMenuItem(
         id: 'settings',
         name: 'Settings',
+        leading: Icon(Icons.settings),
         action: () {
           Navigator.push(
             context,
@@ -86,13 +87,6 @@ class MainMenuRunner {
           );
         },
       ),
-      ActionMenuItem(
-        id: 'populate',
-        name: 'Debug: Populate',
-        action: () {
-          appFactory.browserController.populateItems();
-        },
-      ),
     ];
 
     return _menuActions;
@@ -100,9 +94,10 @@ class MainMenuRunner {
 }
 
 class ActionMenuItem {
-  ActionMenuItem({required this.id, required this.name, required this.action});
+  ActionMenuItem({required this.id, required this.name, required this.action, this.leading});
 
   String id;
   String name;
   VoidCallback action;
+  Icon? leading;
 }
