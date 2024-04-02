@@ -8,14 +8,19 @@ class HomeController {
 
   BrowserController browserController;
   EditorController editorController;
-  
+
   TreeTraverser treeTraverser;
-  
-  HomeController(this.homeState, this.treeTraverser, this.browserController, this.editorController);
+
+  HomeController(this.homeState, this.treeTraverser, this.browserController,
+      this.editorController);
 
   void goBack() {
     if (homeState.pageView == HomePageView.treeBrowser) {
-      browserController.goBack();
+      if (browserController.treeTraverser.selectionMode) {
+        browserController.ensureNoSelectionMode();
+      } else {
+        browserController.goBack();
+      }
     } else if (homeState.pageView == HomePageView.itemEditor) {
       editorController.cancelEdit();
     }
