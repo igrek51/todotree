@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:todotree/services/shortcut_handler.dart';
-import 'package:todotree/util/logger.dart';
 
 import 'package:todotree/views/editor/editor_widget.dart';
 import 'package:todotree/views/home/home_controller.dart';

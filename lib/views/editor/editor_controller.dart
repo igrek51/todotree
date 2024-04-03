@@ -283,12 +283,13 @@ class EditorController {
     editorState.textEditFocus.requestFocus();
   }
 
-  void toggleNumericKeyboard() {
-    editorState.numericKeyboard = !editorState.numericKeyboard;
+  void toggleNumericKeyboard(BuildContext context) {
     editorState.textEditFocus.unfocus();
+    editorState.numericKeyboard = !editorState.numericKeyboard;
     editorState.notify();
-    Future.delayed(const Duration(milliseconds: 1), () {
-        editorState.textEditFocus.requestFocus();
+    Future.delayed(const Duration(milliseconds: 100), () {
+      FocusScope.of(context).requestFocus(editorState.textEditFocus);
+      editorState.notify();
     });
   }
 }

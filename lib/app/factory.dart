@@ -57,7 +57,7 @@ class AppFactory {
     browserController.editorController = editorController;
     homeController = HomeController(homeState, treeTraverser, browserController, editorController);
     mainMenuRunner = MainMenuRunner(this);
-    shortcutHandler = ShortcutHandler(homeController);
+    shortcutHandler = ShortcutHandler(homeController, editorController);
     logger.debug('AppFactory created');
   }
 }

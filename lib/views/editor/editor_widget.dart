@@ -179,7 +179,7 @@ class EditorWidget extends StatelessWidget {
         label: '123',
         onPressed: () {
           safeExecute(() {
-            editorController.toggleNumericKeyboard();
+            editorController.toggleNumericKeyboard(context);
           });
         },
       ),
