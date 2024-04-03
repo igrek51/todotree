@@ -166,13 +166,17 @@ class EditorWidget extends StatelessWidget {
       FlatButton(
         label: '-',
         onPressed: () {
-          safeExecute(() {});
+          safeExecute(() {
+            editorController.insertDash();
+          });
         },
       ),
       FlatButton(
         label: ':',
         onPressed: () {
-          safeExecute(() {});
+          safeExecute(() {
+            editorController.insertColon();
+          });
         },
       ),
       FlatButton(
@@ -254,7 +258,7 @@ class FlatButton extends StatelessWidget {
               borderRadius: BorderRadius.circular(5.0),
             ),
             padding: EdgeInsets.symmetric(vertical: 10.0),
-            minimumSize: Size.fromHeight(55.0),
+            minimumSize: Size.fromHeight(50.0),
           ),
           onPressed: () {
             onPressed();

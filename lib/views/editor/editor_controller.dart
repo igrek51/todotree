@@ -160,6 +160,11 @@ class EditorController {
     editorState.notify();
   }
 
+  int get minSelection =>
+      min(editorState.editTextController.selection.baseOffset, editorState.editTextController.selection.extentOffset);
+  int get maxSelection =>
+      max(editorState.editTextController.selection.baseOffset, editorState.editTextController.selection.extentOffset);
+
   void jumpCursorToStart() {
     editorState.editTextController.selection = TextSelection.fromPosition(
       TextPosition(offset: 0),
@@ -175,8 +180,7 @@ class EditorController {
   }
 
   void moveCursorLeft() {
-    final currentPos = editorState.editTextController.selection.baseOffset;
-    final newPos = (currentPos - 1).clampMin(0);
+    final newPos = (minSelection - 1).clampMin(0);
     editorState.editTextController.selection = TextSelection.fromPosition(
       TextPosition(offset: newPos),
     );
@@ -184,8 +188,7 @@ class EditorController {
   }
 
   void moveCursorRight() {
-    final currentPos = editorState.editTextController.selection.extentOffset;
-    final newPos = (currentPos + 1).clampMax(editorState.editTextController.text.length);
+    final newPos = (maxSelection + 1).clampMax(editorState.editTextController.text.length);
     editorState.editTextController.selection = TextSelection.fromPosition(
       TextPosition(offset: newPos),
     );
@@ -193,9 +196,8 @@ class EditorController {
   }
 
   void selectAll() {
-    var selection = editorState.editTextController.selection;
     var len = editorState.editTextController.text.length;
-    if (selection.baseOffset == 0 && selection.extentOffset == len) {
+    if (minSelection == 0 && maxSelection == len) {
       // already selected all
       editorState.editTextController.selection = TextSelection.fromPosition(
         TextPosition(offset: editorState.editTextController.text.length),
@@ -210,16 +212,10 @@ class EditorController {
   }
 
   void copyToClipboard() {
-    final selection = editorState.editTextController.selection;
-    if (selection.baseOffset == selection.extentOffset) {
+    if (minSelection == maxSelection) {
       return InfoService.info('No selection to copy.');
     }
-    final minSelection = min(selection.baseOffset, selection.extentOffset);
-    final maxSelection = max(selection.baseOffset, selection.extentOffset);
-    final selectedText = editorState.editTextController.text.substring(
-      minSelection,
-      maxSelection,
-    );
+    final selectedText = editorState.editTextController.text.substring(minSelection, maxSelection);
     clipboardManager.copyAsText(selectedText);
   }
 
@@ -228,13 +224,9 @@ class EditorController {
     if (clipboardText == null) {
       return InfoService.info('Clipboard is empty.');
     }
-    final selection = editorState.editTextController.selection;
-    final minSelection = min(selection.baseOffset, selection.extentOffset);
-    final maxSelection = max(selection.baseOffset, selection.extentOffset);
     final textBefore = editorState.editTextController.text.substring(0, minSelection);
     final textAfter = editorState.editTextController.text.substring(maxSelection);
     final finalText = textBefore + clipboardText + textAfter;
-
     editorState.editTextController.text = finalText;
     editorState.editTextController.selection = TextSelection.fromPosition(
       TextPosition(offset: textBefore.length + clipboardText.length),
@@ -244,12 +236,8 @@ class EditorController {
   }
 
   void keyBackspace() {
-    final selection = editorState.editTextController.selection;
-    final minSelection = min(selection.baseOffset, selection.extentOffset);
-    final maxSelection = max(selection.baseOffset, selection.extentOffset);
     final textBefore = editorState.editTextController.text.substring(0, minSelection);
     final textAfter = editorState.editTextController.text.substring(maxSelection);
-
     String finalText;
     if (minSelection == maxSelection) {
       finalText = textBefore.substring(0, (minSelection - 1).clampMin(0)) + textAfter;
@@ -264,12 +252,8 @@ class EditorController {
   }
 
   void keyDelete() {
-    final selection = editorState.editTextController.selection;
-    final minSelection = min(selection.baseOffset, selection.extentOffset);
-    final maxSelection = max(selection.baseOffset, selection.extentOffset);
     final textBefore = editorState.editTextController.text.substring(0, minSelection);
     final textAfter = editorState.editTextController.text.substring(maxSelection);
-
     String finalText;
     if (minSelection == maxSelection && textAfter.isNotEmpty) {
       finalText = textBefore + textAfter.substring(1);
@@ -291,5 +275,31 @@ class EditorController {
       FocusScope.of(context).requestFocus(editorState.textEditFocus);
       editorState.notify();
     });
+  }
+
+  void insertDash() {
+    final textBefore = editorState.editTextController.text.substring(0, minSelection);
+    final textAfter = editorState.editTextController.text.substring(maxSelection);
+    var appendText = '-';
+    if (!textBefore.endsWith(' ')) appendText = ' $appendText';
+    if (!textAfter.startsWith(' ')) appendText = '$appendText ';
+    editorState.editTextController.text = textBefore + appendText + textAfter;
+    editorState.editTextController.selection = TextSelection.fromPosition(
+      TextPosition(offset: textBefore.length + appendText.length),
+    );
+    editorState.textEditFocus.requestFocus();
+  }
+
+  void insertColon() {
+    var textBefore = editorState.editTextController.text.substring(0, minSelection);
+    final textAfter = editorState.editTextController.text.substring(maxSelection);
+    var appendText = ':';
+    if (textBefore.endsWith(' ')) textBefore = textBefore.substring(0, textBefore.length - 1);
+    if (!textAfter.startsWith(' ')) appendText = '$appendText ';
+    editorState.editTextController.text = textBefore + appendText + textAfter;
+    editorState.editTextController.selection = TextSelection.fromPosition(
+      TextPosition(offset: textBefore.length + appendText.length),
+    );
+    editorState.textEditFocus.requestFocus();
   }
 }
