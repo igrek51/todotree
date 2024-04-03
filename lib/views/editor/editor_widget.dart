@@ -19,6 +19,7 @@ class EditorWidget extends StatelessWidget {
       autofocus: true,
       keyboardType: TextInputType.multiline,
       maxLines: null,
+      focusNode: editorState.textEditFocus,
       decoration: InputDecoration(
         border: OutlineInputBorder(),
         hintText: 'Text',
@@ -71,31 +72,41 @@ class EditorWidget extends StatelessWidget {
       FlatButton(
         icon: Icon(Icons.skip_previous_rounded),
         onPressed: () {
-          safeExecute(() {});
+          safeExecute(() {
+            editorController.jumpCursorToStart();
+          });
         },
       ),
       FlatButton(
         icon: Icon(Icons.keyboard_arrow_left_rounded),
         onPressed: () {
-          safeExecute(() {});
+          safeExecute(() {
+            editorController.moveCursorLeft();
+          });
         },
       ),
       FlatButton(
         icon: Icon(Icons.select_all),
         onPressed: () {
-          safeExecute(() {});
+          safeExecute(() {
+            editorController.selectAll();
+          });
         },
       ),
       FlatButton(
         icon: Icon(Icons.keyboard_arrow_right_rounded),
         onPressed: () {
-          safeExecute(() {});
+          safeExecute(() {
+            editorController.moveCursorRight();
+          });
         },
       ),
       FlatButton(
         icon: Icon(Icons.skip_next_rounded),
         onPressed: () {
-          safeExecute(() {});
+          safeExecute(() {
+            editorController.jumpCursorToEnd();
+          });
         },
       ),
     ];
