@@ -22,8 +22,7 @@ class BrowserWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final browserState = context.watch<BrowserState>();
-    final browserController =
-        Provider.of<BrowserController>(context, listen: false);
+    final browserController = Provider.of<BrowserController>(context, listen: false);
 
     return ReorderableListView(
       onReorder: (int oldIndex, int newIndex) {
@@ -31,6 +30,13 @@ class BrowserWidget extends StatelessWidget {
       },
       buildDefaultDragHandles: false,
       scrollController: browserState.scrollController,
+      proxyDecorator: (Widget child, int index, Animation<double> animation) {
+        return Material(
+          elevation: 4.0,
+          color: Color.fromARGB(75, 190, 190, 190),
+          child: child,
+        );
+      },
       children: <Widget>[
         for (final (index, item) in browserState.items.indexed)
           TreeListItemWidget(
@@ -85,8 +91,7 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final browserController =
-        Provider.of<BrowserController>(context, listen: false);
+    final browserController = Provider.of<BrowserController>(context, listen: false);
     final treeTraverser = Provider.of<TreeTraverser>(context, listen: false);
     final browserState = context.watch<BrowserState>();
     final selectionMode = browserState.selectedIndexes.isNotEmpty;
@@ -102,8 +107,7 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
       child: InkWell(
         onTap: () {
           safeExecute(() async {
-            await browserController.handleNodeTap(
-                widget.treeItem, widget.index);
+            await browserController.handleNodeTap(widget.treeItem, widget.index);
           });
         },
         onLongPress: () {
@@ -113,9 +117,7 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
           duration: const Duration(seconds: 1),
           padding: const EdgeInsets.all(0.0),
           decoration: BoxDecoration(
-            color: highlighted
-                ? Color.fromARGB(199, 53, 156, 240)
-                : Colors.transparent,
+            color: highlighted ? Color.fromARGB(199, 53, 156, 240) : Colors.transparent,
             border: Border.symmetric(
               horizontal: BorderSide(
                 color: const Color(0x44888888),
@@ -139,8 +141,7 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
     );
   }
 
-  Widget buildLeftIcon(bool selectionMode, bool isItemSelected,
-      BrowserController browserController) {
+  Widget buildLeftIcon(bool selectionMode, bool isItemSelected, BrowserController browserController) {
     if (selectionMode) {
       return SizedBox(
         width: 40,
@@ -161,8 +162,7 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
           icon: const Icon(Icons.unfold_more, size: _iconButtonInternalSize),
           padding: EdgeInsets.all(_iconButtonPaddingVertical),
           constraints: BoxConstraints(),
-          style: const ButtonStyle(
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+          style: const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
           onPressed: () {
             browserController.onToggleSelectedNode(widget.index);
           },
@@ -238,15 +238,13 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
   }
 
   Widget buildMiddleActionButton(BuildContext context) {
-    final browserController =
-        Provider.of<BrowserController>(context, listen: false);
+    final browserController = Provider.of<BrowserController>(context, listen: false);
     if (widget.treeItem.isLeaf) {
       return IconButton(
         icon: const Icon(Icons.arrow_right, size: _iconButtonInternalSize),
-      padding: EdgeInsets.symmetric(vertical: _iconButtonPaddingVertical, horizontal: _iconButtonPaddingHorizontal),
+        padding: EdgeInsets.symmetric(vertical: _iconButtonPaddingVertical, horizontal: _iconButtonPaddingHorizontal),
         constraints: BoxConstraints(),
-        style:
-            const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+        style: const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
         onPressed: () {
           safeExecute(() {
             browserController.goIntoNode(widget.treeItem);
@@ -256,10 +254,9 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
     } else {
       return IconButton(
         icon: const Icon(Icons.edit, size: _iconButtonInternalSize),
-      padding: EdgeInsets.symmetric(vertical: _iconButtonPaddingVertical, horizontal: _iconButtonPaddingHorizontal),
+        padding: EdgeInsets.symmetric(vertical: _iconButtonPaddingVertical, horizontal: _iconButtonPaddingHorizontal),
         constraints: BoxConstraints(),
-        style:
-            const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+        style: const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
         onPressed: () {
           safeExecute(() {
             browserController.editNode(widget.treeItem);
@@ -284,18 +281,15 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
   }
 
   void showNodeOptionsDialog(BuildContext context) {
-    final browserController =
-        Provider.of<BrowserController>(context, listen: false);
+    final browserController = Provider.of<BrowserController>(context, listen: false);
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return NodeMenuDialog.buildForNode(
-            context, widget.treeItem, widget.index);
+        return NodeMenuDialog.buildForNode(context, widget.treeItem, widget.index);
       },
     ).then((value) {
       if (value != null) {
-        browserController.runNodeMenuAction(value,
-            node: widget.treeItem, position: widget.index);
+        browserController.runNodeMenuAction(value, node: widget.treeItem, position: widget.index);
       }
     });
   }
@@ -306,8 +300,7 @@ class PlusItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final browserController =
-        Provider.of<BrowserController>(context, listen: false);
+    final browserController = Provider.of<BrowserController>(context, listen: false);
     final treeTraverser = Provider.of<TreeTraverser>(context, listen: false);
     return Material(
       color: Colors.transparent,
@@ -326,8 +319,7 @@ class PlusItemWidget extends StatelessWidget {
           ).then((value) {
             if (value != null) {
               final plusPosition = treeTraverser.currentParent.size;
-              browserController.runNodeMenuAction(value,
-                  position: plusPosition);
+              browserController.runNodeMenuAction(value, position: plusPosition);
             }
           });
         },
