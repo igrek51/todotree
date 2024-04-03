@@ -20,8 +20,7 @@ class EditorController {
   ClipboardManager clipboardManager;
   TreeTraverser treeTraverser;
 
-  EditorController(this.homeState, this.editorState, this.treeTraverser,
-      this.clipboardManager);
+  EditorController(this.homeState, this.editorState, this.treeTraverser, this.clipboardManager);
 
   void saveNode() {
     if (editorState.editedNode != null) {
@@ -56,13 +55,44 @@ class EditorController {
       return InfoService.info('Blank node has been dropped.');
     }
     final newNode = TreeNode.textNode(newName);
-    treeTraverser.addChildToCurrent(newNode,
-        position: editorState.newItemPosition);
+    treeTraverser.addChildToCurrent(newNode, position: editorState.newItemPosition);
     browserController.renderItems();
     homeState.pageView = HomePageView.treeBrowser;
     homeState.notify();
     editorState.editTextController.clear();
     editorState.notify();
+  }
+
+  void saveAndAddNext() {
+    final newName = editorState.editTextController.text.trim();
+    if (newName.isEmpty) {
+      cancelEdit();
+      return InfoService.info('Blank node has been dropped.');
+    }
+  }
+
+  void addNodeAt(int position) {
+    if (position < 0) position = treeTraverser.currentParent.size; // last
+    if (position > treeTraverser.currentParent.size) {
+      position = treeTraverser.currentParent.size;
+    }
+    editorState.newItemPosition = position;
+    editorState.editedNode = null;
+    editorState.numericKeyboard = false;
+    editorState.editTextController.text = '';
+    editorState.notify();
+    homeState.pageView = HomePageView.itemEditor;
+    homeState.notify();
+  }
+
+  void editNode(TreeNode node) {
+    editorState.newItemPosition = null;
+    editorState.editedNode = node;
+    editorState.numericKeyboard = false;
+    editorState.editTextController.text = node.name;
+    editorState.notify();
+    homeState.pageView = HomePageView.itemEditor;
+    homeState.notify();
   }
 
   void cancelEdit() {
@@ -99,8 +129,7 @@ class EditorController {
 
   void moveCursorRight() {
     final currentPos = editorState.editTextController.selection.extentOffset;
-    final newPos =
-        (currentPos + 1).clampMax(editorState.editTextController.text.length);
+    final newPos = (currentPos + 1).clampMax(editorState.editTextController.text.length);
     editorState.editTextController.selection = TextSelection.fromPosition(
       TextPosition(offset: newPos),
     );
@@ -146,10 +175,8 @@ class EditorController {
     final selection = editorState.editTextController.selection;
     final minSelection = min(selection.baseOffset, selection.extentOffset);
     final maxSelection = max(selection.baseOffset, selection.extentOffset);
-    final textBefore =
-        editorState.editTextController.text.substring(0, minSelection);
-    final textAfter =
-        editorState.editTextController.text.substring(maxSelection);
+    final textBefore = editorState.editTextController.text.substring(0, minSelection);
+    final textAfter = editorState.editTextController.text.substring(maxSelection);
     final finalText = textBefore + clipboardText + textAfter;
 
     editorState.editTextController.text = finalText;
@@ -164,15 +191,12 @@ class EditorController {
     final selection = editorState.editTextController.selection;
     final minSelection = min(selection.baseOffset, selection.extentOffset);
     final maxSelection = max(selection.baseOffset, selection.extentOffset);
-    final textBefore =
-        editorState.editTextController.text.substring(0, minSelection);
-    final textAfter =
-        editorState.editTextController.text.substring(maxSelection);
+    final textBefore = editorState.editTextController.text.substring(0, minSelection);
+    final textAfter = editorState.editTextController.text.substring(maxSelection);
 
     String finalText;
     if (minSelection == maxSelection) {
-      finalText =
-          textBefore.substring(0, (minSelection - 1).clampMin(0)) + textAfter;
+      finalText = textBefore.substring(0, (minSelection - 1).clampMin(0)) + textAfter;
     } else {
       finalText = textBefore + textAfter;
     }
@@ -187,10 +211,8 @@ class EditorController {
     final selection = editorState.editTextController.selection;
     final minSelection = min(selection.baseOffset, selection.extentOffset);
     final maxSelection = max(selection.baseOffset, selection.extentOffset);
-    final textBefore =
-        editorState.editTextController.text.substring(0, minSelection);
-    final textAfter =
-        editorState.editTextController.text.substring(maxSelection);
+    final textBefore = editorState.editTextController.text.substring(0, minSelection);
+    final textAfter = editorState.editTextController.text.substring(maxSelection);
 
     String finalText;
     if (minSelection == maxSelection && textAfter.isNotEmpty) {
@@ -203,5 +225,10 @@ class EditorController {
       TextPosition(offset: textBefore.length),
     );
     editorState.textEditFocus.requestFocus();
+  }
+
+  void toggleNumericKeyboard() {
+    editorState.numericKeyboard = !editorState.numericKeyboard;
+    editorState.notify();
   }
 }

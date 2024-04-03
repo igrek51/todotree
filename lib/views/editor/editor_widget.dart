@@ -11,13 +11,12 @@ class EditorWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final editorState = context.watch<EditorState>();
-    final editorController =
-        Provider.of<EditorController>(context, listen: false);
+    final editorController = Provider.of<EditorController>(context, listen: false);
 
     final textField = TextField(
       controller: editorState.editTextController,
       autofocus: true,
-      keyboardType: TextInputType.multiline,
+      keyboardType: editorState.numericKeyboard ? TextInputType.number : TextInputType.multiline,
       maxLines: null,
       focusNode: editorState.textEditFocus,
       decoration: InputDecoration(
@@ -30,7 +29,7 @@ class EditorWidget extends StatelessWidget {
       ),
     );
 
-    final rowSaveBtns = [
+    final rowSaveAuxBtns = [
       FlatButton(
         icon: Icon(Icons.check),
         label: '& Add',
@@ -46,7 +45,7 @@ class EditorWidget extends StatelessWidget {
         },
       ),
     ];
-    final rowSave2Btns = [
+    final rowSaveBtns = [
       FlatButton(
         icon: Icon(Icons.check),
         label: 'Save',
@@ -68,7 +67,7 @@ class EditorWidget extends StatelessWidget {
         },
       ),
     ];
-    final row2Btns = [
+    final rowCursorBtns = [
       FlatButton(
         icon: Icon(Icons.skip_previous_rounded),
         onPressed: () {
@@ -110,7 +109,7 @@ class EditorWidget extends StatelessWidget {
         },
       ),
     ];
-    final row3Btns = [
+    final rowClipboardBtns = [
       FlatButton(
         icon: Icon(Icons.copy),
         onPressed: () {
@@ -147,7 +146,7 @@ class EditorWidget extends StatelessWidget {
         },
       ),
     ];
-    final row4Btns = [
+    final rowToolkitBtns = [
       FlatButton(
         label: 'HH:mm',
         onPressed: () {
@@ -175,7 +174,9 @@ class EditorWidget extends StatelessWidget {
       FlatButton(
         label: '123',
         onPressed: () {
-          safeExecute(() {});
+          safeExecute(() {
+            editorController.toggleNumericKeyboard();
+          });
         },
       ),
     ];
@@ -188,14 +189,14 @@ class EditorWidget extends StatelessWidget {
             mainAxisSize: MainAxisSize.max,
             children: [
               textField,
-              Row(children: row2Btns),
-              Row(children: row3Btns),
-              Row(children: row4Btns),
-              Row(children: rowSaveBtns),
+              Row(children: rowCursorBtns),
+              Row(children: rowClipboardBtns),
+              Row(children: rowToolkitBtns),
+              Row(children: rowSaveAuxBtns),
               Expanded(
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: rowSave2Btns,
+                  children: rowSaveBtns,
                 ),
               ),
             ],
@@ -230,11 +231,7 @@ class FlatButton extends StatelessWidget {
     } else if (icon != null && label != null) {
       child = Row(
         mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          icon!,
-          SizedBox(width: 3),
-          Flexible(child: Text(label!))
-        ],
+        children: <Widget>[icon!, SizedBox(width: 3), Flexible(child: Text(label!))],
       );
     } else if (icon != null) {
       child = icon!;

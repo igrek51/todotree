@@ -48,9 +48,11 @@ class AppFactory {
     clipboardManager = ClipboardManager();
     treeTraverser = TreeTraverser(treeStorage);
     appLifecycle = AppLifecycle(treeStorage, treeTraverser);
-    browserController = BrowserController(homeState, browserState, editorState, treeTraverser, clipboardManager, appLifecycle, settingsProvider);
+    browserController =
+        BrowserController(homeState, browserState, treeTraverser, clipboardManager, appLifecycle, settingsProvider);
     editorController = EditorController(homeState, editorState, treeTraverser, clipboardManager);
     editorController.browserController = browserController;
+    browserController.editorController = editorController;
     homeController = HomeController(homeState, treeTraverser, browserController, editorController);
     mainMenuRunner = MainMenuRunner(this);
     logger.debug('AppFactory created');

@@ -8,6 +8,7 @@ class EditorState extends ChangeNotifier {
   FocusNode textEditFocus = FocusNode();
   TreeNode? editedNode;
   int? newItemPosition;
+  bool numericKeyboard = false;
 
   void notify() {
     notifyListeners();

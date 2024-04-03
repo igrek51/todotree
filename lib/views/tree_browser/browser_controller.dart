@@ -6,7 +6,7 @@ import 'package:todotree/services/info_service.dart';
 import 'package:todotree/util/logger.dart';
 import 'package:todotree/util/collections.dart';
 import 'package:todotree/util/numbers.dart';
-import 'package:todotree/views/editor/editor_state.dart';
+import 'package:todotree/views/editor/editor_controller.dart';
 import 'package:todotree/services/tree_traverser.dart';
 import 'package:todotree/model/tree_node.dart';
 import 'package:todotree/views/home/home_state.dart';
@@ -15,7 +15,8 @@ import 'package:todotree/views/tree_browser/browser_state.dart';
 class BrowserController {
   HomeState homeState;
   BrowserState browserState;
-  EditorState editorState;
+
+  late EditorController editorController;
 
   TreeTraverser treeTraverser;
   ClipboardManager clipboardManager;
@@ -24,8 +25,8 @@ class BrowserController {
 
   Map<TreeNode, double> scrollCache = {};
 
-  BrowserController(this.homeState, this.browserState, this.editorState,
-      this.treeTraverser, this.clipboardManager, this.appLifecycle, this.settingsProvider);
+  BrowserController(this.homeState, this.browserState, this.treeTraverser, this.clipboardManager, this.appLifecycle,
+      this.settingsProvider);
 
   void init() {
     renderAll();
@@ -53,12 +54,7 @@ class BrowserController {
     if (node.type == TreeNodeType.link) {
       return InfoService.error('Can\'t edit a link');
     }
-    editorState.newItemPosition = null;
-    editorState.editedNode = node;
-    editorState.editTextController.text = node.name;
-    editorState.notify();
-    homeState.pageView = HomePageView.itemEditor;
-    homeState.notify();
+    editorController.editNode(node);
   }
 
   bool goBack() {
@@ -87,8 +83,7 @@ class BrowserController {
 
   void restoreScrollOffset() {
     if (scrollCache.containsKey(treeTraverser.currentParent)) {
-      browserState.scrollController
-          .jumpTo(scrollCache[treeTraverser.currentParent]!);
+      browserState.scrollController.jumpTo(scrollCache[treeTraverser.currentParent]!);
       scrollCache.remove(treeTraverser.currentParent);
     }
   }
@@ -113,16 +108,7 @@ class BrowserController {
 
   void addNodeAt(int position) {
     ensureNoSelectionMode();
-    if (position < 0) position = treeTraverser.currentParent.size; // last
-    if (position > treeTraverser.currentParent.size) {
-      position = treeTraverser.currentParent.size;
-    }
-    editorState.newItemPosition = position;
-    editorState.editedNode = null;
-    editorState.editTextController.text = '';
-    editorState.notify();
-    homeState.pageView = HomePageView.itemEditor;
-    homeState.notify();
+    editorController.addNodeAt(position);
   }
 
   void addNodeToTheEnd() {
@@ -160,17 +146,15 @@ class BrowserController {
   }
 
   void removeMultipleNodes(List<int> sortedPositions) {
-    List<Pair<int, TreeNode>> originalNodePositions = sortedPositions
-        .map((index) => Pair(index, treeTraverser.getChild(index)))
-        .toList();
+    List<Pair<int, TreeNode>> originalNodePositions =
+        sortedPositions.map((index) => Pair(index, treeTraverser.getChild(index))).toList();
     for (final pair in originalNodePositions) {
       treeTraverser.removeFromCurrent(pair.second);
     }
     treeTraverser.cancelSelection();
     renderItems();
 
-    InfoService.snackbarAction(
-        'Removed: ${sortedPositions.length}', 'UNDO', () {
+    InfoService.snackbarAction('Removed: ${sortedPositions.length}', 'UNDO', () {
       for (final pair in originalNodePositions) {
         treeTraverser.addChildToCurrent(pair.second, position: pair.first);
       }
@@ -181,8 +165,7 @@ class BrowserController {
 
   void removeNodesAt(int position) {
     if (treeTraverser.selectionMode) {
-      List<int> sortedPositions = treeTraverser.selectedIndexes.toList()
-        ..sort();
+      List<int> sortedPositions = treeTraverser.selectedIndexes.toList()..sort();
       removeMultipleNodes(sortedPositions);
     } else {
       final node = treeTraverser.getChild(position);
@@ -196,19 +179,15 @@ class BrowserController {
     final targetParent = target?.parent;
     int? originalTargetPosition;
     if (target != null && targetParent != null) {
-      originalTargetPosition =
-          targetParent.children.indexOf(target).nonNegative();
+      originalTargetPosition = targetParent.children.indexOf(target).nonNegative();
       treeTraverser.removeFromParent(target, targetParent);
     }
     treeTraverser.removeFromCurrent(link);
     renderItems();
 
-    InfoService.snackbarAction('Link & target removed: ${link.name}', 'UNDO',
-        () {
+    InfoService.snackbarAction('Link & target removed: ${link.name}', 'UNDO', () {
       treeTraverser.addChildToCurrent(link, position: originalLinkPosition);
-      if (target != null &&
-          targetParent != null &&
-          originalTargetPosition != null) {
+      if (target != null && targetParent != null && originalTargetPosition != null) {
         targetParent.insertAt(originalTargetPosition, target);
       }
       renderItems();
@@ -317,7 +296,6 @@ class BrowserController {
   }
 
   void rememberScrollOffset() {
-    scrollCache[treeTraverser.currentParent] =
-        browserState.scrollController.offset;
+    scrollCache[treeTraverser.currentParent] = browserState.scrollController.offset;
   }
 }
