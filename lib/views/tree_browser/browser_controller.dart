@@ -28,10 +28,6 @@ class BrowserController {
   BrowserController(this.homeState, this.browserState, this.treeTraverser, this.clipboardManager, this.appLifecycle,
       this.settingsProvider);
 
-  void init() {
-    renderAll();
-  }
-
   void renderAll() {
     renderItems();
     renderTitle();
@@ -207,7 +203,6 @@ class BrowserController {
         selectNodeAt(position);
       } else if (action == 'select-all') {
         selectAll();
-      } else if (action == 'remove-remote-node' && node != null) {
       } else if (action == 'remove-link-and-target' && node != null) {
         removeLinkAndTarget(node);
       } else if (action == 'add-above' && position != null) {
@@ -220,9 +215,12 @@ class BrowserController {
         pasteAbove(position);
       } else if (action == 'paste-as-link' && position != null) {
         pasteAboveAsLink(position);
-      } else if (action == 'split' && node != null) {
-        InfoService.error('Not implemented yet');
+      } else if (action == 'split' && node != null && position != null) {
+        splitNodeByComma(node, position);
       } else if (action == 'push-to-remote' && node != null) {
+        InfoService.error('Not implemented yet');
+      } else if (action == 'remove-remote-node' && node != null) {
+        InfoService.error('Not implemented yet');
       } else {
         logger.error('Unknown action: $action');
       }
@@ -297,5 +295,18 @@ class BrowserController {
 
   void rememberScrollOffset() {
     scrollCache[treeTraverser.currentParent] = browserState.scrollController.offset;
+  }
+
+  void splitNodeByComma(TreeNode node, int position) {
+    final parts = node.name.split(',').map((e) => e.trim()).toList();
+    node.name = parts.first;
+    final newNodes = parts.map((part) => TreeNode.textNode(part)).toList().dropFirst(1);
+    for (final newNode in newNodes) {
+      position++;
+      treeTraverser.addChildToCurrent(newNode, position: position);
+    }
+    treeTraverser.unsavedChanges = true;
+    renderItems();
+    InfoService.info('Split into ${parts.length} nodes.');
   }
 }

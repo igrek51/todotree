@@ -13,7 +13,7 @@ void startupApp(AppFactory app) async {
     _resizeWindow();
     await app.settingsProvider.init();
     await app.treeTraverser.load();
-    app.browserController.init();
+    app.browserController.renderAll();
     kickstartApp(app);
     logger.info('App initialized');
 

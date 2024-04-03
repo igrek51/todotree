@@ -35,7 +35,11 @@ class MainMenuRunner {
       ActionMenuItem(
         id: 'reload',
         name: '🔄 Reload',
-        action: () {},
+        action: () async {
+          await appFactory.treeTraverser.load();
+          appFactory.browserController.renderAll();
+          InfoService.info('Database loaded');
+        },
       ),
       ActionMenuItem(
         id: 'restore-backup',

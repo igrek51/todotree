@@ -13,9 +13,11 @@ class OptionsDialog {
         return AlertDialog(
           title: Text(title),
           contentPadding: EdgeInsets.symmetric(horizontal: 2.0, vertical: 16.0),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: buildOptionWidgets(options, context),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: buildOptionWidgets(options, context),
+            ),
           ),
         );
       },
