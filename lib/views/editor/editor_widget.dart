@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
 import 'package:todotree/util/errors.dart';
@@ -15,23 +14,37 @@ class EditorWidget extends StatelessWidget {
     final editorController =
         Provider.of<EditorController>(context, listen: false);
 
+    final textField = TextField(
+      controller: editorState.editTextController,
+      autofocus: true,
+      keyboardType: TextInputType.multiline,
+      maxLines: null,
+      decoration: InputDecoration(
+        border: OutlineInputBorder(),
+        hintText: 'Text',
+      ),
+      style: TextStyle(
+        color: Colors.white,
+        fontSize: 18,
+      ),
+    );
+
     final rowSaveBtns = [
       FlatButton(
         icon: Icon(Icons.check),
-        label: '& add',
+        label: '& Add',
         onPressed: () {
           safeExecute(() {});
         },
       ),
       FlatButton(
         icon: Icon(Icons.check),
-        label: '& enter',
+        label: '& Enter',
         onPressed: () {
           safeExecute(() {});
         },
       ),
     ];
-
     final rowSave2Btns = [
       FlatButton(
         icon: Icon(Icons.check),
@@ -52,7 +65,6 @@ class EditorWidget extends StatelessWidget {
         },
       ),
     ];
-
     final row2Btns = [
       FlatButton(
         icon: Icon(Icons.skip_previous_rounded),
@@ -85,7 +97,6 @@ class EditorWidget extends StatelessWidget {
         },
       ),
     ];
-
     final row3Btns = [
       FlatButton(
         icon: Icon(Icons.copy),
@@ -115,7 +126,6 @@ class EditorWidget extends StatelessWidget {
         },
       ),
     ];
-
     final row4Btns = [
       FlatButton(
         label: 'HH:mm',
@@ -152,16 +162,7 @@ class EditorWidget extends StatelessWidget {
     return SingleChildScrollView(
       child: Column(
         children: [
-          TextField(
-            controller: editorState.editTextController,
-            autofocus: true,
-            keyboardType: TextInputType.multiline,
-            maxLines: null,
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
-              hintText: 'Text',
-            ),
-          ),
+          textField,
           Row(children: row2Btns),
           Row(children: row3Btns),
           Row(children: row4Btns),
@@ -180,12 +181,14 @@ class FlatButton extends StatelessWidget {
     this.icon,
     required this.onPressed,
     this.flex = 1,
+    this.expandHeight = false,
   });
 
   final String? label;
   final Widget? icon;
   final VoidCallback onPressed;
   final int flex;
+  final bool expandHeight;
 
   @override
   Widget build(BuildContext context) {
@@ -218,7 +221,7 @@ class FlatButton extends StatelessWidget {
               borderRadius: BorderRadius.circular(5.0),
             ),
             padding: EdgeInsets.symmetric(vertical: 10.0),
-            minimumSize: Size.fromHeight(60.0),
+            minimumSize: Size.fromHeight(55.0),
           ),
           onPressed: () {
             onPressed();
