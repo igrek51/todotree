@@ -180,17 +180,28 @@ class EditorWidget extends StatelessWidget {
       ),
     ];
 
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          textField,
-          Row(children: row2Btns),
-          Row(children: row3Btns),
-          Row(children: row4Btns),
-          Row(children: rowSaveBtns),
-          Row(children: rowSave2Btns),
-        ],
-      ),
+    return CustomScrollView(
+      slivers: [
+        SliverFillRemaining(
+          hasScrollBody: false,
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              textField,
+              Row(children: row2Btns),
+              Row(children: row3Btns),
+              Row(children: row4Btns),
+              Row(children: rowSaveBtns),
+              Expanded(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: rowSave2Btns,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
