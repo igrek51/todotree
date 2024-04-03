@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:todotree/util/collections.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 import 'package:todotree/util/errors.dart';
 import 'package:todotree/services/tree_traverser.dart';
@@ -24,30 +26,32 @@ class BrowserWidget extends StatelessWidget {
     final browserState = context.watch<BrowserState>();
     final browserController = Provider.of<BrowserController>(context, listen: false);
 
-    return ReorderableListView(
-      onReorder: (int oldIndex, int newIndex) {
-        browserController.reorderNodes(oldIndex, newIndex);
-      },
-      buildDefaultDragHandles: false,
-      scrollController: browserState.scrollController,
-      proxyDecorator: (Widget child, int index, Animation<double> animation) {
-        return Material(
-          elevation: 4.0,
-          color: Color.fromARGB(75, 190, 190, 190),
-          child: child,
-        );
-      },
-      children: <Widget>[
-        for (final (index, item) in browserState.items.indexed)
-          TreeListItemWidget(
-            key: Key(identityHashCode(item).toString()),
-            index: index,
-            treeItem: item,
+    return SlidableAutoCloseBehavior(
+      child: ReorderableListView(
+        onReorder: (int oldIndex, int newIndex) {
+          browserController.reorderNodes(oldIndex, newIndex);
+        },
+        buildDefaultDragHandles: false,
+        scrollController: browserState.scrollController,
+        proxyDecorator: (Widget child, int index, Animation<double> animation) {
+          return Material(
+            elevation: 4.0,
+            color: Color.fromARGB(90, 190, 190, 190),
+            child: child,
+          );
+        },
+        children: <Widget>[
+          for (final (index, item) in browserState.items.indexed)
+            TreeListItemWidget(
+              key: Key(identityHashCode(item).toString()),
+              index: index,
+              treeItem: item,
+            ),
+          PlusItemWidget(
+            key: const Key('plus'),
           ),
-        PlusItemWidget(
-          key: const Key('plus'),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -104,37 +108,59 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
 
     return Material(
       color: Colors.transparent,
-      child: InkWell(
-        onTap: () {
-          safeExecute(() async {
-            await browserController.handleNodeTap(widget.treeItem, widget.index);
-          });
-        },
-        onLongPress: () {
-          showNodeOptionsDialog(context);
-        },
-        child: AnimatedContainer(
-          duration: const Duration(seconds: 1),
-          padding: const EdgeInsets.all(0.0),
-          decoration: BoxDecoration(
-            color: highlighted ? Color.fromARGB(199, 53, 156, 240) : Colors.transparent,
-            border: Border.symmetric(
-              horizontal: BorderSide(
-                color: const Color(0x44888888),
-                width: 0.5,
-                style: BorderStyle.solid,
-                strokeAlign: BorderSide.strokeAlignInside,
+      child: Slidable(
+        groupTag: '0',
+        key: ValueKey(widget.key),
+        endActionPane: ActionPane(
+          motion: BehindMotion(),
+          extentRatio: 0.2,
+          children: [
+            SlidableAction(
+              padding: EdgeInsets.zero,
+              onPressed: (BuildContext context) {
+                safeExecute(() {
+                  browserController.removeOneNode(widget.treeItem);
+                });
+              },
+              backgroundColor: Color(0xFFFE4A49),
+              foregroundColor: Colors.white,
+              icon: Icons.delete,
+              label: 'Remove',
+            ),
+          ],
+        ),
+        child: InkWell(
+          onTap: () {
+            safeExecute(() async {
+              await browserController.handleNodeTap(widget.treeItem, widget.index);
+            });
+          },
+          onLongPress: () {
+            showNodeOptionsDialog(context);
+          },
+          child: AnimatedContainer(
+            duration: const Duration(seconds: 1),
+            padding: const EdgeInsets.all(0.0),
+            decoration: BoxDecoration(
+              color: highlighted ? Color.fromARGB(199, 53, 156, 240) : Colors.transparent,
+              border: Border.symmetric(
+                horizontal: BorderSide(
+                  color: const Color(0x44888888),
+                  width: 0.5,
+                  style: BorderStyle.solid,
+                  strokeAlign: BorderSide.strokeAlignInside,
+                ),
               ),
             ),
-          ),
-          child: Row(
-            children: [
-              buildLeftIcon(selectionMode, isItemSelected, browserController),
-              buildMiddleText(context),
-              buildMoreActionButton(context),
-              selectionMode ? null : buildMiddleActionButton(context),
-              selectionMode ? null : buildAddButton(browserController),
-            ].filterNotNull(),
+            child: Row(
+              children: [
+                buildLeftIcon(selectionMode, isItemSelected, browserController),
+                buildMiddleText(context),
+                buildMoreActionButton(context),
+                selectionMode ? null : buildMiddleActionButton(context),
+                selectionMode ? null : buildAddButton(browserController),
+              ].filterNotNull(),
+            ),
           ),
         ),
       ),
