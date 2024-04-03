@@ -78,7 +78,13 @@ class TitleBar extends StatelessWidget {
                   return mainMenuRunner.menuActions(context).map((action) {
                     return PopupMenuItem(
                       value: action.id,
-                      child: Text(action.name),
+                      height: 60,
+                      child: Text(
+                        action.name,
+                        style: TextStyle(
+                          fontSize: 17,
+                        ),
+                      ),
                     );
                   }).toList();
                 },

@@ -3,20 +3,24 @@ import 'package:shared_preferences/shared_preferences.dart';
 class SettingsProvider {
   SharedPreferences? sharedPreferences;
 
+  Future<void> init() async {
+    sharedPreferences = await SharedPreferences.getInstance();
+  }
+
   Future<SharedPreferences> getSharedPrefs() async {
     sharedPreferences ??= await SharedPreferences.getInstance();
     return sharedPreferences!;
   }
 
-  Future<String> get externalBackupLocation async {
-    return (await getSharedPrefs()).getString('externalBackupLocation') ?? '';
+  String get externalBackupLocation {
+    return sharedPreferences?.getString('externalBackupLocation') ?? '';
   }
 
-  Future<String> get userAuthToken async {
-    return (await getSharedPrefs()).getString('userAuthToken') ?? '';
+  String get userAuthToken {
+    return sharedPreferences?.getString('userAuthToken') ?? '';
   }
 
-  Future<bool> get firstLevelFolders async {
-    return (await getSharedPrefs()).getBool('firstLevelFolders') ?? false;
+  bool get firstLevelFolders {
+    return sharedPreferences?.getBool('firstLevelFolders') ?? false;
   }
 }

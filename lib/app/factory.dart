@@ -49,7 +49,7 @@ class AppFactory {
     treeTraverser = TreeTraverser(treeStorage);
     appLifecycle = AppLifecycle(treeStorage, treeTraverser);
     browserController = BrowserController(homeState, browserState, editorState, treeTraverser, clipboardManager, appLifecycle, settingsProvider);
-    editorController = EditorController(homeState, editorState, treeTraverser);
+    editorController = EditorController(homeState, editorState, treeTraverser, clipboardManager);
     editorController.browserController = browserController;
     homeController = HomeController(homeState, treeTraverser, browserController, editorController);
     mainMenuRunner = MainMenuRunner(this);

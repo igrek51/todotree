@@ -140,7 +140,7 @@ class ClipboardManager {
   void copyAsText(String text) {
     copyToSystemClipboard(text);
     clearClipboardNodes();
-    InfoService.info('Text copied: $text');
+    InfoService.info('Copied to clipboard: $text');
   }
 
   TreeNode buildLinkItem(TreeNode targetNode) {

@@ -114,19 +114,25 @@ class EditorWidget extends StatelessWidget {
       FlatButton(
         icon: Icon(Icons.copy),
         onPressed: () {
-          safeExecute(() {});
+          safeExecute(() {
+            editorController.copyToClipboard();
+          });
         },
       ),
       FlatButton(
         icon: Icon(Icons.paste),
         onPressed: () {
-          safeExecute(() {});
+          safeExecute(() async {
+            await editorController.pasteFromClipboard();
+          });
         },
       ),
       FlatButton(
         icon: Icon(Icons.backspace),
         onPressed: () {
-          safeExecute(() {});
+          safeExecute(() {
+            editorController.keyBackspace();
+          });
         },
       ),
       FlatButton(
@@ -135,7 +141,9 @@ class EditorWidget extends StatelessWidget {
           child: const Icon(Icons.backspace),
         ),
         onPressed: () {
-          safeExecute(() {});
+          safeExecute(() {
+            editorController.keyDelete();
+          });
         },
       ),
     ];

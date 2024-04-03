@@ -37,7 +37,7 @@ class TreeStorage {
     final file = await _writeDbString(content);
     logger.info('local database saved to ${file.absolute.path}');
     await backupManager.saveLocalBackup(file);
-    await backupManager.saveExternalBackups(file, await settingsProvider.externalBackupLocation);
+    await backupManager.saveExternalBackups(file, settingsProvider.externalBackupLocation);
   }
 
   Future<String> get _localPath async {

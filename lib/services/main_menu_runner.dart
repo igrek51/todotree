@@ -6,14 +6,10 @@ import 'package:todotree/views/settings/settings_page.dart';
 class MainMenuRunner {
   final AppFactory appFactory;
 
-  List<ActionMenuItem> _menuActions = [];
-
   MainMenuRunner(this.appFactory);
 
   List<ActionMenuItem> menuActions(BuildContext context) {
-    if (_menuActions.isNotEmpty) return _menuActions;
-
-    _menuActions = <ActionMenuItem>[
+    final menuActions = <ActionMenuItem>[
       ActionMenuItem(
         id: 'exit-without-saving',
         name: '❌ Exit discarding changes',
@@ -83,8 +79,7 @@ class MainMenuRunner {
         },
       ),
     ];
-
-    return _menuActions;
+    return menuActions;
   }
 }
 

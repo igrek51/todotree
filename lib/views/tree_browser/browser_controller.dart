@@ -307,7 +307,7 @@ class BrowserController {
       onToggleSelectedNode(index);
     } else if (node.isLink) {
       goIntoNode(node);
-    } else if (node.depth == 1 && await settingsProvider.firstLevelFolders) {
+    } else if (node.depth == 1 && settingsProvider.firstLevelFolders) {
       goIntoNode(node);
     } else if (node.isLeaf) {
       editNode(node);
