@@ -49,6 +49,7 @@ class EditorWidget extends StatelessWidget {
       FlatButton(
         icon: Icon(Icons.check),
         label: 'Save',
+        expandHeight: true,
         onPressed: () {
           safeExecute(() {
             editorController.saveNode();
@@ -58,6 +59,7 @@ class EditorWidget extends StatelessWidget {
       FlatButton(
         icon: Icon(Icons.cancel),
         label: 'Cancel',
+        expandHeight: true,
         onPressed: () {
           safeExecute(() {
             editorController.cancelEdit();

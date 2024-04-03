@@ -57,7 +57,7 @@ class EditorController {
   }
 
   void cancelEdit() {
-    treeTraverser.focusNode = null;
+    treeTraverser.focusNode = editorState.editedNode;
     browserController.renderItems();
     homeState.pageView = HomePageView.treeBrowser;
     homeState.notify();
