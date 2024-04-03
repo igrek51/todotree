@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:todotree/util/collections.dart';
 
 import 'package:todotree/util/errors.dart';
 import 'package:todotree/services/tree_traverser.dart';
@@ -129,9 +130,9 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
               buildLeftIcon(selectionMode, isItemSelected, browserController),
               buildMiddleText(context),
               buildMoreActionButton(context),
-              buildMiddleActionButton(context),
-              buildAddButton(browserController),
-            ],
+              selectionMode ? null : buildMiddleActionButton(context),
+              selectionMode ? null : buildAddButton(browserController),
+            ].filterNotNull(),
           ),
         ),
       ),

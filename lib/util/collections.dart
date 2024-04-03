@@ -23,3 +23,9 @@ extension ListExtension<T> on List<T> {
     return sublist(start);
   }
 }
+
+extension ListNullableExtension<T> on List<T?> {
+  List<T> filterNotNull() {
+    return where((e) => e != null).map((e) => e as T).toList();
+  }
+}
