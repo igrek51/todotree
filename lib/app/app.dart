@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:todotree/app/factory.dart';
 import 'package:todotree/services/clipboard_manager.dart';
 import 'package:todotree/services/info_service.dart';
+import 'package:todotree/services/shortcut_handler.dart';
 import 'package:todotree/util/logger.dart';
 import 'package:todotree/services/main_menu_runner.dart';
 import 'package:todotree/services/tree_traverser.dart';
@@ -34,6 +35,7 @@ class _AppWidgetState extends State<AppWidget> with WidgetsBindingObserver {
       Provider<TreeTraverser>(create: (context) => widget.appFactory.treeTraverser),
       Provider<ClipboardManager>(create: (context) => widget.appFactory.clipboardManager),
       Provider<MainMenuRunner>(create: (context) => widget.appFactory.mainMenuRunner),
+      Provider<ShortcutHandler>(create: (context) => widget.appFactory.shortcutHandler),
       Provider<AppFactory>(create: (context) => widget.appFactory),
     ];
 

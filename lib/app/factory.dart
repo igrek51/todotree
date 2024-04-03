@@ -1,5 +1,6 @@
 import 'package:todotree/services/database/backup_manager.dart';
 import 'package:todotree/services/settings_provider.dart';
+import 'package:todotree/services/shortcut_handler.dart';
 import 'package:todotree/views/editor/editor_controller.dart';
 import 'package:todotree/services/clipboard_manager.dart';
 import 'package:todotree/services/app_lifecycle.dart';
@@ -33,6 +34,7 @@ class AppFactory {
   late final MainMenuRunner mainMenuRunner;
   late final BackupManager backupManager;
   late final SettingsProvider settingsProvider;
+  late final ShortcutHandler shortcutHandler;
 
   AppFactory();
 
@@ -55,6 +57,7 @@ class AppFactory {
     browserController.editorController = editorController;
     homeController = HomeController(homeState, treeTraverser, browserController, editorController);
     mainMenuRunner = MainMenuRunner(this);
+    shortcutHandler = ShortcutHandler(homeController);
     logger.debug('AppFactory created');
   }
 }

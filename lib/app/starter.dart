@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:window_manager/window_manager.dart';
@@ -16,7 +15,6 @@ void startupApp(AppFactory app) async {
     app.browserController.renderAll();
     kickstartApp(app);
     logger.info('App initialized');
-
   } catch (error, stackTrace) {
     reportError(error, stackTrace, 'Startup failed');
   }
@@ -34,5 +32,4 @@ void kickstartApp(AppFactory app) {
   const kickstartVar = String.fromEnvironment('KICKSTART', defaultValue: '0');
   if (kickstartVar != '1') return;
   logger.debug('Kickstarting app...');
-  // Initialization steps go here
 }

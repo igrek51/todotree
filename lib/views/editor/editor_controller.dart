@@ -69,7 +69,7 @@ class EditorController {
     homeState.notify();
     editorState.editTextController.clear();
     editorState.notify();
-    InfoService.info('Node saved: $newName');
+    InfoService.info('Saved: $newName');
   }
 
   void saveNewNode() {
@@ -85,7 +85,7 @@ class EditorController {
     homeState.notify();
     editorState.editTextController.clear();
     editorState.notify();
-    InfoService.info('Node added: $newName');
+    InfoService.info('Added: $newName');
   }
 
   void saveAndAddNext() {
@@ -102,13 +102,13 @@ class EditorController {
       editorState.editedNode?.name = newName;
       treeTraverser.focusNode = editorState.editedNode;
       nextPosition = (treeTraverser.getChildIndex(editorState.editedNode!) ?? 0) + 1;
-      InfoService.info('Node saved: $newName');
+      InfoService.info('Saved: $newName');
     } else if (editorState.newItemPosition != null) {
       final newNode = TreeNode.textNode(newName);
       treeTraverser.addChildToCurrent(newNode, position: editorState.newItemPosition);
       nextPosition = (editorState.newItemPosition ?? 0) + 1;
       browserController.renderAll();
-      InfoService.info('Node added: $newName');
+      InfoService.info('Added: $newName');
     }
 
     editorState.newItemPosition = nextPosition;
@@ -132,12 +132,12 @@ class EditorController {
       editorState.editedNode?.name = newName;
       treeTraverser.focusNode = editorState.editedNode;
       newParent = editorState.editedNode;
-      InfoService.info('Node saved: $newName');
+      InfoService.info('Saved: $newName');
     } else if (editorState.newItemPosition != null) {
       final newNode = TreeNode.textNode(newName);
       treeTraverser.addChildToCurrent(newNode, position: editorState.newItemPosition);
       newParent = newNode;
-      InfoService.info('Node added: $newName');
+      InfoService.info('Added: $newName');
     }
 
     if (newParent != null) {
@@ -285,6 +285,10 @@ class EditorController {
 
   void toggleNumericKeyboard() {
     editorState.numericKeyboard = !editorState.numericKeyboard;
+    editorState.textEditFocus.unfocus();
     editorState.notify();
+    Future.delayed(const Duration(milliseconds: 1), () {
+        editorState.textEditFocus.requestFocus();
+    });
   }
 }
