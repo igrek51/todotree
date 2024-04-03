@@ -34,14 +34,18 @@ class EditorWidget extends StatelessWidget {
         icon: Icon(Icons.check),
         label: '& Add',
         onPressed: () {
-          safeExecute(() {});
+          safeExecute(() {
+            editorController.saveAndAddNext();
+          });
         },
       ),
       FlatButton(
         icon: Icon(Icons.check),
         label: '& Enter',
         onPressed: () {
-          safeExecute(() {});
+          safeExecute(() {
+            editorController.saveAndEnter();
+          });
         },
       ),
     ];

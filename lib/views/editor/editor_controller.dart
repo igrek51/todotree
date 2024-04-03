@@ -22,6 +22,29 @@ class EditorController {
 
   EditorController(this.homeState, this.editorState, this.treeTraverser, this.clipboardManager);
 
+  void addNodeAt(int position) {
+    position = position.clampMax(treeTraverser.currentParent.size);
+    editorState.newItemPosition = position;
+    editorState.editedNode = null;
+    editorState.numericKeyboard = false;
+    editorState.editTextController.text = '';
+    editorState.textEditFocus.requestFocus();
+    editorState.notify();
+    homeState.pageView = HomePageView.itemEditor;
+    homeState.notify();
+  }
+
+  void editNode(TreeNode node) {
+    editorState.newItemPosition = null;
+    editorState.editedNode = node;
+    editorState.numericKeyboard = false;
+    editorState.editTextController.text = node.name;
+    editorState.textEditFocus.requestFocus();
+    editorState.notify();
+    homeState.pageView = HomePageView.itemEditor;
+    homeState.notify();
+  }
+
   void saveNode() {
     if (editorState.editedNode != null) {
       saveEditedNode();
@@ -46,6 +69,7 @@ class EditorController {
     homeState.notify();
     editorState.editTextController.clear();
     editorState.notify();
+    InfoService.info('Node saved: $newName');
   }
 
   void saveNewNode() {
@@ -61,38 +85,70 @@ class EditorController {
     homeState.notify();
     editorState.editTextController.clear();
     editorState.notify();
+    InfoService.info('Node added: $newName');
   }
 
   void saveAndAddNext() {
     final newName = editorState.editTextController.text.trim();
     if (newName.isEmpty) {
-      cancelEdit();
-      return InfoService.info('Blank node has been dropped.');
+      editorState.editTextController.clear();
+      editorState.textEditFocus.requestFocus();
+      editorState.notify();
+      return InfoService.info('Can\'t save a blank node');
     }
-  }
 
-  void addNodeAt(int position) {
-    if (position < 0) position = treeTraverser.currentParent.size; // last
-    if (position > treeTraverser.currentParent.size) {
-      position = treeTraverser.currentParent.size;
+    int nextPosition = 0;
+    if (editorState.editedNode != null) {
+      editorState.editedNode?.name = newName;
+      treeTraverser.focusNode = editorState.editedNode;
+      nextPosition = (treeTraverser.getChildIndex(editorState.editedNode!) ?? 0) + 1;
+      InfoService.info('Node saved: $newName');
+    } else if (editorState.newItemPosition != null) {
+      final newNode = TreeNode.textNode(newName);
+      treeTraverser.addChildToCurrent(newNode, position: editorState.newItemPosition);
+      nextPosition = (editorState.newItemPosition ?? 0) + 1;
+      browserController.renderAll();
+      InfoService.info('Node added: $newName');
     }
-    editorState.newItemPosition = position;
+
+    editorState.newItemPosition = nextPosition;
     editorState.editedNode = null;
-    editorState.numericKeyboard = false;
-    editorState.editTextController.text = '';
+    editorState.editTextController.clear();
+    editorState.textEditFocus.requestFocus();
     editorState.notify();
-    homeState.pageView = HomePageView.itemEditor;
-    homeState.notify();
   }
 
-  void editNode(TreeNode node) {
-    editorState.newItemPosition = null;
-    editorState.editedNode = node;
-    editorState.numericKeyboard = false;
-    editorState.editTextController.text = node.name;
+  void saveAndEnter() {
+    final newName = editorState.editTextController.text.trim();
+    if (newName.isEmpty) {
+      editorState.editTextController.clear();
+      editorState.textEditFocus.requestFocus();
+      editorState.notify();
+      return InfoService.info('Can\'t save a blank node');
+    }
+
+    TreeNode? newParent;
+    if (editorState.editedNode != null) {
+      editorState.editedNode?.name = newName;
+      treeTraverser.focusNode = editorState.editedNode;
+      newParent = editorState.editedNode;
+      InfoService.info('Node saved: $newName');
+    } else if (editorState.newItemPosition != null) {
+      final newNode = TreeNode.textNode(newName);
+      treeTraverser.addChildToCurrent(newNode, position: editorState.newItemPosition);
+      newParent = newNode;
+      InfoService.info('Node added: $newName');
+    }
+
+    if (newParent != null) {
+      treeTraverser.goTo(newParent);
+      browserController.renderAll();
+    }
+    editorState.newItemPosition = 0;
+    editorState.editedNode = null;
+    editorState.editTextController.clear();
+    editorState.textEditFocus.requestFocus();
     editorState.notify();
-    homeState.pageView = HomePageView.itemEditor;
-    homeState.notify();
   }
 
   void cancelEdit() {

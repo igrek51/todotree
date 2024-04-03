@@ -142,14 +142,17 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
   Widget buildLeftIcon(bool selectionMode, bool isItemSelected,
       BrowserController browserController) {
     if (selectionMode) {
-      return Checkbox(
-        value: isItemSelected,
-        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        onChanged: (bool? value) {
-          safeExecute(() {
-            browserController.onToggleSelectedNode(widget.index);
-          });
-        },
+      return SizedBox(
+        width: 40,
+        child: Checkbox(
+          value: isItemSelected,
+          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          onChanged: (bool? value) {
+            safeExecute(() {
+              browserController.onToggleSelectedNode(widget.index);
+            });
+          },
+        ),
       );
     } else {
       return ReorderableDragStartListener(
