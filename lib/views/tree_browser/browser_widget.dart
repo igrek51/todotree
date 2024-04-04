@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:todotree/services/settings_provider.dart';
 import 'package:todotree/util/collections.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
@@ -96,6 +97,7 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
   Widget build(BuildContext context) {
     final browserController = Provider.of<BrowserController>(context, listen: false);
     final treeTraverser = Provider.of<TreeTraverser>(context, listen: false);
+    final settingsProvider = Provider.of<SettingsProvider>(context, listen: false);
     final browserState = context.watch<BrowserState>();
     final selectionMode = browserState.selectedIndexes.isNotEmpty;
     final isItemSelected = browserState.selectedIndexes.contains(widget.position);
@@ -105,84 +107,94 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
       _startAnimation();
     }
 
-    return Material(
-      color: Colors.transparent,
-      child: Slidable(
-        groupTag: '0',
-        key: ValueKey(widget.key),
-        startActionPane: ActionPane(
-          motion: BehindMotion(),
-          extentRatio: 0.25,
-          openThreshold: 0.2,
-          closeThreshold: 0.2,
-          children: [
-            SlidableAction(
-              padding: EdgeInsets.zero,
-              onPressed: (BuildContext context) {
-                safeExecute(() {
-                  browserController.copyItemsAt(widget.position);
-                });
-              },
-              backgroundColor: Color.fromARGB(255, 73, 85, 254),
-              foregroundColor: Colors.white,
-              icon: Icons.copy,
-            ),
-          ],
-        ),
-        endActionPane: ActionPane(
-          motion: BehindMotion(),
-          extentRatio: 0.25,
-          openThreshold: 0.2,
-          closeThreshold: 0.2,
-          children: [
-            SlidableAction(
-              padding: EdgeInsets.zero,
-              onPressed: (BuildContext context) {
-                safeExecute(() {
-                  browserController.removeOneNode(widget.treeItem);
-                });
-              },
-              backgroundColor: Color(0xFFFE4A49),
-              foregroundColor: Colors.white,
-              icon: Icons.delete,
-            ),
-          ],
-        ),
-        child: InkWell(
-          onTap: () {
-            safeExecute(() async {
-              await browserController.handleNodeTap(widget.treeItem, widget.position);
-            });
-          },
-          onLongPress: () {
-            showNodeOptionsDialog(context);
-          },
-          child: AnimatedContainer(
-            duration: const Duration(seconds: 1),
-            padding: const EdgeInsets.all(0.0),
-            decoration: BoxDecoration(
-              color: highlighted ? Color.fromARGB(199, 53, 156, 240) : Colors.transparent,
-              border: Border.symmetric(
-                horizontal: BorderSide(
-                  color: const Color(0x44888888),
-                  width: 0.5,
-                  style: BorderStyle.solid,
-                  strokeAlign: BorderSide.strokeAlignInside,
-                ),
-              ),
-            ),
-            child: Row(
-              children: [
-                buildLeftIcon(selectionMode, isItemSelected, browserController),
-                buildMiddleText(context),
-                buildMoreActionButton(context),
-                selectionMode ? null : buildMiddleActionButton(context),
-                selectionMode ? null : buildAddButton(browserController),
-              ].filterNotNull(),
+    var inkWell = InkWell(
+      onTap: () {
+        safeExecute(() async {
+          await browserController.handleNodeTap(widget.treeItem, widget.position);
+        });
+      },
+      onLongPress: () {
+        showNodeOptionsDialog(context);
+      },
+      child: AnimatedContainer(
+        duration: const Duration(seconds: 1),
+        padding: const EdgeInsets.all(0.0),
+        decoration: BoxDecoration(
+          color: highlighted ? Color.fromARGB(199, 53, 156, 240) : Colors.transparent,
+          border: Border.symmetric(
+            horizontal: BorderSide(
+              color: const Color(0x44888888),
+              width: 0.5,
+              style: BorderStyle.solid,
+              strokeAlign: BorderSide.strokeAlignInside,
             ),
           ),
         ),
+        child: Row(
+          children: [
+            buildLeftIcon(selectionMode, isItemSelected, browserController),
+            buildMiddleText(context),
+            buildMoreActionButton(context),
+            selectionMode ? null : buildMiddleActionButton(context),
+            selectionMode ? null : buildAddButton(browserController),
+          ].filterNotNull(),
+        ),
       ),
+    );
+
+    if (!settingsProvider.slidableActions) {
+      return Material(
+        color: Colors.transparent,
+        child: inkWell,
+      );
+    }
+
+    var slidable = Slidable(
+      groupTag: '0',
+      key: ValueKey(widget.key),
+      startActionPane: ActionPane(
+        motion: BehindMotion(),
+        extentRatio: 0.25,
+        openThreshold: 0.2,
+        closeThreshold: 0.2,
+        children: [
+          SlidableAction(
+            padding: EdgeInsets.zero,
+            onPressed: (BuildContext context) {
+              safeExecute(() {
+                browserController.copyItemsAt(widget.position);
+              });
+            },
+            backgroundColor: Color.fromARGB(255, 67, 122, 243),
+            foregroundColor: Colors.white,
+            icon: Icons.copy,
+          ),
+        ],
+      ),
+      endActionPane: ActionPane(
+        motion: BehindMotion(),
+        extentRatio: 0.25,
+        openThreshold: 0.2,
+        closeThreshold: 0.2,
+        children: [
+          SlidableAction(
+            padding: EdgeInsets.zero,
+            onPressed: (BuildContext context) {
+              safeExecute(() {
+                browserController.removeOneNode(widget.treeItem);
+              });
+            },
+            backgroundColor: Color(0xFFFE4A49),
+            foregroundColor: Colors.white,
+            icon: Icons.delete,
+          ),
+        ],
+      ),
+      child: inkWell,
+    );
+    return Material(
+      color: Colors.transparent,
+      child: slidable,
     );
   }
 

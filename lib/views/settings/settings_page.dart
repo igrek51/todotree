@@ -4,6 +4,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:settings_ui/settings_ui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:todotree/services/info_service.dart';
+import 'package:todotree/services/settings_provider.dart';
 import 'package:todotree/views/components/textfield_dialog.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -15,18 +16,20 @@ class _SettingsPageState extends State<SettingsPage> {
   String _externalBackupLocation = '';
   String _userAuthToken = '';
   bool _firstLevelFolders = false;
+  bool _slidableActions = true;
 
   SharedPreferences? sharedPreferences;
+  SettingsProvider settingsProvider = SettingsProvider();
 
   readSharedPrefs() async {
     sharedPreferences = await SharedPreferences.getInstance();
     if (sharedPreferences == null) return;
+    await settingsProvider.init();
     setState(() {
-      _externalBackupLocation =
-          sharedPreferences?.getString('externalBackupLocation') ?? '';
-      _userAuthToken = sharedPreferences?.getString('userAuthToken') ?? '';
-      _firstLevelFolders =
-          sharedPreferences?.getBool('firstLevelFolders') ?? false;
+      _externalBackupLocation = settingsProvider.externalBackupLocation;
+      _userAuthToken = settingsProvider.userAuthToken;
+      _firstLevelFolders = settingsProvider.firstLevelFolders;
+      _slidableActions = settingsProvider.slidableActions;
     });
   }
 
@@ -52,8 +55,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   'External backup location',
                   _externalBackupLocation,
                   (String value) {
-                    sharedPreferences?.setString(
-                        'externalBackupLocation', value);
+                    sharedPreferences?.setString('externalBackupLocation', value);
                     setState(() {
                       _externalBackupLocation = value;
                     });
@@ -90,13 +92,24 @@ class _SettingsPageState extends State<SettingsPage> {
                 });
               },
             ),
+            SettingsTile.switchTile(
+              leading: Icon(Icons.folder),
+              title: Text('Slidable actions'),
+              description: Text('Swipe left or right to perform quick actions on nodes'),
+              initialValue: _slidableActions,
+              onToggle: (value) {
+                sharedPreferences?.setBool('slidableActions', value);
+                setState(() {
+                  _slidableActions = value;
+                });
+              },
+            ),
             SettingsTile.navigation(
               leading: Icon(Icons.perm_device_info),
               title: Text('Grant storage permissions'),
               onPressed: (BuildContext context) async {
                 var result1 = await Permission.manageExternalStorage.request();
-                InfoService.info(
-                    'Storage permission status: $result1');
+                InfoService.info('Storage permission status: $result1');
               },
             ),
           ],
