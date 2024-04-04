@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -44,7 +43,7 @@ class BrowserWidget extends StatelessWidget {
           for (final (index, item) in browserState.items.indexed)
             TreeListItemWidget(
               key: Key(identityHashCode(item).toString()),
-              index: index,
+              position: index,
               treeItem: item,
             ),
           PlusItemWidget(
@@ -59,11 +58,11 @@ class BrowserWidget extends StatelessWidget {
 class TreeListItemWidget extends StatefulWidget {
   const TreeListItemWidget({
     super.key,
-    required this.index,
+    required this.position,
     required this.treeItem,
   });
 
-  final int index;
+  final int position;
   final TreeNode treeItem;
 
   @override
@@ -99,7 +98,7 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
     final treeTraverser = Provider.of<TreeTraverser>(context, listen: false);
     final browserState = context.watch<BrowserState>();
     final selectionMode = browserState.selectedIndexes.isNotEmpty;
-    final isItemSelected = browserState.selectedIndexes.contains(widget.index);
+    final isItemSelected = browserState.selectedIndexes.contains(widget.position);
     final shouldBeHighlighted = treeTraverser.focusNode == widget.treeItem;
 
     if (shouldBeHighlighted && !animationStarted) {
@@ -111,9 +110,30 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
       child: Slidable(
         groupTag: '0',
         key: ValueKey(widget.key),
+        startActionPane: ActionPane(
+          motion: BehindMotion(),
+          extentRatio: 0.25,
+          openThreshold: 0.2,
+          closeThreshold: 0.2,
+          children: [
+            SlidableAction(
+              padding: EdgeInsets.zero,
+              onPressed: (BuildContext context) {
+                safeExecute(() {
+                  browserController.copyItemsAt(widget.position);
+                });
+              },
+              backgroundColor: Color.fromARGB(255, 73, 85, 254),
+              foregroundColor: Colors.white,
+              icon: Icons.copy,
+            ),
+          ],
+        ),
         endActionPane: ActionPane(
           motion: BehindMotion(),
-          extentRatio: 0.2,
+          extentRatio: 0.25,
+          openThreshold: 0.2,
+          closeThreshold: 0.2,
           children: [
             SlidableAction(
               padding: EdgeInsets.zero,
@@ -125,14 +145,13 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
               backgroundColor: Color(0xFFFE4A49),
               foregroundColor: Colors.white,
               icon: Icons.delete,
-              label: 'Remove',
             ),
           ],
         ),
         child: InkWell(
           onTap: () {
             safeExecute(() async {
-              await browserController.handleNodeTap(widget.treeItem, widget.index);
+              await browserController.handleNodeTap(widget.treeItem, widget.position);
             });
           },
           onLongPress: () {
@@ -176,21 +195,21 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
           materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
           onChanged: (bool? value) {
             safeExecute(() {
-              browserController.onToggleSelectedNode(widget.index);
+              browserController.onToggleSelectedNode(widget.position);
             });
           },
         ),
       );
     } else {
       return ReorderableDragStartListener(
-        index: widget.index,
+        index: widget.position,
         child: IconButton(
           icon: const Icon(Icons.unfold_more, size: _iconButtonInternalSize),
           padding: EdgeInsets.all(_iconButtonPaddingVertical),
           constraints: BoxConstraints(),
           style: const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
           onPressed: () {
-            browserController.onToggleSelectedNode(widget.index);
+            browserController.onToggleSelectedNode(widget.position);
           },
         ),
       );
@@ -300,7 +319,7 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
       style: const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
       onPressed: () {
         safeExecute(() {
-          browserController.addNodeAt(widget.index);
+          browserController.addNodeAt(widget.position);
         });
       },
     );
@@ -311,11 +330,11 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return NodeMenuDialog.buildForNode(context, widget.treeItem, widget.index);
+        return NodeMenuDialog.buildForNode(context, widget.treeItem, widget.position);
       },
     ).then((value) {
       if (value != null) {
-        browserController.runNodeMenuAction(value, node: widget.treeItem, position: widget.index);
+        browserController.runNodeMenuAction(value, node: widget.treeItem, position: widget.position);
       }
     });
   }
