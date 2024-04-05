@@ -153,3 +153,14 @@ class TreeNode {
 enum TreeNodeType { text, link, remote }
 
 final TreeNode cRootNode = TreeNode.rootNode();
+
+TreeNode createDefaultRootNode() {
+  final root = TreeNode.rootNode();
+  root.add(TreeNode.textNode('📁 Threads'));
+  root.add(TreeNode.textNode('📒 Quests'));
+  root.add(TreeNode.textNode('🕓 Today'));
+  root.add(TreeNode.textNode('⏳ Tmp'));
+  root.add(TreeNode.textNode('📜 Info'));
+  root.add(TreeNode.textNode('🛒 Shopping'));
+  return root;
+}

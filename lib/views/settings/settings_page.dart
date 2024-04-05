@@ -94,8 +94,8 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             SettingsTile.switchTile(
               leading: Icon(Icons.folder),
-              title: Text('Slidable actions'),
-              description: Text('Swipe left or right to perform quick actions on nodes'),
+              title: Text('Swipe menu'),
+              description: Text('Slide left or right to perform quick actions on nodes'),
               initialValue: _slidableActions,
               onToggle: (value) {
                 sharedPreferences?.setBool('slidableActions', value);

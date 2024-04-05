@@ -24,8 +24,8 @@ class TreeStorage {
     File nFile = file ?? await _localDbFile;
     final String content = await _readDbString(nFile);
     if (content.isEmpty) {
-      logger.warning('empty database file, returning empty tree');
-      return TreeNode.rootNode();
+      InfoService.info('No database file, initializing with a default tree.');
+      return createDefaultRootNode();
     }
     final node = YamlTreeDeserializer().deserializeTree(content);
     return node;
@@ -58,7 +58,7 @@ class TreeStorage {
   Future<String> _readDbString(File file) async {
     try {
       if (!file.existsSync()) {
-        logger.warning('database file $file does not exist, loading empty');
+        logger.warning('database file $file does not exist, loading default tree');
         return '';
       }
       logger.debug('reading local database from ${file.absolute.path}');
