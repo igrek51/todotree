@@ -37,3 +37,6 @@ build-apk:
 
 icon:
 	flutter pub run flutter_launcher_icons
+
+clean:
+	flutter clean

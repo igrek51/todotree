@@ -1,0 +1,2 @@
+Generate the image with this exact prompt:
+"The image depicts an elegant, beautiful icon for a to-do notes app. It features a yellow writing pad with yellow pages, viewed from a top-down perspective, straight, not angled. The writing pad has binder rings on top, it includes a tree symbol on the front. The background is white"
