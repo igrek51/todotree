@@ -21,7 +21,7 @@ class SettingsProvider {
   }
 
   bool get firstLevelFolders {
-    return sharedPreferences?.getBool('firstLevelFolders') ?? false;
+    return sharedPreferences?.getBool('firstLevelFolders') ?? true;
   }
 
   bool get slidableActions {

@@ -11,48 +11,17 @@ class MainMenuRunner {
   List<ActionMenuItem> menuActions(BuildContext context) {
     final menuActions = <ActionMenuItem>[
       ActionMenuItem(
-        id: 'exit-without-saving',
-        name: '❌ Exit discarding changes',
+        id: 'go-step-up',
+        name: '⬆️ Go up',
         action: () {
-          appFactory.treeTraverser.exitDiscardingChanges();
+          appFactory.browserController.goStepUp();
         },
       ),
       ActionMenuItem(
-        id: 'save-and-exit',
-        name: '💾 Save and exit',
-        action: () async {
-          await appFactory.homeController.saveAndExit();
-        },
-      ),
-      ActionMenuItem(
-        id: 'save',
-        name: '💾 Save',
-        action: () async {
-          await appFactory.treeTraverser.save();
-          InfoService.info('Database saved');
-        },
-      ),
-      ActionMenuItem(
-        id: 'reload',
-        name: '🔄 Reload',
-        action: () async {
-          await appFactory.treeTraverser.load();
-          appFactory.browserController.renderAll();
-          InfoService.info('Database loaded');
-        },
-      ),
-      ActionMenuItem(
-        id: 'restore-backup',
-        name: '⏮️ Restore backup',
-        action: () async {
-          await appFactory.backupManager.restoreBackupUi(appFactory);
-        },
-      ),
-      ActionMenuItem(
-        id: 'import-database',
-        name: '📂 Import database',
-        action: () async {
-          await appFactory.treeStorage.importDatabaseUi(appFactory);
+        id: 'enter-random-item',
+        name: '🎲 Enter random item',
+        action: () {
+          appFactory.browserController.enterRandomItem();
         },
       ),
       ActionMenuItem(
@@ -60,13 +29,6 @@ class MainMenuRunner {
         name: '☑️ Select all',
         action: () {
           appFactory.browserController.selectAll();
-        },
-      ),
-      ActionMenuItem(
-        id: 'go-step-up',
-        name: '⬆️ Go up',
-        action: () {
-          appFactory.browserController.goStepUp();
         },
       ),
       ActionMenuItem(
@@ -80,6 +42,51 @@ class MainMenuRunner {
               builder: (context) => SettingsPage(),
             ),
           );
+        },
+      ),
+      ActionMenuItem(
+        id: 'import-database',
+        name: '📂 Import database',
+        action: () async {
+          await appFactory.treeStorage.importDatabaseUi(appFactory);
+        },
+      ),
+      ActionMenuItem(
+        id: 'restore-backup',
+        name: '⏮️ Restore backup',
+        action: () async {
+          await appFactory.backupManager.restoreBackupUi(appFactory);
+        },
+      ),
+      ActionMenuItem(
+        id: 'reload',
+        name: '🔄 Reload',
+        action: () async {
+          await appFactory.treeTraverser.load();
+          appFactory.browserController.renderAll();
+          InfoService.info('Database loaded');
+        },
+      ),
+      ActionMenuItem(
+        id: 'save',
+        name: '💾 Save',
+        action: () async {
+          await appFactory.treeTraverser.save();
+          InfoService.info('Database saved');
+        },
+      ),
+      ActionMenuItem(
+        id: 'save-and-exit',
+        name: '💾 Save and exit',
+        action: () async {
+          await appFactory.homeController.saveAndExit();
+        },
+      ),
+      ActionMenuItem(
+        id: 'exit-without-saving',
+        name: '❌ Exit discarding changes',
+        action: () {
+          appFactory.treeTraverser.exitDiscardingChanges();
         },
       ),
     ];

@@ -5,6 +5,7 @@ import 'package:todotree/util/errors.dart';
 import 'package:todotree/services/main_menu_runner.dart';
 import 'package:todotree/views/components/rounded_badge.dart';
 import 'package:todotree/views/home/home_controller.dart';
+import 'package:todotree/views/home/home_state.dart';
 import 'package:todotree/views/tree_browser/browser_state.dart';
 
 class TitleBar extends StatelessWidget {
@@ -15,6 +16,7 @@ class TitleBar extends StatelessWidget {
     final theme = Theme.of(context);
 
     final browserState = context.watch<BrowserState>();
+    final homeState = context.watch<HomeState>();
     final homeController = Provider.of<HomeController>(context, listen: false);
     final mainMenuRunner = Provider.of<MainMenuRunner>(context, listen: false);
 
@@ -32,7 +34,7 @@ class TitleBar extends StatelessWidget {
                 maintainSize: true,
                 maintainAnimation: true,
                 maintainState: true,
-                visible: !browserState.atRoot,
+                visible: !browserState.atRoot || homeState.pageView == HomePageView.itemEditor,
                 child: IconButton(
                   iconSize: 32,
                   icon: const Icon(
@@ -66,14 +68,6 @@ class TitleBar extends StatelessWidget {
               PopupMenuButton(
                 iconSize: 32,
                 icon: const Icon(Icons.more_vert, size: 28),
-                onSelected: (value) {
-                  final action = mainMenuRunner
-                      .menuActions(context)
-                      .firstWhere((element) => element.id == value);
-                  safeExecute(() {
-                    action.action();
-                  });
-                },
                 itemBuilder: (context) {
                   return mainMenuRunner.menuActions(context).map((action) {
                     return PopupMenuItem(
@@ -87,6 +81,12 @@ class TitleBar extends StatelessWidget {
                       ),
                     );
                   }).toList();
+                },
+                onSelected: (value) {
+                  final action = mainMenuRunner.menuActions(context).firstWhere((element) => element.id == value);
+                  safeExecute(() {
+                    action.action();
+                  });
                 },
               ),
             ],

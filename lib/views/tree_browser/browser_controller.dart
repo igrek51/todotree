@@ -1,3 +1,5 @@
+import "dart:math";
+
 import 'package:todotree/services/app_lifecycle.dart';
 import 'package:todotree/services/clipboard_manager.dart';
 import 'package:todotree/services/settings_provider.dart';
@@ -308,5 +310,15 @@ class BrowserController {
     treeTraverser.unsavedChanges = true;
     renderItems();
     InfoService.info('Split into ${parts.length} nodes.');
+  }
+
+  void enterRandomItem() {
+    final children = treeTraverser.currentParent.children;
+    if (children.isEmpty) {
+      return InfoService.error('No items to choose from');
+    }
+    final randomNode = children[Random().nextInt(children.length)];
+    goIntoNode(randomNode);
+    InfoService.info('Entered random item: ${randomNode.name}');
   }
 }
