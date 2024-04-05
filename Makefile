@@ -35,3 +35,5 @@ doctor:
 build-apk:
 	flutter build apk --release
 
+icon:
+	flutter pub run flutter_launcher_icons
