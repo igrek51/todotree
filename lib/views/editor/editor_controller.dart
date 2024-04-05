@@ -173,6 +173,13 @@ class EditorController {
   }
 
   void jumpCursorToEnd() {
+    if (maxSelection == editorState.editTextController.text.length && minSelection == maxSelection && maxSelection > 0) {
+      // move forcefully, if already at the end
+      editorState.editTextController.selection = TextSelection.fromPosition(
+        TextPosition(offset: editorState.editTextController.text.length - 1),
+      );
+      editorState.textEditFocus.requestFocus();
+    }
     editorState.editTextController.selection = TextSelection.fromPosition(
       TextPosition(offset: editorState.editTextController.text.length),
     );
