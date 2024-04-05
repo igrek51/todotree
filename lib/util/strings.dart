@@ -75,3 +75,9 @@ String randomName() {
     )
   );
 }
+
+extension StringExtension on String {
+  bool isDigit() {
+    return codeUnitAt(0) >= 48 && codeUnitAt(0) <= 57;
+  }
+}

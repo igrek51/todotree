@@ -173,7 +173,9 @@ class EditorController {
   }
 
   void jumpCursorToEnd() {
-    if (maxSelection == editorState.editTextController.text.length && minSelection == maxSelection && maxSelection > 0) {
+    if (maxSelection == editorState.editTextController.text.length &&
+        minSelection == maxSelection &&
+        maxSelection > 0) {
       // move forcefully, if already at the end
       editorState.editTextController.selection = TextSelection.fromPosition(
         TextPosition(offset: editorState.editTextController.text.length - 1),
@@ -284,6 +286,16 @@ class EditorController {
     });
   }
 
+  void disableNumericKeyboard() {
+    editorState.textEditFocus.unfocus();
+    editorState.numericKeyboard = false;
+    editorState.notify();
+    Future.delayed(const Duration(milliseconds: 100), () {
+      editorState.textEditFocus.requestFocus();
+      editorState.notify();
+    });
+  }
+
   void insertDash() {
     final textBefore = editorState.editTextController.text.substring(0, minSelection);
     final textAfter = editorState.editTextController.text.substring(maxSelection);
@@ -301,12 +313,29 @@ class EditorController {
     var textBefore = editorState.editTextController.text.substring(0, minSelection);
     final textAfter = editorState.editTextController.text.substring(maxSelection);
     var appendText = ':';
-    if (textBefore.endsWith(' ')) textBefore = textBefore.substring(0, textBefore.length - 1);
-    if (!textAfter.startsWith(' ')) appendText = '$appendText ';
+    if (!editorState.numericKeyboard) {
+      if (textBefore.endsWith(' ')) textBefore = textBefore.substring(0, textBefore.length - 1);
+      if (!textAfter.startsWith(' ')) appendText = '$appendText ';
+    }
     editorState.editTextController.text = textBefore + appendText + textAfter;
     editorState.editTextController.selection = TextSelection.fromPosition(
       TextPosition(offset: textBefore.length + appendText.length),
     );
     editorState.textEditFocus.requestFocus();
+  }
+
+  void insertDot() {
+    final textBefore = editorState.editTextController.text.substring(0, minSelection);
+    final textAfter = editorState.editTextController.text.substring(maxSelection);
+    var appendText = '.';
+    editorState.editTextController.text = textBefore + appendText + textAfter;
+    editorState.editTextController.selection = TextSelection.fromPosition(
+      TextPosition(offset: textBefore.length + appendText.length),
+    );
+    editorState.textEditFocus.requestFocus();
+  }
+
+  void concludeNumericInput() {
+    disableNumericKeyboard();
   }
 }

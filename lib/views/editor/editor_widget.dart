@@ -27,6 +27,7 @@ class EditorWidget extends StatelessWidget {
         color: Colors.white,
         fontSize: 18,
       ),
+      onSubmitted: (value) => editorController.concludeNumericInput(),
     );
 
     final rowSaveAuxBtns = [
@@ -152,22 +153,10 @@ class EditorWidget extends StatelessWidget {
     ];
     final rowToolkitBtns = [
       FlatButton(
-        label: 'HH:mm',
-        onPressed: () {
-          safeExecute(() {});
-        },
-      ),
-      FlatButton(
-        label: 'dd.MM',
-        onPressed: () {
-          safeExecute(() {});
-        },
-      ),
-      FlatButton(
-        label: '-',
+        label: '.',
         onPressed: () {
           safeExecute(() {
-            editorController.insertDash();
+            editorController.insertDot();
           });
         },
       ),
@@ -180,7 +169,15 @@ class EditorWidget extends StatelessWidget {
         },
       ),
       FlatButton(
-        label: '123',
+        label: '-',
+        onPressed: () {
+          safeExecute(() {
+            editorController.insertDash();
+          });
+        },
+      ),
+      FlatButton(
+        label: editorState.numericKeyboard ? 'ABC' : '123',
         onPressed: () {
           safeExecute(() {
             editorController.toggleNumericKeyboard(context);
