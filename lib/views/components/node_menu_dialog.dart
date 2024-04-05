@@ -5,8 +5,7 @@ import 'package:todotree/model/tree_node.dart';
 import 'package:todotree/services/clipboard_manager.dart';
 
 class NodeMenuDialog {
-  static Widget buildForNode(
-      BuildContext context, TreeNode item, int position) {
+  static Widget buildForNode(BuildContext context, TreeNode item, int position) {
     final actionChildren = buildNodeActions(context, item, position);
     return AlertDialog(
       contentPadding: EdgeInsets.symmetric(horizontal: 2.0, vertical: 16.0),
@@ -30,8 +29,7 @@ class NodeMenuDialog {
 }
 
 // actions handled by BrowserController.runNodeMenuAction
-List<Widget> buildNodeActions(
-    BuildContext context, TreeNode item, int position) {
+List<Widget> buildNodeActions(BuildContext context, TreeNode item, int position) {
   final clipboardManager = Provider.of<ClipboardManager>(context, listen: false);
   final actions = <Widget>[];
 
@@ -109,9 +107,9 @@ List<Widget> buildNodeActions(
       },
     ));
   }
-  if (item.type == TreeNodeType.text && item.displayName.contains(',')) {
+  if (item.type == TreeNodeType.text && (item.displayName.contains(',') || item.displayName.contains('\n'))) {
     actions.add(ListTile(
-      title: Text('🔪 Split by comma'),
+      title: Text('🔪 Split'),
       onTap: () {
         Navigator.pop(context, 'split');
       },

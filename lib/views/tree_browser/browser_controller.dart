@@ -218,7 +218,7 @@ class BrowserController {
       } else if (action == 'paste-as-link' && position != null) {
         pasteAboveAsLink(position);
       } else if (action == 'split' && node != null && position != null) {
-        splitNodeByComma(node, position);
+        splitNodeBySeparator(node, position);
       } else if (action == 'push-to-remote' && node != null) {
         InfoService.error('Not implemented yet');
       } else if (action == 'remove-remote-node' && node != null) {
@@ -299,8 +299,9 @@ class BrowserController {
     scrollCache[treeTraverser.currentParent] = browserState.scrollController.offset;
   }
 
-  void splitNodeByComma(TreeNode node, int position) {
-    final parts = node.name.split(',').map((e) => e.trim()).toList();
+  void splitNodeBySeparator(TreeNode node, int position) {
+    final separator = node.name.contains('\n') ? '\n' : ',';
+    final parts = node.name.split(separator).map((e) => e.trim()).toList();
     node.name = parts.first;
     final newNodes = parts.map((part) => TreeNode.textNode(part)).toList().dropFirst(1);
     for (final newNode in newNodes) {
