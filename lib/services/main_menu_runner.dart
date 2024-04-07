@@ -9,7 +9,33 @@ class MainMenuRunner {
   MainMenuRunner(this.appFactory);
 
   List<ActionMenuItem> menuActions(BuildContext context) {
-    final menuActions = <ActionMenuItem>[
+    final menuActions = <ActionMenuItem>[];
+
+    if (appFactory.treeTraverser.selectionMode) {
+      menuActions.add(ActionMenuItem(
+        id: 'remove-selected',
+        name: '❌ Remove selected',
+        action: () {
+          appFactory.browserController.removeSelectedNodes();
+        },
+      ));
+      menuActions.add(ActionMenuItem(
+        id: 'cut-selected',
+        name: '✂️ Cut selected',
+        action: () {
+          appFactory.browserController.cutSelectedItems();
+        },
+      ));
+      menuActions.add(ActionMenuItem(
+        id: 'copy-selected',
+        name: '📄 Copy selected',
+        action: () {
+          appFactory.browserController.copySelectedItems();
+        },
+      ));
+    }
+
+    menuActions.addAll([
       ActionMenuItem(
         id: 'go-step-up',
         name: '⬆️ Go up',
@@ -89,7 +115,7 @@ class MainMenuRunner {
           appFactory.treeTraverser.exitDiscardingChanges();
         },
       ),
-    ];
+    ]);
     return menuActions;
   }
 }

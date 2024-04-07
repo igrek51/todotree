@@ -171,6 +171,14 @@ class BrowserController {
     }
   }
 
+  void removeSelectedNodes() {
+    List<int> sortedPositions = treeTraverser.selectedIndexes.toList()..sort();
+    if (sortedPositions.isEmpty) {
+      return InfoService.error('No items selected');
+    }
+    removeMultipleNodes(sortedPositions);
+  }
+
   void removeLinkAndTarget(TreeNode link) {
     final originalLinkPosition = treeTraverser.getChildIndex(link);
     final target = treeTraverser.findLinkTarget(link.name);
@@ -260,10 +268,28 @@ class BrowserController {
     renderItems();
   }
 
+  void cutSelectedItems() {
+    final positions = treeTraverser.selectedIndexes.toSet();
+    if (positions.isEmpty) {
+      return InfoService.error('No items selected');
+    }
+    clipboardManager.cutItems(treeTraverser, positions);
+    renderItems();
+  }
+
   void copyItemsAt(int position) {
     final positions = treeTraverser.selectedIndexes.toSet();
     if (positions.isEmpty) {
       positions.add(position); // if nothing selected - include current item
+    }
+    clipboardManager.copyItems(treeTraverser, positions, info: true);
+    renderItems();
+  }
+
+  void copySelectedItems() {
+    final positions = treeTraverser.selectedIndexes.toSet();
+    if (positions.isEmpty) {
+      return InfoService.error('No items selected');
     }
     clipboardManager.copyItems(treeTraverser, positions, info: true);
     renderItems();
