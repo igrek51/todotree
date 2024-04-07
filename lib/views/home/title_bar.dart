@@ -72,7 +72,8 @@ class TitleBar extends StatelessWidget {
                   return mainMenuRunner.menuActions(context).map((action) {
                     return PopupMenuItem(
                       value: action.id,
-                      height: 60,
+                      height: 50,
+                      padding: EdgeInsets.symmetric(horizontal: 10),
                       child: Text(
                         action.name,
                         style: TextStyle(
