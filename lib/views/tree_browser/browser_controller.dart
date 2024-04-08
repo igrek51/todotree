@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:flutter/material.dart';
 
 import 'package:todotree/services/app_lifecycle.dart';
 import 'package:todotree/services/clipboard_manager.dart';
@@ -48,10 +49,11 @@ class BrowserController {
   }
 
   void editNode(TreeNode node) {
-    ensureNoSelectionMode();
     if (node.type == TreeNodeType.link) {
       return InfoService.error('Can\'t edit a link');
     }
+    ensureNoSelectionMode();
+    rememberScrollOffset();
     editorController.editNode(node);
   }
 
@@ -81,9 +83,21 @@ class BrowserController {
 
   void restoreScrollOffset() {
     if (scrollCache.containsKey(treeTraverser.currentParent)) {
-      browserState.scrollController.jumpTo(scrollCache[treeTraverser.currentParent]!);
+      var scrollOffset = scrollCache[treeTraverser.currentParent]!;
+      if (browserState.scrollController.hasClients) {
+        browserState.scrollController.jumpTo(scrollOffset);
+      }
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (browserState.scrollController.hasClients) {
+          browserState.scrollController.jumpTo(scrollOffset);
+        }
+      });
       scrollCache.remove(treeTraverser.currentParent);
     }
+  }
+
+  void doneEditing() {
+    restoreScrollOffset();
   }
 
   void goIntoNode(TreeNode node) {
@@ -106,6 +120,7 @@ class BrowserController {
 
   void addNodeAt(int position) {
     ensureNoSelectionMode();
+    rememberScrollOffset();
     editorController.addNodeAt(position);
   }
 

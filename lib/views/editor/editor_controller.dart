@@ -69,6 +69,7 @@ class EditorController {
     homeState.notify();
     editorState.editTextController.clear();
     editorState.notify();
+    browserController.doneEditing();
     InfoService.info('Saved: $newName');
   }
 
@@ -85,6 +86,7 @@ class EditorController {
     homeState.notify();
     editorState.editTextController.clear();
     editorState.notify();
+    browserController.doneEditing();
     InfoService.info('Added: $newName');
   }
 
@@ -158,6 +160,7 @@ class EditorController {
     homeState.notify();
     editorState.editTextController.clear();
     editorState.notify();
+    browserController.doneEditing();
   }
 
   int get minSelection =>
