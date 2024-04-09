@@ -28,6 +28,7 @@ class BrowserController {
 
   Map<TreeNode, double> scrollCache = {};
   Map<int, double> topOffsetAnimations = {};
+  Map<int, double> itemHeights = {};
 
   BrowserController(this.homeState, this.browserState, this.treeTraverser, this.clipboardManager, this.appLifecycle,
       this.settingsProvider);
@@ -152,10 +153,11 @@ class BrowserController {
 
   void removeOneNode(TreeNode node) {
     final originalPosition = treeTraverser.getChildIndex(node);
+    final removedHeight = itemHeights[originalPosition] ?? 0;
     treeTraverser.removeFromCurrent(node);
 
     if (originalPosition != null && originalPosition < treeTraverser.currentParent.size) {
-      topOffsetAnimations[originalPosition] = 500;
+      topOffsetAnimations[originalPosition] = removedHeight;
     }
 
     renderItems();

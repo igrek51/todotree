@@ -48,6 +48,7 @@ class BrowserWidget extends StatelessWidget {
               key: Key(identityHashCode(item).toString()),
               position: index,
               treeItem: item,
+              browserController: browserController,
             );
           } else {
             return PlusItemWidget(
@@ -65,10 +66,12 @@ class TreeListItemWidget extends StatefulWidget {
     super.key,
     required this.position,
     required this.treeItem,
+    required this.browserController,
   });
 
   final int position;
   final TreeNode treeItem;
+  final BrowserController browserController;
 
   @override
   State<TreeListItemWidget> createState() => _TreeListItemWidgetState();
@@ -78,6 +81,19 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
   bool highlighted = false;
   double animationTopOffset = 0;
   Timer? _timer;
+  final key = GlobalKey();
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final context = key.currentContext;
+      if (context == null) return;
+      final box = context.findRenderObject() as RenderBox;
+      final height = box.size.height;
+      widget.browserController.itemHeights[widget.position] = height;
+    });
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -88,7 +104,7 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
   void _startAnimation(BrowserState browserState, BrowserController browserController, TreeTraverser treeTraverser) {
     if (browserState.animationsStarted[widget.position] ?? true) return;
     final shouldBeHighlighted = treeTraverser.focusNode == widget.treeItem;
-    final shouldBeMoved = browserController.topOffsetAnimations.containsKey(widget.position);
+    const shouldBeMoved = false; // (browserController.topOffsetAnimations[widget.position] ?? 0) != 0;
     if (!shouldBeHighlighted && !shouldBeMoved) return;
 
     browserState.animationsStarted[widget.position] = true;
@@ -121,6 +137,7 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
     _startAnimation(browserState, browserController, treeTraverser);
 
     var inkWell = InkWell(
+      key: key,
       onTap: () {
         safeExecute(() async {
           await browserController.handleNodeTap(widget.treeItem, widget.position);
@@ -130,7 +147,7 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
         showNodeOptionsDialog(context);
       },
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 500),
+        duration: const Duration(milliseconds: 900),
         padding: const EdgeInsets.all(0.0),
         margin: EdgeInsets.only(top: animationTopOffset),
         decoration: BoxDecoration(
