@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 
 import 'package:todotree/services/app_lifecycle.dart';
 import 'package:todotree/services/clipboard_manager.dart';
+import 'package:todotree/services/remote_service.dart';
 import 'package:todotree/services/settings_provider.dart';
 import 'package:todotree/util/errors.dart';
 import 'package:todotree/services/info_service.dart';
 import 'package:todotree/util/logger.dart';
 import 'package:todotree/util/collections.dart';
 import 'package:todotree/util/numbers.dart';
+import 'package:todotree/util/time.dart';
 import 'package:todotree/views/editor/editor_controller.dart';
 import 'package:todotree/services/tree_traverser.dart';
 import 'package:todotree/model/tree_node.dart';
@@ -25,13 +27,14 @@ class BrowserController {
   ClipboardManager clipboardManager;
   AppLifecycle appLifecycle;
   SettingsProvider settingsProvider;
+  RemoteService remoteService;
 
   Map<TreeNode, double> scrollCache = {};
   Map<int, double> topOffsetAnimations = {};
   Map<int, double> itemHeights = {};
 
   BrowserController(this.homeState, this.browserState, this.treeTraverser, this.clipboardManager, this.appLifecycle,
-      this.settingsProvider);
+      this.settingsProvider, this.remoteService);
 
   void renderAll() {
     renderItems();
@@ -110,6 +113,9 @@ class BrowserController {
     ensureNoSelectionMode();
     if (node.type == TreeNodeType.link) {
       treeTraverser.goToLinkTarget(node);
+    } else if (node.type == TreeNodeType.remote) {
+      treeTraverser.goTo(node);
+      fetchRemoteNodes(node);
     } else {
       treeTraverser.goTo(node);
     }
@@ -373,5 +379,25 @@ class BrowserController {
     final randomNode = children[Random().nextInt(children.length)];
     goIntoNode(randomNode);
     InfoService.info('Entered random item: ${randomNode.name}');
+  }
+  
+  void fetchRemoteNodes(TreeNode rootNode) async {
+    InfoService.info('Fetching remote items…');
+    final pair = await remoteService.fetchRemoteTreeNodes();
+    final treeNodes = pair.first;
+    final dtoNodes = pair.second;
+    rootNode.children.clear();
+    for (final treeNode in treeNodes) {
+      rootNode.add(treeNode);
+    }
+    if (treeNodes.isEmpty) {
+      InfoService.info('No remote items');
+    } else {
+      treeTraverser.unsavedChanges = true;
+      final lastTimestamp = dtoNodes.last.createTimestamp;
+      final lastDateStr = timestampSToString(lastTimestamp);
+      InfoService.info('${treeNodes.length} remote items fetched.\nLast on $lastDateStr');
+    }
+    renderItems();
   }
 }

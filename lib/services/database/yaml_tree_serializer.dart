@@ -19,6 +19,8 @@ class YamlTreeSerializer {
     
     if (node.type == TreeNodeType.link) {
       content['type'] = 'link';
+    } else if (node.type == TreeNodeType.remote) {
+      content['type'] = 'remote';
     }
     serializeAttributes(content, node);
 

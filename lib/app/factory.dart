@@ -1,4 +1,5 @@
 import 'package:todotree/services/database/backup_manager.dart';
+import 'package:todotree/services/remote_service.dart';
 import 'package:todotree/services/settings_provider.dart';
 import 'package:todotree/services/shortcut_handler.dart';
 import 'package:todotree/views/editor/editor_controller.dart';
@@ -35,11 +36,13 @@ class AppFactory {
   late final BackupManager backupManager;
   late final SettingsProvider settingsProvider;
   late final ShortcutHandler shortcutHandler;
+  late final RemoteService remoteService;
 
   AppFactory();
 
   void create() {
     settingsProvider = SettingsProvider();
+    remoteService = RemoteService(settingsProvider);
     homeState = HomeState();
     browserState = BrowserState();
     editorState = EditorState();
@@ -50,8 +53,8 @@ class AppFactory {
     clipboardManager = ClipboardManager();
     treeTraverser = TreeTraverser(treeStorage);
     appLifecycle = AppLifecycle(treeStorage, treeTraverser);
-    browserController =
-        BrowserController(homeState, browserState, treeTraverser, clipboardManager, appLifecycle, settingsProvider);
+    browserController = BrowserController(
+        homeState, browserState, treeTraverser, clipboardManager, appLifecycle, settingsProvider, remoteService);
     editorController = EditorController(homeState, editorState, treeTraverser, clipboardManager);
     editorController.browserController = browserController;
     browserController.editorController = editorController;

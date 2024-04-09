@@ -112,9 +112,9 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
       if (shouldBeHighlighted) {
         highlighted = true;
       }
-      if (shouldBeMoved) {
-        animationTopOffset = browserController.topOffsetAnimations[widget.position] ?? 0;
-      }
+      // if (shouldBeMoved) {
+      //   animationTopOffset = browserController.topOffsetAnimations[widget.position] ?? 0;
+      // }
     });
     _timer = Timer(Duration(milliseconds: 10), () {
       browserController.topOffsetAnimations[widget.position] = 0;

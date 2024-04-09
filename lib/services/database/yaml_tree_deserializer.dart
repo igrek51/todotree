@@ -25,7 +25,7 @@ class YamlTreeDeserializer {
         treeItem = TreeNode.textNode(name);
       case 'remote':
         final name = node['name'] as String;
-        treeItem = TreeNode.textNode(name);
+        treeItem = TreeNode.remoteOriginNode(name);
       case 'link':
         final target = node['target'] as String;
         treeItem = TreeNode.linkNode(target);
