@@ -18,7 +18,7 @@ run-chrome:
 	flutter run --device-id chrome --web-renderer html
 
 run-android:
-	flutter run --device-id 958744f
+	flutter run --device-id 192.168.0.22:5555
 
 run-android-release:
 	flutter run --device-id 958744f --release

@@ -25,7 +25,7 @@ class EditorWidget extends StatelessWidget {
       ),
       style: TextStyle(
         color: Colors.white,
-        fontSize: 18,
+        fontSize: 20,
       ),
       onSubmitted: (value) => editorController.concludeNumericInput(),
     );

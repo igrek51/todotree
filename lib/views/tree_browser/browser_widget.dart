@@ -254,7 +254,7 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
             treeTraverser.displayLinkName(widget.treeItem),
             style: TextStyle(
               color: Color(0xFFD2D2D2),
-              fontSize: 16,
+              fontSize: 18,
               decoration: TextDecoration.underline,
             ),
           ),
@@ -268,7 +268,7 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
             widget.treeItem.name,
             style: TextStyle(
               color: Colors.white,
-              fontSize: 16,
+              fontSize: 18,
             ),
           ),
         ),
@@ -284,7 +284,7 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
                   widget.treeItem.name,
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 16,
+                    fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
