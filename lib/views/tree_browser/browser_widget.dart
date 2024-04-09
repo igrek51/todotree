@@ -27,7 +27,7 @@ class BrowserWidget extends StatelessWidget {
     final browserController = Provider.of<BrowserController>(context, listen: false);
 
     return SlidableAutoCloseBehavior(
-      child: ReorderableListView(
+      child: ReorderableListView.builder(
         onReorder: (int oldIndex, int newIndex) {
           browserController.reorderNodes(oldIndex, newIndex);
         },
@@ -40,17 +40,21 @@ class BrowserWidget extends StatelessWidget {
             child: child,
           );
         },
-        children: <Widget>[
-          for (final (index, item) in browserState.items.indexed)
-            TreeListItemWidget(
+        itemCount: browserState.items.length + 1,
+        itemBuilder: (BuildContext context, int index) {
+          if (index < browserState.items.length){
+            final item = browserState.items[index];
+            return TreeListItemWidget(
               key: Key(identityHashCode(item).toString()),
               position: index,
               treeItem: item,
-            ),
-          PlusItemWidget(
-            key: const Key('plus'),
-          ),
-        ],
+            );
+          } else {
+            return PlusItemWidget(
+              key: const Key('plus'),
+            );
+          }
+        },
       ),
     );
   }
