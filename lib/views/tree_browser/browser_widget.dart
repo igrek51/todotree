@@ -42,7 +42,7 @@ class BrowserWidget extends StatelessWidget {
         },
         itemCount: browserState.items.length + 1,
         itemBuilder: (BuildContext context, int index) {
-          if (index < browserState.items.length){
+          if (index < browserState.items.length) {
             final item = browserState.items[index];
             return TreeListItemWidget(
               key: Key(identityHashCode(item).toString()),
@@ -76,7 +76,7 @@ class TreeListItemWidget extends StatefulWidget {
 
 class _TreeListItemWidgetState extends State<TreeListItemWidget> {
   bool highlighted = false;
-  bool animationStarted = false;
+  double animationTopOffset = 0;
   Timer? _timer;
 
   @override
@@ -85,14 +85,26 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
     super.dispose();
   }
 
-  void _startAnimation() {
+  void _startAnimation(BrowserState browserState, BrowserController browserController, TreeTraverser treeTraverser) {
+    if (browserState.animationsStarted[widget.position] ?? true) return;
+    final shouldBeHighlighted = treeTraverser.focusNode == widget.treeItem;
+    final shouldBeMoved = browserController.topOffsetAnimations.containsKey(widget.position);
+    if (!shouldBeHighlighted && !shouldBeMoved) return;
+
+    browserState.animationsStarted[widget.position] = true;
     setState(() {
-      highlighted = true;
-      animationStarted = true;
+      if (shouldBeHighlighted) {
+        highlighted = true;
+      }
+      if (shouldBeMoved) {
+        animationTopOffset = browserController.topOffsetAnimations[widget.position] ?? 0;
+      }
     });
     _timer = Timer(Duration(milliseconds: 10), () {
+      browserController.topOffsetAnimations[widget.position] = 0;
       setState(() {
         highlighted = false;
+        animationTopOffset = 0;
       });
     });
   }
@@ -105,11 +117,8 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
     final browserState = context.watch<BrowserState>();
     final selectionMode = browserState.selectedIndexes.isNotEmpty;
     final isItemSelected = browserState.selectedIndexes.contains(widget.position);
-    final shouldBeHighlighted = treeTraverser.focusNode == widget.treeItem;
 
-    if (shouldBeHighlighted && !animationStarted) {
-      _startAnimation();
-    }
+    _startAnimation(browserState, browserController, treeTraverser);
 
     var inkWell = InkWell(
       onTap: () {
@@ -121,8 +130,9 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
         showNodeOptionsDialog(context);
       },
       child: AnimatedContainer(
-        duration: const Duration(seconds: 1),
+        duration: const Duration(milliseconds: 500),
         padding: const EdgeInsets.all(0.0),
+        margin: EdgeInsets.only(top: animationTopOffset),
         decoration: BoxDecoration(
           color: highlighted ? Color.fromARGB(199, 53, 156, 240) : Colors.transparent,
           border: Border.symmetric(
@@ -156,25 +166,6 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
     var slidable = Slidable(
       groupTag: '0',
       key: ValueKey(widget.key),
-      startActionPane: ActionPane(
-        motion: BehindMotion(),
-        extentRatio: 0.25,
-        openThreshold: 0.2,
-        closeThreshold: 0.2,
-        children: [
-          SlidableAction(
-            padding: EdgeInsets.zero,
-            onPressed: (BuildContext context) {
-              safeExecute(() {
-                browserController.copyItemsAt(widget.position);
-              });
-            },
-            backgroundColor: Color.fromARGB(255, 67, 122, 243),
-            foregroundColor: Colors.white,
-            icon: Icons.copy,
-          ),
-        ],
-      ),
       endActionPane: ActionPane(
         motion: BehindMotion(),
         extentRatio: 0.25,

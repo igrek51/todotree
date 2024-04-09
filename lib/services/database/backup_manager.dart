@@ -124,7 +124,6 @@ class BackupManager {
 
   Future<void> restoreBackup(AppFactory app, File backupFile) async {
     await app.treeTraverser.loadFromFile(backupFile);
-    app.treeTraverser.unsavedChanges = true;
     app.browserController.renderAll();
     InfoService.info('Backup restored from ${backupFile.absolute.path}');
   }

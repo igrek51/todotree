@@ -39,6 +39,7 @@ class TreeTraverser {
     final value = await treeStorage.readDbTree(file: file);
     rootNode = value;
     currentParent = value;
+    unsavedChanges = true;
   }
 
   Future<void> save() async {
@@ -79,14 +80,6 @@ class TreeTraverser {
     unsavedChanges = true;
     currentParent.insertAt(nPosision, item);
     focusNode = item;
-  }
-
-  void removeFromCurrentAt(int position) {
-    if (isItemAtPosition(position)) {
-      currentParent.removeAt(position);
-      unsavedChanges = true;
-      focusNode = null;
-    }
   }
 
   void removeFromCurrent(TreeNode item) {

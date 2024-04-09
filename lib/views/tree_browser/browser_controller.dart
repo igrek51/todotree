@@ -27,6 +27,7 @@ class BrowserController {
   SettingsProvider settingsProvider;
 
   Map<TreeNode, double> scrollCache = {};
+  Map<int, double> topOffsetAnimations = {};
 
   BrowserController(this.homeState, this.browserState, this.treeTraverser, this.clipboardManager, this.appLifecycle,
       this.settingsProvider);
@@ -45,6 +46,9 @@ class BrowserController {
   void renderItems() {
     browserState.items = treeTraverser.currentParent.children.toList();
     browserState.selectedIndexes = treeTraverser.selectedIndexes.toSet();
+    for (int i = 0; i < treeTraverser.currentParent.size; i++) {
+      browserState.animationsStarted[i] = false;
+    }
     browserState.notify();
   }
 
@@ -149,6 +153,11 @@ class BrowserController {
   void removeOneNode(TreeNode node) {
     final originalPosition = treeTraverser.getChildIndex(node);
     treeTraverser.removeFromCurrent(node);
+
+    if (originalPosition != null && originalPosition < treeTraverser.currentParent.size) {
+      topOffsetAnimations[originalPosition] = 500;
+    }
+
     renderItems();
 
     InfoService.snackbarAction('Removed: ${node.name}', 'UNDO', () {
