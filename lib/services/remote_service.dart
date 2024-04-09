@@ -8,7 +8,7 @@ import 'package:todotree/util/collections.dart';
 
 class RemoteService {
   SettingsProvider settingsProvider;
-  
+
   RemoteService(this.settingsProvider);
 
   final String todoApiBase = 'https://todo.igrek.dev/api/v1';
@@ -24,7 +24,7 @@ class RemoteService {
         authTokenHeader: settingsProvider.userAuthToken,
       },
     );
-    if (response.statusCode != 200) {
+    if (response.statusCode >= 300) {
       throw Exception('HTTP response ${response.statusCode} for URL $url: ${response.body}');
     }
     Iterable jsons = json.decode(response.body);
@@ -44,5 +44,46 @@ class RemoteService {
       remoteItemToId[textNode] = dto.id;
     }
     return Pair(textNodes, dtos);
+  }
+
+  Future<void> removeRemoteItem(TreeNode treeNode) async {
+    final id = remoteItemToId[treeNode];
+    if (id == null) {
+      throw Exception('Unknown remote ID for $treeNode');
+    }
+    final url = '$todoApiBase/todo/$id';
+    final http.Response response = await http.delete(
+      Uri.parse(url),
+      headers: {
+        authTokenHeader: settingsProvider.userAuthToken,
+      },
+    );
+    if (response.statusCode >= 300) {
+      throw Exception('HTTP response ${response.statusCode} for URL $url: ${response.body}');
+    }
+  }
+
+  Future<void> pushRemoteItems(List<TreeNode> treeNodes) async {
+    final url = '$todoApiBase/todo/many';
+    final payload = treeNodes.map((node) {
+      if (!node.isText) throw Exception('Only text nodes are supported for pushing to remote');
+      return {
+        'id': '',
+        'content': node.name,
+        'create_timestamp': DateTime.now().millisecondsSinceEpoch / 1000,
+        'device_id': '',
+      };
+    }).toList();
+    final http.Response response = await http.post(
+      Uri.parse(url),
+      headers: {
+        'Content-Type': 'application/json',
+        authTokenHeader: settingsProvider.userAuthToken,
+      },
+      body: json.encode(payload),
+    );
+    if (response.statusCode >= 300) {
+      throw Exception('HTTP response ${response.statusCode} for URL $url: ${response.body}');
+    }
   }
 }

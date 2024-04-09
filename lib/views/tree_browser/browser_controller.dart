@@ -259,10 +259,10 @@ class BrowserController {
         pasteAboveAsLink(position);
       } else if (action == 'split' && node != null && position != null) {
         splitNodeBySeparator(node, position);
-      } else if (action == 'push-to-remote' && node != null) {
-        InfoService.error('Not implemented yet');
-      } else if (action == 'remove-remote-node' && node != null) {
-        InfoService.error('Not implemented yet');
+      } else if (action == 'push-to-remote' && node != null && position != null) {
+        pushRemoteNodes(position);
+      } else if (action == 'remove-remote-node' && node != null && position != null) {
+        removeRemoteNodes(position);
       } else {
         logger.error('Unknown action: $action');
       }
@@ -399,5 +399,36 @@ class BrowserController {
       InfoService.info('${treeNodes.length} remote items fetched.\nLast on $lastDateStr');
     }
     renderItems();
+  }
+
+  void removeRemoteNodes(int position) async {
+    final positions = treeTraverser.selectedIndexes.toSet();
+    if (positions.isEmpty) {
+      positions.add(position);
+    }
+    final nodes = positions.map((index) => treeTraverser.getChild(index)).toList();
+    for (final node in nodes) {
+      await remoteService.removeRemoteItem(node);
+    }
+    removeMultipleNodes(positions.toList());
+    if (nodes.length == 1) {
+      InfoService.info('Item removed remotely: ${nodes.first.name}');
+    } else {
+      InfoService.info('${nodes.length} items removed remotely.');
+    }
+  }
+
+  void pushRemoteNodes(int position) async {
+    final positions = treeTraverser.selectedIndexes.toSet();
+    if (positions.isEmpty) {
+      positions.add(position);
+    }
+    final nodes = positions.map((index) => treeTraverser.getChild(index)).toList();
+    await remoteService.pushRemoteItems(nodes);
+    if (nodes.length == 1) {
+      InfoService.info('Node pushed: ${nodes.first.name}');
+    } else {
+      InfoService.info('${nodes.length} nodes pushed.');
+    }
   }
 }

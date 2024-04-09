@@ -32,4 +32,13 @@ class RemoteNode {
   static List<RemoteNode> fromJsons(Iterable<dynamic> jsons) {
     return jsons.map((json) => RemoteNode.fromJson(json)).toList();
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'content': name,
+      'create_timestamp': createTimestamp,
+      'device_id': deviceId,
+    };
+  }
 }
