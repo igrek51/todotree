@@ -8,6 +8,8 @@ class NodeMenuDialog {
   static Widget buildForNode(BuildContext context, TreeNode item, int position) {
     final actionChildren = buildNodeActions(context, item, position);
     return AlertDialog(
+      title: Text(item.displayName),
+      titleTextStyle: TextStyle(fontSize: 18.0),
       contentPadding: EdgeInsets.symmetric(horizontal: 2.0, vertical: 16.0),
       content: Column(
         mainAxisSize: MainAxisSize.min,
