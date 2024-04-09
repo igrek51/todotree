@@ -27,7 +27,8 @@ class RemoteService {
     if (response.statusCode >= 300) {
       throw Exception('HTTP response ${response.statusCode} for URL $url: ${response.body}');
     }
-    Iterable jsons = json.decode(response.body);
+    String body = Utf8Decoder().convert(response.bodyBytes);
+    Iterable jsons = jsonDecode(body);
     final nodes = RemoteNode.fromJsons(jsons);
 
     remoteItemToId.clear();
