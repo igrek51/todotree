@@ -10,6 +10,7 @@ import 'package:todotree/util/errors.dart';
 import 'package:todotree/services/tree_traverser.dart';
 import 'package:todotree/model/tree_node.dart';
 import 'package:todotree/views/components/node_menu_dialog.dart';
+import 'package:todotree/views/components/ripple_indicator.dart';
 import 'package:todotree/views/components/rounded_badge.dart';
 import 'package:todotree/views/tree_browser/browser_controller.dart';
 import 'package:todotree/views/tree_browser/browser_state.dart';
@@ -18,45 +19,69 @@ const double _iconButtonInternalSize = 24;
 const double _iconButtonPaddingVertical = 8;
 const double _iconButtonPaddingHorizontal = 4;
 
-class BrowserWidget extends StatelessWidget {
+class BrowserWidget extends StatefulWidget {
   const BrowserWidget({super.key});
+
+  @override
+  State<BrowserWidget> createState() => _BrowserWidgetState();
+}
+
+class _BrowserWidgetState extends State<BrowserWidget> {
+
+  final GlobalKey<RippleIndicatorState> _rippleIndicatorKey = GlobalKey<RippleIndicatorState>();
 
   @override
   Widget build(BuildContext context) {
     final browserState = context.watch<BrowserState>();
     final browserController = Provider.of<BrowserController>(context, listen: false);
+    final settingsProvider = Provider.of<SettingsProvider>(context, listen: false);
+
+    var rippleIndicator = RippleIndicator(key: _rippleIndicatorKey);
+    var reorderableListView = ReorderableListView.builder(
+      onReorder: (int oldIndex, int newIndex) {
+        browserController.reorderNodes(oldIndex, newIndex);
+      },
+      buildDefaultDragHandles: false,
+      scrollController: browserState.scrollController,
+      proxyDecorator: (Widget child, int index, Animation<double> animation) {
+        return Material(
+          elevation: 4.0,
+          color: Color.fromARGB(90, 190, 190, 190),
+          child: child,
+        );
+      },
+      itemCount: browserState.items.length + 1,
+      itemBuilder: (BuildContext context, int index) {
+        if (index < browserState.items.length) {
+          final item = browserState.items[index];
+          return TreeListItemWidget(
+            key: Key(identityHashCode(item).toString()),
+            position: index,
+            treeItem: item,
+            browserController: browserController,
+            rippleIndicatorKey: _rippleIndicatorKey,
+          );
+        } else {
+          return PlusItemWidget(
+            key: const Key('plus'),
+          );
+        }
+      },
+    );
+
+    var stack = Stack(
+      children: [
+        rippleIndicator,
+        reorderableListView,
+      ],
+    );
+
+    if (!settingsProvider.slidableActions) {
+      return stack;
+    }
 
     return SlidableAutoCloseBehavior(
-      child: ReorderableListView.builder(
-        onReorder: (int oldIndex, int newIndex) {
-          browserController.reorderNodes(oldIndex, newIndex);
-        },
-        buildDefaultDragHandles: false,
-        scrollController: browserState.scrollController,
-        proxyDecorator: (Widget child, int index, Animation<double> animation) {
-          return Material(
-            elevation: 4.0,
-            color: Color.fromARGB(90, 190, 190, 190),
-            child: child,
-          );
-        },
-        itemCount: browserState.items.length + 1,
-        itemBuilder: (BuildContext context, int index) {
-          if (index < browserState.items.length) {
-            final item = browserState.items[index];
-            return TreeListItemWidget(
-              key: Key(identityHashCode(item).toString()),
-              position: index,
-              treeItem: item,
-              browserController: browserController,
-            );
-          } else {
-            return PlusItemWidget(
-              key: const Key('plus'),
-            );
-          }
-        },
-      ),
+      child: stack,
     );
   }
 }
@@ -67,11 +92,13 @@ class TreeListItemWidget extends StatefulWidget {
     required this.position,
     required this.treeItem,
     required this.browserController,
+    required this.rippleIndicatorKey,
   });
 
   final int position;
   final TreeNode treeItem;
   final BrowserController browserController;
+  final GlobalKey<RippleIndicatorState> rippleIndicatorKey;
 
   @override
   State<TreeListItemWidget> createState() => _TreeListItemWidgetState();
@@ -142,6 +169,9 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
         safeExecute(() async {
           await browserController.handleNodeTap(widget.treeItem, widget.position);
         });
+      },
+      onTapUp: (TapUpDetails details) {
+        widget.rippleIndicatorKey.currentState?.startRipple(details.globalPosition.dx, details.globalPosition.dy);
       },
       onLongPress: () {
         showNodeOptionsDialog(context);
