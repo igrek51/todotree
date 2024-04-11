@@ -112,8 +112,10 @@ class TreeTraverser {
     if (target2link.containsKey(currentParent)) {
       final link = target2link[currentParent]!;
       target2link.remove(currentParent);
-      if (link.parent != null) {
-        goTo(link.parent!);
+      var parent = link.parent;
+      if (parent != null) {
+        focusNode = link;
+        goTo(parent);
       }
     } else {
       target2link.remove(currentParent);
@@ -127,7 +129,6 @@ class TreeTraverser {
   }
 
   void goTo(TreeNode child) {
-    focusNode = currentParent;
     currentParent = child;
   }
 
