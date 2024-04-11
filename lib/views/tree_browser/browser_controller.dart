@@ -30,8 +30,9 @@ class BrowserController {
   RemoteService remoteService;
 
   Map<TreeNode, double> scrollCache = {};
-  Map<int, double> topOffsetAnimations = {};
   Map<int, double> itemHeights = {};
+  Map<int, bool> highlightAnimationRequests = {};
+  Map<int, double> offsetAnimationRequests = {};
 
   BrowserController(this.homeState, this.browserState, this.treeTraverser, this.clipboardManager, this.appLifecycle,
       this.settingsProvider, this.remoteService);
@@ -50,8 +51,10 @@ class BrowserController {
   void renderItems() {
     browserState.items = treeTraverser.currentParent.children.toList();
     browserState.selectedIndexes = treeTraverser.selectedIndexes.toSet();
-    for (int i = 0; i < treeTraverser.currentParent.size; i++) {
-      browserState.animationsStarted[i] = false;
+    for (final (index, item) in treeTraverser.currentParent.children.indexed) {
+      if (treeTraverser.focusNode == item) {
+        highlightAnimationRequests[index] = true;
+      }
     }
     browserState.notify();
   }
@@ -163,7 +166,7 @@ class BrowserController {
     treeTraverser.removeFromCurrent(node);
 
     if (originalPosition != null && originalPosition < treeTraverser.currentParent.size) {
-      topOffsetAnimations[originalPosition] = removedHeight;
+      offsetAnimationRequests[originalPosition] = removedHeight;
     }
 
     renderItems();
@@ -380,7 +383,7 @@ class BrowserController {
     goIntoNode(randomNode);
     InfoService.info('Entered random item: ${randomNode.name}');
   }
-  
+
   void fetchRemoteNodes(TreeNode rootNode) async {
     InfoService.info('Fetching remote items…');
     final pair = await remoteService.fetchRemoteTreeNodes();

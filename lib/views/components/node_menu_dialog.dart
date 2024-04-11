@@ -11,9 +11,11 @@ class NodeMenuDialog {
       title: Text(item.displayName),
       titleTextStyle: TextStyle(fontSize: 18.0),
       contentPadding: EdgeInsets.symmetric(horizontal: 2.0, vertical: 16.0),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: actionChildren,
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: actionChildren,
+        ),
       ),
     );
   }
@@ -22,9 +24,11 @@ class NodeMenuDialog {
     final actionChildren = buildPlusActions(context);
     return AlertDialog(
       contentPadding: EdgeInsets.symmetric(horizontal: 2.0, vertical: 16.0),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: actionChildren,
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: actionChildren,
+        ),
       ),
     );
   }

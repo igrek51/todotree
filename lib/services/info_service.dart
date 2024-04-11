@@ -6,7 +6,6 @@ final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey = GlobalKey<Scaffol
 final navigatorKey = GlobalKey<NavigatorState>();
 
 class InfoService {
-
   static void info(String message) {
     logger.info('UI: $message');
     scaffoldMessengerKey.currentState?.clearSnackBars();
@@ -59,7 +58,9 @@ class InfoService {
               builder: (BuildContext context) {
                 return AlertDialog(
                   title: Text('Error Details'),
-                  content: Text(fullMessage),
+                  content: SingleChildScrollView(
+                    child: Text(fullMessage),
+                  ),
                   actions: <Widget>[
                     TextButton(
                       child: Text('CLOSE'),
@@ -76,5 +77,4 @@ class InfoService {
       ),
     );
   }
-
 }

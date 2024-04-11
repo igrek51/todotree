@@ -15,13 +15,15 @@ class TextFieldDialog {
         controller.text = initialValue;
         return AlertDialog(
           title: Text(title),
-          content: TextField(
-            controller: controller,
-            autofocus: true,
-            maxLines: null,
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
-              hintText: 'Value',
+          content: SingleChildScrollView(
+            child: TextField(
+              controller: controller,
+              autofocus: true,
+              maxLines: null,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                hintText: 'Value',
+              ),
             ),
           ),
           actions: <Widget>[

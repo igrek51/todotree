@@ -9,9 +9,9 @@ class HighlightIndicator extends StatefulWidget {
 
 class HighlightIndicatorState extends State<HighlightIndicator> with TickerProviderStateMixin {
   late final AnimationController _animController = AnimationController(
+    value: 1,
     vsync: this,
     duration: const Duration(milliseconds: 600),
-    lowerBound: 0.0,
   );
   Offset _offset = Offset.zero;
   Size _size = Size.zero;

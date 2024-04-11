@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:todotree/services/settings_provider.dart';
@@ -116,12 +114,17 @@ class TreeListItemWidget extends StatefulWidget {
   final GlobalKey<HighlightIndicatorState> highlightIndicatorKey;
 
   @override
-  State<TreeListItemWidget> createState() => _TreeListItemWidgetState();
+  State<TreeListItemWidget> createState() => TreeListItemWidgetState();
 }
 
-class _TreeListItemWidgetState extends State<TreeListItemWidget> {
+class TreeListItemWidgetState extends State<TreeListItemWidget> with TickerProviderStateMixin {
+  late final AnimationController _offsetAnimator = AnimationController(
+    value: 1,
+    vsync: this,
+    duration: const Duration(milliseconds: 600),
+  );
+  late final CurvedAnimation _offsetAnimation = CurvedAnimation(parent: _offsetAnimator, curve: Curves.bounceOut);
   double animationTopOffset = 0;
-  Timer? _timer;
   final _inkWellKey = GlobalKey();
 
   @override
@@ -129,96 +132,82 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final context = _inkWellKey.currentContext;
       if (context == null) return;
-      final box = context.findRenderObject() as RenderBox;
-      final height = box.size.height;
+      final renderBox = context.findRenderObject() as RenderBox;
+      final height = renderBox.size.height;
       final browserController = Provider.of<BrowserController>(context, listen: false);
       browserController.itemHeights[widget.position] = height;
 
-      Offset globalPosition = box.localToGlobal(Offset.zero);
-
       final treeTraverser = Provider.of<TreeTraverser>(context, listen: false);
-      final browserState = Provider.of<BrowserState>(context, listen: false);
 
-      if (browserState.animationsStarted[widget.position] ?? true) return;
-      final shouldBeHighlighted = treeTraverser.focusNode == widget.treeItem;
-      if (!shouldBeHighlighted) return;
-
-      browserState.animationsStarted[widget.position] = true;
-
-      if (shouldBeHighlighted) {
-        widget.highlightIndicatorKey.currentState?.animate(globalPosition.dx, globalPosition.dy, box.size.width, box.size.height);
-      }
+      _startHighlightAnimation(browserController, treeTraverser, renderBox);
     });
     super.initState();
   }
 
   @override
   void dispose() {
-    _timer?.cancel();
+    _offsetAnimator.dispose();
     super.dispose();
   }
 
-  // void _startAnimation(BrowserState browserState, BrowserController browserController, TreeTraverser treeTraverser) {
-  //   if (browserState.animationsStarted[widget.position] ?? true) return;
-  //   final shouldBeHighlighted = treeTraverser.focusNode == widget.treeItem;
-  //   const shouldBeMoved = false; // (browserController.topOffsetAnimations[widget.position] ?? 0) != 0;
-  //   if (!shouldBeHighlighted && !shouldBeMoved) return;
+  void _startHighlightAnimation(BrowserController browserController, TreeTraverser treeTraverser,
+      RenderBox renderBox) {
+    if (!(browserController.highlightAnimationRequests[widget.position] ?? false)) return;
+    browserController.highlightAnimationRequests.remove(widget.position);
 
-  //   browserState.animationsStarted[widget.position] = true;
-  //   setState(() {
-  //     if (shouldBeHighlighted) {
-  //       highlighted = true;
-  //     }
-  //     // if (shouldBeMoved) {
-  //     //   animationTopOffset = browserController.topOffsetAnimations[widget.position] ?? 0;
-  //     // }
-  //   });
-  //   _timer = Timer(Duration(milliseconds: 10), () {
-  //     browserController.topOffsetAnimations[widget.position] = 0;
-  //     setState(() {
-  //       highlighted = false;
-  //       animationTopOffset = 0;
-  //     });
-  //   });
-  // }
+    Offset globalPosition = renderBox.localToGlobal(Offset.zero);
+    widget.highlightIndicatorKey.currentState
+        ?.animate(globalPosition.dx, globalPosition.dy, renderBox.size.width, renderBox.size.height);
+  }
+  
+  void _startOffsetAnimation(BrowserController browserController) {
+    if (!browserController.offsetAnimationRequests.containsKey(widget.position)) return;
+    animationTopOffset = browserController.offsetAnimationRequests[widget.position] ?? 0;
+    browserController.offsetAnimationRequests.remove(widget.position);
+    _offsetAnimator.forward(from: 0);
+  }
 
   @override
   Widget build(BuildContext context) {
     final browserController = Provider.of<BrowserController>(context, listen: false);
     final settingsProvider = Provider.of<SettingsProvider>(context, listen: false);
 
-    // _startAnimation(browserState, browserController, treeTraverser);
+    _startOffsetAnimation(browserController);
 
-    var inkWell = InkWell(
-      key: _inkWellKey,
-      onTap: () {
-        safeExecute(() async {
-          await browserController.handleNodeTap(widget.treeItem, widget.position);
-        });
-      },
-      onTapUp: (TapUpDetails details) {
-        widget.rippleIndicatorKey.currentState?.startRipple(details.globalPosition.dx, details.globalPosition.dy);
-      },
-      onLongPress: () {
-        showNodeOptionsDialog(context, widget.treeItem, widget.position);
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 900),
-        padding: const EdgeInsets.all(0.0),
-        margin: EdgeInsets.only(top: animationTopOffset),
-        decoration: BoxDecoration(
-          color: Colors.transparent,
-          border: Border.symmetric(
-            horizontal: BorderSide(
-              color: const Color(0x44888888),
-              width: 0.5,
-              style: BorderStyle.solid,
-              strokeAlign: BorderSide.strokeAlignInside,
+    var inkWell = AnimatedBuilder(
+      animation: _offsetAnimation,
+      builder: (context, child) {
+        return InkWell(
+          key: _inkWellKey,
+          onTap: () {
+            safeExecute(() async {
+              await browserController.handleNodeTap(widget.treeItem, widget.position);
+            });
+          },
+          onTapUp: (TapUpDetails details) {
+            widget.rippleIndicatorKey.currentState?.startRipple(details.globalPosition.dx, details.globalPosition.dy);
+          },
+          onLongPress: () {
+            showNodeOptionsDialog(context, widget.treeItem, widget.position);
+          },
+          child: Container(
+            padding: const EdgeInsets.all(0.0),
+            margin: EdgeInsets.only(top: (1 - _offsetAnimation.value) * animationTopOffset),
+            decoration: BoxDecoration(
+              color: Colors.transparent,
+              border: Border.symmetric(
+                horizontal: BorderSide(
+                  color: const Color(0x44888888),
+                  width: 0.5,
+                  style: BorderStyle.solid,
+                  strokeAlign: BorderSide.strokeAlignInside,
+                ),
+              ),
             ),
+            child: TreeItemRow(position: widget.position, treeItem: widget.treeItem),
           ),
-        ),
-        child: TreeItemRow(position: widget.position, treeItem: widget.treeItem),
-      ),
+        );
+      },
     );
 
     if (!settingsProvider.slidableActions) {
@@ -274,7 +263,7 @@ class TreeItemRow extends StatelessWidget {
         buildLeftIcon(selectionMode, isItemSelected, browserController),
         buildMiddleText(context),
         buildMoreActionButton(context),
-        selectionMode ? null : buildMiddleActionButton(context),
+        selectionMode ? null : buildMiddleActionButton(browserController),
         selectionMode ? null : buildAddButton(browserController),
       ].filterNotNull(),
     );
@@ -384,8 +373,7 @@ class TreeItemRow extends StatelessWidget {
     );
   }
 
-  Widget buildMiddleActionButton(BuildContext context) {
-    final browserController = Provider.of<BrowserController>(context, listen: false);
+  Widget buildMiddleActionButton(BrowserController browserController) {
     if (treeItem.isLeaf) {
       return IconButton(
         icon: const Icon(
@@ -439,7 +427,6 @@ class TreeItemRow extends StatelessWidget {
     );
   }
 }
-
 
 void showNodeOptionsDialog(BuildContext context, TreeNode treeItem, int position) {
   final browserController = Provider.of<BrowserController>(context, listen: false);
