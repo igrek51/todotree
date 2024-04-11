@@ -32,12 +32,38 @@ class _BrowserWidgetState extends State<BrowserWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final browserState = context.watch<BrowserState>();
-    final browserController = Provider.of<BrowserController>(context, listen: false);
     final settingsProvider = Provider.of<SettingsProvider>(context, listen: false);
 
-    var rippleIndicator = RippleIndicator(key: _rippleIndicatorKey);
-    var reorderableListView = ReorderableListView.builder(
+    var stack = Stack(
+      children: [
+        RippleIndicator(key: _rippleIndicatorKey),
+        TreeListView(rippleIndicatorKey: _rippleIndicatorKey),
+      ],
+    );
+
+    if (!settingsProvider.slidableActions) {
+      return stack;
+    }
+    return SlidableAutoCloseBehavior(
+      child: stack,
+    );
+  }
+}
+
+class TreeListView extends StatelessWidget {
+  const TreeListView({
+    super.key,
+    required this.rippleIndicatorKey,
+  });
+
+  final GlobalKey<RippleIndicatorState> rippleIndicatorKey;
+
+  @override
+  Widget build(BuildContext context) {
+    final browserState = context.watch<BrowserState>();
+    final browserController = Provider.of<BrowserController>(context, listen: false);
+
+    return ReorderableListView.builder(
       onReorder: (int oldIndex, int newIndex) {
         browserController.reorderNodes(oldIndex, newIndex);
       },
@@ -59,7 +85,7 @@ class _BrowserWidgetState extends State<BrowserWidget> {
             position: index,
             treeItem: item,
             browserController: browserController,
-            rippleIndicatorKey: _rippleIndicatorKey,
+            rippleIndicatorKey: rippleIndicatorKey,
           );
         } else {
           return PlusItemWidget(
@@ -67,21 +93,6 @@ class _BrowserWidgetState extends State<BrowserWidget> {
           );
         }
       },
-    );
-
-    var stack = Stack(
-      children: [
-        rippleIndicator,
-        reorderableListView,
-      ],
-    );
-
-    if (!settingsProvider.slidableActions) {
-      return stack;
-    }
-
-    return SlidableAutoCloseBehavior(
-      child: stack,
     );
   }
 }
