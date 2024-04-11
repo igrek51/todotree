@@ -20,19 +20,18 @@ import 'package:todotree/views/tree_browser/browser_state.dart';
 class BrowserController {
   HomeState homeState;
   BrowserState browserState;
-
-  late EditorController editorController;
-
   TreeTraverser treeTraverser;
   ClipboardManager clipboardManager;
   AppLifecycle appLifecycle;
   SettingsProvider settingsProvider;
   RemoteService remoteService;
+  late EditorController editorController;
 
   Map<TreeNode, double> scrollCache = {};
   Map<int, double> itemHeights = {};
   Map<int, bool> highlightAnimationRequests = {};
   Map<int, double> offsetAnimationRequests = {};
+  int lastSelectedIndex = -1;
 
   BrowserController(this.homeState, this.browserState, this.treeTraverser, this.clipboardManager, this.appLifecycle,
       this.settingsProvider, this.remoteService);
@@ -281,6 +280,20 @@ class BrowserController {
 
   void onToggleSelectedNode(int position) {
     treeTraverser.toggleItemSelected(position);
+    lastSelectedIndex = position;
+    if (!treeTraverser.selectionMode) lastSelectedIndex = -1;
+    renderItems();
+  }
+
+  void onLongToggleSelectedNode(int position) {
+    if (lastSelectedIndex != -1 && lastSelectedIndex < position && treeTraverser.isItemSelected(lastSelectedIndex)) {
+      final selectionState = !treeTraverser.isItemSelected(position);
+      for (var i = lastSelectedIndex; i <= position; i++) {
+        treeTraverser.setItemSelected(i, selectionState);
+      }
+    } else {
+      treeTraverser.toggleItemSelected(position);
+    }
     renderItems();
   }
 

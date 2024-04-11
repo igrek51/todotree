@@ -272,14 +272,21 @@ class TreeItemRow extends StatelessWidget {
     if (selectionMode) {
       return SizedBox(
         width: 40,
-        child: Checkbox(
-          value: isItemSelected,
-          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          onChanged: (bool? value) {
+        child: GestureDetector(
+          onLongPress: () {
             safeExecute(() {
-              browserController.onToggleSelectedNode(position);
+              browserController.onLongToggleSelectedNode(position);
             });
           },
+          child: Checkbox(
+            value: isItemSelected,
+            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            onChanged: (bool? value) {
+              safeExecute(() {
+                browserController.onToggleSelectedNode(position);
+              });
+            },
+          ),
         ),
       );
     } else {
