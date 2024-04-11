@@ -67,7 +67,9 @@ class RippleIndicatorState extends State<RippleIndicator> with TickerProviderSta
     if (_boxKey.currentContext == null) return;
     RenderBox renderBox = _boxKey.currentContext!.findRenderObject() as RenderBox;
     Offset boxPosition = renderBox.localToGlobal(Offset.zero);
-    _offset = Offset(globalX - boxPosition.dx - 125, globalY - boxPosition.dy - 125);
+    setState(() {
+      _offset = Offset(globalX - boxPosition.dx - 125, globalY - boxPosition.dy - 125);
+    });
     _rippleController.forward(from: 0);
   }
 }

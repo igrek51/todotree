@@ -9,6 +9,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:todotree/util/errors.dart';
 import 'package:todotree/services/tree_traverser.dart';
 import 'package:todotree/model/tree_node.dart';
+import 'package:todotree/views/components/highlight_indicator.dart';
 import 'package:todotree/views/components/node_menu_dialog.dart';
 import 'package:todotree/views/components/ripple_indicator.dart';
 import 'package:todotree/views/components/rounded_badge.dart';
@@ -27,8 +28,8 @@ class BrowserWidget extends StatefulWidget {
 }
 
 class _BrowserWidgetState extends State<BrowserWidget> {
-
   final GlobalKey<RippleIndicatorState> _rippleIndicatorKey = GlobalKey<RippleIndicatorState>();
+  final GlobalKey<HighlightIndicatorState> _highlightIndicatorKey = GlobalKey<HighlightIndicatorState>();
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +38,8 @@ class _BrowserWidgetState extends State<BrowserWidget> {
     var stack = Stack(
       children: [
         RippleIndicator(key: _rippleIndicatorKey),
-        TreeListView(rippleIndicatorKey: _rippleIndicatorKey),
+        HighlightIndicator(key: _highlightIndicatorKey),
+        TreeListView(rippleIndicatorKey: _rippleIndicatorKey, highlightIndicatorKey: _highlightIndicatorKey),
       ],
     );
 
@@ -54,9 +56,11 @@ class TreeListView extends StatelessWidget {
   const TreeListView({
     super.key,
     required this.rippleIndicatorKey,
+    required this.highlightIndicatorKey,
   });
 
   final GlobalKey<RippleIndicatorState> rippleIndicatorKey;
+  final GlobalKey<HighlightIndicatorState> highlightIndicatorKey;
 
   @override
   Widget build(BuildContext context) {
@@ -84,8 +88,8 @@ class TreeListView extends StatelessWidget {
             key: Key(identityHashCode(item).toString()),
             position: index,
             treeItem: item,
-            browserController: browserController,
             rippleIndicatorKey: rippleIndicatorKey,
+            highlightIndicatorKey: highlightIndicatorKey,
           );
         } else {
           return PlusItemWidget(
@@ -102,33 +106,48 @@ class TreeListItemWidget extends StatefulWidget {
     super.key,
     required this.position,
     required this.treeItem,
-    required this.browserController,
     required this.rippleIndicatorKey,
+    required this.highlightIndicatorKey,
   });
 
   final int position;
   final TreeNode treeItem;
-  final BrowserController browserController;
   final GlobalKey<RippleIndicatorState> rippleIndicatorKey;
+  final GlobalKey<HighlightIndicatorState> highlightIndicatorKey;
 
   @override
   State<TreeListItemWidget> createState() => _TreeListItemWidgetState();
 }
 
 class _TreeListItemWidgetState extends State<TreeListItemWidget> {
-  bool highlighted = false;
   double animationTopOffset = 0;
   Timer? _timer;
-  final key = GlobalKey();
+  final _inkWellKey = GlobalKey();
 
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final context = key.currentContext;
+      final context = _inkWellKey.currentContext;
       if (context == null) return;
       final box = context.findRenderObject() as RenderBox;
       final height = box.size.height;
-      widget.browserController.itemHeights[widget.position] = height;
+      final browserController = Provider.of<BrowserController>(context, listen: false);
+      browserController.itemHeights[widget.position] = height;
+
+      Offset globalPosition = box.localToGlobal(Offset.zero);
+
+      final treeTraverser = Provider.of<TreeTraverser>(context, listen: false);
+      final browserState = Provider.of<BrowserState>(context, listen: false);
+
+      if (browserState.animationsStarted[widget.position] ?? true) return;
+      final shouldBeHighlighted = treeTraverser.focusNode == widget.treeItem;
+      if (!shouldBeHighlighted) return;
+
+      browserState.animationsStarted[widget.position] = true;
+
+      if (shouldBeHighlighted) {
+        widget.highlightIndicatorKey.currentState?.animate(globalPosition.dx, globalPosition.dy, box.size.width, box.size.height);
+      }
     });
     super.initState();
   }
@@ -139,43 +158,39 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
     super.dispose();
   }
 
-  void _startAnimation(BrowserState browserState, BrowserController browserController, TreeTraverser treeTraverser) {
-    if (browserState.animationsStarted[widget.position] ?? true) return;
-    final shouldBeHighlighted = treeTraverser.focusNode == widget.treeItem;
-    const shouldBeMoved = false; // (browserController.topOffsetAnimations[widget.position] ?? 0) != 0;
-    if (!shouldBeHighlighted && !shouldBeMoved) return;
+  // void _startAnimation(BrowserState browserState, BrowserController browserController, TreeTraverser treeTraverser) {
+  //   if (browserState.animationsStarted[widget.position] ?? true) return;
+  //   final shouldBeHighlighted = treeTraverser.focusNode == widget.treeItem;
+  //   const shouldBeMoved = false; // (browserController.topOffsetAnimations[widget.position] ?? 0) != 0;
+  //   if (!shouldBeHighlighted && !shouldBeMoved) return;
 
-    browserState.animationsStarted[widget.position] = true;
-    setState(() {
-      if (shouldBeHighlighted) {
-        highlighted = true;
-      }
-      // if (shouldBeMoved) {
-      //   animationTopOffset = browserController.topOffsetAnimations[widget.position] ?? 0;
-      // }
-    });
-    _timer = Timer(Duration(milliseconds: 10), () {
-      browserController.topOffsetAnimations[widget.position] = 0;
-      setState(() {
-        highlighted = false;
-        animationTopOffset = 0;
-      });
-    });
-  }
+  //   browserState.animationsStarted[widget.position] = true;
+  //   setState(() {
+  //     if (shouldBeHighlighted) {
+  //       highlighted = true;
+  //     }
+  //     // if (shouldBeMoved) {
+  //     //   animationTopOffset = browserController.topOffsetAnimations[widget.position] ?? 0;
+  //     // }
+  //   });
+  //   _timer = Timer(Duration(milliseconds: 10), () {
+  //     browserController.topOffsetAnimations[widget.position] = 0;
+  //     setState(() {
+  //       highlighted = false;
+  //       animationTopOffset = 0;
+  //     });
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
     final browserController = Provider.of<BrowserController>(context, listen: false);
-    final treeTraverser = Provider.of<TreeTraverser>(context, listen: false);
     final settingsProvider = Provider.of<SettingsProvider>(context, listen: false);
-    final browserState = context.watch<BrowserState>();
-    final selectionMode = browserState.selectedIndexes.isNotEmpty;
-    final isItemSelected = browserState.selectedIndexes.contains(widget.position);
 
-    _startAnimation(browserState, browserController, treeTraverser);
+    // _startAnimation(browserState, browserController, treeTraverser);
 
     var inkWell = InkWell(
-      key: key,
+      key: _inkWellKey,
       onTap: () {
         safeExecute(() async {
           await browserController.handleNodeTap(widget.treeItem, widget.position);
@@ -185,14 +200,14 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
         widget.rippleIndicatorKey.currentState?.startRipple(details.globalPosition.dx, details.globalPosition.dy);
       },
       onLongPress: () {
-        showNodeOptionsDialog(context);
+        showNodeOptionsDialog(context, widget.treeItem, widget.position);
       },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 900),
         padding: const EdgeInsets.all(0.0),
         margin: EdgeInsets.only(top: animationTopOffset),
         decoration: BoxDecoration(
-          color: highlighted ? Color.fromARGB(199, 53, 156, 240) : Colors.transparent,
+          color: Colors.transparent,
           border: Border.symmetric(
             horizontal: BorderSide(
               color: const Color(0x44888888),
@@ -202,26 +217,15 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
             ),
           ),
         ),
-        child: Row(
-          children: [
-            buildLeftIcon(selectionMode, isItemSelected, browserController),
-            buildMiddleText(context),
-            buildMoreActionButton(context),
-            selectionMode ? null : buildMiddleActionButton(context),
-            selectionMode ? null : buildAddButton(browserController),
-          ].filterNotNull(),
-        ),
+        child: TreeItemRow(position: widget.position, treeItem: widget.treeItem),
       ),
     );
 
     if (!settingsProvider.slidableActions) {
-      return Material(
-        color: Colors.transparent,
-        child: inkWell,
-      );
+      return inkWell;
     }
 
-    var slidable = Slidable(
+    return Slidable(
       groupTag: '0',
       key: ValueKey(widget.key),
       endActionPane: ActionPane(
@@ -245,9 +249,34 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
       ),
       child: inkWell,
     );
-    return Material(
-      color: Colors.transparent,
-      child: slidable,
+  }
+}
+
+class TreeItemRow extends StatelessWidget {
+  const TreeItemRow({
+    super.key,
+    required this.position,
+    required this.treeItem,
+  });
+
+  final int position;
+  final TreeNode treeItem;
+
+  @override
+  Widget build(BuildContext context) {
+    final browserState = context.watch<BrowserState>();
+    final selectionMode = browserState.selectedIndexes.isNotEmpty;
+    final isItemSelected = browserState.selectedIndexes.contains(position);
+    final browserController = Provider.of<BrowserController>(context, listen: false);
+
+    return Row(
+      children: [
+        buildLeftIcon(selectionMode, isItemSelected, browserController),
+        buildMiddleText(context),
+        buildMoreActionButton(context),
+        selectionMode ? null : buildMiddleActionButton(context),
+        selectionMode ? null : buildAddButton(browserController),
+      ].filterNotNull(),
     );
   }
 
@@ -260,14 +289,14 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
           materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
           onChanged: (bool? value) {
             safeExecute(() {
-              browserController.onToggleSelectedNode(widget.position);
+              browserController.onToggleSelectedNode(position);
             });
           },
         ),
       );
     } else {
       return ReorderableDragStartListener(
-        index: widget.position,
+        index: position,
         child: IconButton(
           icon: const Icon(
             Icons.unfold_more,
@@ -278,7 +307,7 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
           constraints: BoxConstraints(),
           style: const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
           onPressed: () {
-            browserController.onToggleSelectedNode(widget.position);
+            browserController.onToggleSelectedNode(position);
           },
         ),
       );
@@ -286,13 +315,13 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
   }
 
   Widget buildMiddleText(BuildContext context) {
-    if (widget.treeItem.isLink) {
+    if (treeItem.isLink) {
       final treeTraverser = Provider.of<TreeTraverser>(context, listen: false);
       return Expanded(
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 10),
           child: Text(
-            treeTraverser.displayLinkName(widget.treeItem),
+            treeTraverser.displayLinkName(treeItem),
             style: TextStyle(
               color: Color(0xFFD2D2D2),
               fontSize: 18,
@@ -301,12 +330,12 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
           ),
         ),
       );
-    } else if (widget.treeItem.isLeaf) {
+    } else if (treeItem.isLeaf) {
       return Expanded(
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 10),
           child: Text(
-            widget.treeItem.name,
+            treeItem.name,
             style: TextStyle(
               color: Colors.white,
               fontSize: 18,
@@ -322,7 +351,7 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 10),
                 child: Text(
-                  widget.treeItem.name,
+                  treeItem.name,
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 18,
@@ -332,7 +361,7 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
               ),
             ),
             SizedBox(width: 3),
-            RoundedBadge(text: widget.treeItem.size.toString()),
+            RoundedBadge(text: treeItem.size.toString()),
           ],
         ),
       );
@@ -350,14 +379,14 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
       constraints: BoxConstraints(),
       style: const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
       onPressed: () {
-        showNodeOptionsDialog(context);
+        showNodeOptionsDialog(context, treeItem, position);
       },
     );
   }
 
   Widget buildMiddleActionButton(BuildContext context) {
     final browserController = Provider.of<BrowserController>(context, listen: false);
-    if (widget.treeItem.isLeaf) {
+    if (treeItem.isLeaf) {
       return IconButton(
         icon: const Icon(
           Icons.arrow_right,
@@ -369,7 +398,7 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
         style: const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
         onPressed: () {
           safeExecute(() {
-            browserController.goIntoNode(widget.treeItem);
+            browserController.goIntoNode(treeItem);
           });
         },
       );
@@ -385,7 +414,7 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
         style: const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
         onPressed: () {
           safeExecute(() {
-            browserController.editNode(widget.treeItem);
+            browserController.editNode(treeItem);
           });
         },
       );
@@ -404,25 +433,26 @@ class _TreeListItemWidgetState extends State<TreeListItemWidget> {
       style: const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
       onPressed: () {
         safeExecute(() {
-          browserController.addNodeAt(widget.position);
+          browserController.addNodeAt(position);
         });
       },
     );
   }
+}
 
-  void showNodeOptionsDialog(BuildContext context) {
-    final browserController = Provider.of<BrowserController>(context, listen: false);
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return NodeMenuDialog.buildForNode(context, widget.treeItem, widget.position);
-      },
-    ).then((value) {
-      if (value != null) {
-        browserController.runNodeMenuAction(value, node: widget.treeItem, position: widget.position);
-      }
-    });
-  }
+
+void showNodeOptionsDialog(BuildContext context, TreeNode treeItem, int position) {
+  final browserController = Provider.of<BrowserController>(context, listen: false);
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return NodeMenuDialog.buildForNode(context, treeItem, position);
+    },
+  ).then((value) {
+    if (value != null) {
+      browserController.runNodeMenuAction(value, node: treeItem, position: position);
+    }
+  });
 }
 
 class PlusItemWidget extends StatelessWidget {
