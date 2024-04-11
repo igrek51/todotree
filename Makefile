@@ -26,6 +26,8 @@ run-android-release:
 run-android-release-wireless:
 	flutter run --device-id 192.168.0.22:5555 --release
 
+release: run-android-release-wireless
+
 dart-fix-dry:
 	dart fix --dry-run
 
