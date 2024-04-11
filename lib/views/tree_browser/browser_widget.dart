@@ -150,8 +150,7 @@ class TreeListItemWidgetState extends State<TreeListItemWidget> with TickerProvi
     super.dispose();
   }
 
-  void _startHighlightAnimation(BrowserController browserController, TreeTraverser treeTraverser,
-      RenderBox renderBox) {
+  void _startHighlightAnimation(BrowserController browserController, TreeTraverser treeTraverser, RenderBox renderBox) {
     if (!(browserController.highlightAnimationRequests[widget.position] ?? false)) return;
     browserController.highlightAnimationRequests.remove(widget.position);
 
@@ -159,7 +158,7 @@ class TreeListItemWidgetState extends State<TreeListItemWidget> with TickerProvi
     widget.highlightIndicatorKey.currentState
         ?.animate(globalPosition.dx, globalPosition.dy, renderBox.size.width, renderBox.size.height);
   }
-  
+
   void _startOffsetAnimation(BrowserController browserController) {
     if (!browserController.offsetAnimationRequests.containsKey(widget.position)) return;
     animationTopOffset = browserController.offsetAnimationRequests[widget.position] ?? 0;
@@ -286,28 +285,30 @@ class TreeItemRow extends StatelessWidget {
     } else {
       return ReorderableDragStartListener(
         index: position,
-        child: IconButton(
-          icon: const Icon(
-            Icons.unfold_more,
-            size: _iconButtonInternalSize,
-            color: Colors.white,
+        child: Tooltip(
+          message: 'Drag to reorder',
+          child: IconButton(
+            icon: const Icon(
+              Icons.unfold_more,
+              size: _iconButtonInternalSize,
+              color: Colors.white,
+            ),
+            padding: EdgeInsets.all(_iconButtonPaddingVertical),
+            constraints: BoxConstraints(),
+            style: const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+            onPressed: () {
+              browserController.onToggleSelectedNode(position);
+            },
           ),
-          padding: EdgeInsets.all(_iconButtonPaddingVertical),
-          constraints: BoxConstraints(),
-          style: const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
-          onPressed: () {
-            browserController.onToggleSelectedNode(position);
-          },
         ),
       );
     }
   }
 
   Widget buildMiddleText(BuildContext context) {
-    if (treeItem.isLink) {
-      final treeTraverser = Provider.of<TreeTraverser>(context, listen: false);
-      return Expanded(
-        child: Container(
+    final treeTraverser = Provider.of<TreeTraverser>(context, listen: false);
+    var child = switch (true) {
+      true when treeItem.isLink => Container(
           padding: const EdgeInsets.symmetric(vertical: 10),
           child: Text(
             treeTraverser.displayLinkName(treeItem),
@@ -318,10 +319,7 @@ class TreeItemRow extends StatelessWidget {
             ),
           ),
         ),
-      );
-    } else if (treeItem.isLeaf) {
-      return Expanded(
-        child: Container(
+      true when treeItem.isLeaf => Container(
           padding: const EdgeInsets.symmetric(vertical: 10),
           child: Text(
             treeItem.name,
@@ -331,10 +329,7 @@ class TreeItemRow extends StatelessWidget {
             ),
           ),
         ),
-      );
-    } else {
-      return Expanded(
-        child: Row(
+      _ => Row(
           children: [
             Expanded(
               child: Container(
@@ -352,9 +347,9 @@ class TreeItemRow extends StatelessWidget {
             SizedBox(width: 3),
             RoundedBadge(text: treeItem.size.toString()),
           ],
-        ),
-      );
-    }
+        )
+    };
+    return Expanded(child: child);
   }
 
   Widget buildMoreActionButton(BuildContext context) {
@@ -375,55 +370,64 @@ class TreeItemRow extends StatelessWidget {
 
   Widget buildMiddleActionButton(BrowserController browserController) {
     if (treeItem.isLeaf) {
-      return IconButton(
-        icon: const Icon(
-          Icons.arrow_right,
-          size: _iconButtonInternalSize,
-          color: Colors.white,
+      return Tooltip(
+        message: 'Go into',
+        child: IconButton(
+          icon: const Icon(
+            Icons.arrow_right,
+            size: _iconButtonInternalSize,
+            color: Colors.white,
+          ),
+          padding: EdgeInsets.symmetric(vertical: _iconButtonPaddingVertical, horizontal: _iconButtonPaddingHorizontal),
+          constraints: BoxConstraints(),
+          style: const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+          onPressed: () {
+            safeExecute(() {
+              browserController.goIntoNode(treeItem);
+            });
+          },
         ),
-        padding: EdgeInsets.symmetric(vertical: _iconButtonPaddingVertical, horizontal: _iconButtonPaddingHorizontal),
-        constraints: BoxConstraints(),
-        style: const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
-        onPressed: () {
-          safeExecute(() {
-            browserController.goIntoNode(treeItem);
-          });
-        },
       );
     } else {
-      return IconButton(
-        icon: const Icon(
-          Icons.edit,
-          size: _iconButtonInternalSize,
-          color: Colors.white,
+      return Tooltip(
+        message: 'Edit',
+        child: IconButton(
+          icon: const Icon(
+            Icons.edit,
+            size: _iconButtonInternalSize,
+            color: Colors.white,
+          ),
+          padding: EdgeInsets.symmetric(vertical: _iconButtonPaddingVertical, horizontal: _iconButtonPaddingHorizontal),
+          constraints: BoxConstraints(),
+          style: const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+          onPressed: () {
+            safeExecute(() {
+              browserController.editNode(treeItem);
+            });
+          },
         ),
-        padding: EdgeInsets.symmetric(vertical: _iconButtonPaddingVertical, horizontal: _iconButtonPaddingHorizontal),
-        constraints: BoxConstraints(),
-        style: const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
-        onPressed: () {
-          safeExecute(() {
-            browserController.editNode(treeItem);
-          });
-        },
       );
     }
   }
 
   Widget buildAddButton(BrowserController browserController) {
-    return IconButton(
-      icon: const Icon(
-        Icons.add,
-        size: _iconButtonInternalSize,
-        color: Colors.white,
+    return Tooltip(
+      message: 'Add above',
+      child: IconButton(
+        icon: const Icon(
+          Icons.add,
+          size: _iconButtonInternalSize,
+          color: Colors.white,
+        ),
+        padding: EdgeInsets.symmetric(vertical: _iconButtonPaddingVertical, horizontal: _iconButtonPaddingHorizontal),
+        constraints: BoxConstraints(),
+        style: const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+        onPressed: () {
+          safeExecute(() {
+            browserController.addNodeAt(position);
+          });
+        },
       ),
-      padding: EdgeInsets.symmetric(vertical: _iconButtonPaddingVertical, horizontal: _iconButtonPaddingHorizontal),
-      constraints: BoxConstraints(),
-      style: const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
-      onPressed: () {
-        safeExecute(() {
-          browserController.addNodeAt(position);
-        });
-      },
     );
   }
 }
