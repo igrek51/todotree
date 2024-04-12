@@ -7,6 +7,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:todotree/util/errors.dart';
 import 'package:todotree/services/tree_traverser.dart';
 import 'package:todotree/model/tree_node.dart';
+import 'package:todotree/views/components/explosion_indicator.dart';
 import 'package:todotree/views/components/node_menu_dialog.dart';
 import 'package:todotree/views/components/ripple_indicator.dart';
 import 'package:todotree/views/components/rounded_badge.dart';
@@ -34,6 +35,7 @@ class _BrowserWidgetState extends State<BrowserWidget> {
     var stack = Stack(
       children: [
         RippleIndicator(key: _rippleIndicatorKey),
+        ExplosionIndicator(key: explosionIndicatorKey),
         TreeListView(rippleIndicatorKey: _rippleIndicatorKey),
       ],
     );

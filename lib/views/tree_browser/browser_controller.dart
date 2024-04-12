@@ -11,6 +11,7 @@ import 'package:todotree/util/logger.dart';
 import 'package:todotree/util/collections.dart';
 import 'package:todotree/util/numbers.dart';
 import 'package:todotree/util/time.dart';
+import 'package:todotree/views/components/explosion_indicator.dart';
 import 'package:todotree/views/editor/editor_controller.dart';
 import 'package:todotree/services/tree_traverser.dart';
 import 'package:todotree/model/tree_node.dart';
@@ -169,7 +170,7 @@ class BrowserController {
     }
 
     renderItems();
-
+    explosionIndicatorKey.currentState?.animate();
     InfoService.snackbarAction('Removed: ${node.name}', 'UNDO', () {
       treeTraverser.addChildToCurrent(node, position: originalPosition);
       renderItems();
@@ -184,8 +185,9 @@ class BrowserController {
       treeTraverser.removeFromCurrent(pair.second);
     }
     treeTraverser.cancelSelection();
+    
     renderItems();
-
+    explosionIndicatorKey.currentState?.animate();
     InfoService.snackbarAction('Removed: ${sortedPositions.length}', 'UNDO', () {
       for (final pair in originalNodePositions) {
         treeTraverser.addChildToCurrent(pair.second, position: pair.first);
