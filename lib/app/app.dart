@@ -36,7 +36,6 @@ class _AppWidgetState extends State<AppWidget> with WidgetsBindingObserver {
       Provider<TreeTraverser>(create: (context) => widget.appFactory.treeTraverser),
       Provider<ClipboardManager>(create: (context) => widget.appFactory.clipboardManager),
       Provider<MainMenuRunner>(create: (context) => widget.appFactory.mainMenuRunner),
-      Provider<ShortcutHandler>(create: (context) => widget.appFactory.shortcutHandler),
       Provider<SettingsProvider>(create: (context) => widget.appFactory.settingsProvider),
       Provider<AppFactory>(create: (context) => widget.appFactory),
     ];

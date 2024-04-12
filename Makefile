@@ -17,16 +17,13 @@ run-linux-kickstart:
 run-chrome:
 	flutter run --device-id chrome --web-renderer html
 
-run-android:
+run-android-debug:
 	flutter run --device-id 192.168.0.22:5555
 
 run-android-release:
-	flutter run --device-id 958744f --release
-
-run-android-release-wireless:
 	flutter run --device-id 192.168.0.22:5555 --release
 
-release: run-android-release-wireless
+release: run-android-release
 
 dart-fix-dry:
 	dart fix --dry-run
