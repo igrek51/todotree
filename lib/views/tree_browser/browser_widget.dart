@@ -177,34 +177,37 @@ class TreeListItemWidgetState extends State<TreeListItemWidget> with TickerProvi
     var inkWell = AnimatedBuilder(
       animation: _offsetAnimation,
       builder: (context, child) {
-        return InkWell(
-          key: _inkWellKey,
-          onTap: () {
-            safeExecute(() async {
-              await browserController.handleNodeTap(widget.treeItem, widget.position);
-            });
-          },
-          onTapUp: (TapUpDetails details) {
-            widget.rippleIndicatorKey.currentState?.startRipple(details.globalPosition.dx, details.globalPosition.dy);
-          },
-          onLongPress: () {
-            showNodeOptionsDialog(context, widget.treeItem, widget.position);
-          },
-          child: Container(
-            padding: const EdgeInsets.all(0.0),
-            margin: EdgeInsets.only(top: (1 - _offsetAnimation.value) * animationTopOffset),
-            decoration: BoxDecoration(
-              color: Colors.transparent,
-              border: Border.symmetric(
-                horizontal: BorderSide(
-                  color: const Color(0x44888888),
-                  width: 0.5,
-                  style: BorderStyle.solid,
-                  strokeAlign: BorderSide.strokeAlignInside,
+        return Material(
+          color: Colors.transparent,
+          child: InkWell(
+            key: _inkWellKey,
+            onTap: () {
+              safeExecute(() async {
+                await browserController.handleNodeTap(widget.treeItem, widget.position);
+              });
+            },
+            onTapUp: (TapUpDetails details) {
+              widget.rippleIndicatorKey.currentState?.startRipple(details.globalPosition.dx, details.globalPosition.dy);
+            },
+            onLongPress: () {
+              showNodeOptionsDialog(context, widget.treeItem, widget.position);
+            },
+            child: Container(
+              padding: const EdgeInsets.all(0.0),
+              margin: EdgeInsets.only(top: (1 - _offsetAnimation.value) * animationTopOffset),
+              decoration: BoxDecoration(
+                color: Colors.transparent,
+                border: Border.symmetric(
+                  horizontal: BorderSide(
+                    color: const Color(0x44888888),
+                    width: 0.5,
+                    style: BorderStyle.solid,
+                    strokeAlign: BorderSide.strokeAlignInside,
+                  ),
                 ),
               ),
+              child: TreeItemRow(position: widget.position, treeItem: widget.treeItem),
             ),
-            child: TreeItemRow(position: widget.position, treeItem: widget.treeItem),
           ),
         );
       },
@@ -483,7 +486,7 @@ class PlusItemWidget extends StatelessWidget {
           });
         },
         child: SizedBox(
-          height: 45,
+          height: 55,
           child: Center(
             child: const Icon(Icons.add),
           ),
