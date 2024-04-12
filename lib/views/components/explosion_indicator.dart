@@ -31,9 +31,9 @@ class ExplosionIndicatorState extends State<ExplosionIndicator> {
         numberOfParticles: 20,
         minBlastForce: 5,
         maxBlastForce: 100,
-        gravity: 0.2,
+        gravity: 0.4,
         minimumSize: const Size(5, 5),
-        maximumSize: const Size(10, 10),
+        maximumSize: const Size(8, 8),
       ),
     );
   }

@@ -283,40 +283,56 @@ class TreeItemRow extends StatelessWidget {
 
   Widget buildLeftIcon(bool selectionMode, bool isItemSelected, BrowserController browserController) {
     if (selectionMode) {
+      Widget sizedBoxChild = GestureDetector(
+        onLongPress: () {
+          safeExecute(() {
+            browserController.onLongToggleSelectedNode(position);
+          });
+        },
+        child: Checkbox(
+          value: isItemSelected,
+          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          onChanged: (bool? value) {
+            safeExecute(() {
+              browserController.onToggleSelectedNode(position);
+            });
+          },
+        ),
+      );
+      if (isItemSelected) {
+        sizedBoxChild = ReorderableDragStartListener(
+          index: position,
+          child: sizedBoxChild,
+        );
+      }
       return SizedBox(
         width: 40,
+        child: sizedBoxChild,
+      );
+    } else {
+      return ReorderableDragStartListener(
+        index: position,
         child: GestureDetector(
           onLongPress: () {
             safeExecute(() {
-              browserController.onLongToggleSelectedNode(position);
+              browserController.onToggleSelectedNode(position);
             });
           },
-          child: Checkbox(
-            value: isItemSelected,
-            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            onChanged: (bool? value) {
+          child: IconButton(
+            icon: const Icon(
+              Icons.unfold_more,
+              size: _iconButtonInternalSize,
+              color: Colors.white,
+            ),
+            padding: EdgeInsets.all(_iconButtonPaddingVertical),
+            constraints: BoxConstraints(),
+            style: const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+            onPressed: () {
               safeExecute(() {
                 browserController.onToggleSelectedNode(position);
               });
             },
           ),
-        ),
-      );
-    } else {
-      return ReorderableDragStartListener(
-        index: position,
-        child: IconButton(
-          icon: const Icon(
-            Icons.unfold_more,
-            size: _iconButtonInternalSize,
-            color: Colors.white,
-          ),
-          padding: EdgeInsets.all(_iconButtonPaddingVertical),
-          constraints: BoxConstraints(),
-          style: const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
-          onPressed: () {
-            browserController.onToggleSelectedNode(position);
-          },
         ),
       );
     }

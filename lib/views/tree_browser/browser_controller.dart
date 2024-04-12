@@ -147,17 +147,31 @@ class BrowserController {
     final newList = treeTraverser.currentParent.children.toList();
     if (newIndex >= newList.length) newIndex = newList.length - 1;
     if (newIndex == oldIndex) return;
-    if (newIndex < oldIndex) {
-      final node = newList.removeAt(oldIndex);
-      newList.insert(newIndex, node);
+
+    if (treeTraverser.selectionMode) {
+      List<int> sortedPositions = treeTraverser.selectedIndexes.toList()..sort();
+      final otherSelectedPositions = sortedPositions.where((index) => index != oldIndex).toList();
+      final nodesToMove = sortedPositions.map((index) => newList[index]).toList();
+      final newListReordered = newList.where((node) => !nodesToMove.contains(node)).toList();
+      var insertIndex = (newIndex - otherSelectedPositions.where((index) => index < newIndex).length).clampMin(0);
+      newListReordered.insertAll(insertIndex, nodesToMove);
+      treeTraverser.currentParent.children = newListReordered;
+      treeTraverser.cancelSelection();
+      InfoService.info('Multiple nodes reordered: ${sortedPositions.length}');
+      logger.debug('Reordered multiple nodes: $sortedPositions -> $newIndex');
     } else {
-      final node = newList.removeAt(oldIndex);
-      newList.insert(newIndex, node);
+      if (newIndex < oldIndex) {
+        final node = newList.removeAt(oldIndex);
+        newList.insert(newIndex, node);
+      } else {
+        final node = newList.removeAt(oldIndex);
+        newList.insert(newIndex, node);
+      }
+      treeTraverser.currentParent.children = newList;
+      logger.debug('Reordered nodes: $oldIndex -> $newIndex');
     }
-    treeTraverser.currentParent.children = newList;
     treeTraverser.unsavedChanges = true;
     renderItems();
-    logger.debug('Reordered nodes: $oldIndex -> $newIndex');
   }
 
   void removeOneNode(TreeNode node) {
@@ -185,7 +199,7 @@ class BrowserController {
       treeTraverser.removeFromCurrent(pair.second);
     }
     treeTraverser.cancelSelection();
-    
+
     renderItems();
     explosionIndicatorKey.currentState?.animate();
     InfoService.snackbarAction('Removed: ${sortedPositions.length}', 'UNDO', () {
@@ -225,8 +239,9 @@ class BrowserController {
       treeTraverser.removeFromParent(target, targetParent);
     }
     treeTraverser.removeFromCurrent(link);
-    renderItems();
 
+    renderItems();
+    explosionIndicatorKey.currentState?.animate();
     InfoService.snackbarAction('Link & target removed: ${link.name}', 'UNDO', () {
       treeTraverser.addChildToCurrent(link, position: originalLinkPosition);
       if (target != null && targetParent != null && originalTargetPosition != null) {
@@ -288,7 +303,7 @@ class BrowserController {
   }
 
   void onLongToggleSelectedNode(int position) {
-    if (lastSelectedIndex != -1 && lastSelectedIndex < position && treeTraverser.isItemSelected(lastSelectedIndex)) {
+    if (lastSelectedIndex != -1 && lastSelectedIndex < position) {
       final selectionState = !treeTraverser.isItemSelected(position);
       for (var i = lastSelectedIndex; i <= position; i++) {
         treeTraverser.setItemSelected(i, selectionState);
