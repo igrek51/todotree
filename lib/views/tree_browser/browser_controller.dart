@@ -170,6 +170,7 @@ class BrowserController {
       treeTraverser.currentParent.children = newList;
       logger.debug('Reordered nodes: $oldIndex -> $newIndex');
     }
+    treeTraverser.focusNode = null;
     treeTraverser.unsavedChanges = true;
     renderItems();
   }
@@ -463,5 +464,10 @@ class BrowserController {
     } else {
       InfoService.info('${nodes.length} nodes pushed.');
     }
+  }
+
+  void highlightAnimationDone() {
+    treeTraverser.focusNode = null;
+    highlightAnimationRequests.clear();
   }
 }

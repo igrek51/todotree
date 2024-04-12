@@ -155,6 +155,7 @@ class TreeListItemWidgetState extends State<TreeListItemWidget> with TickerProvi
     browserController.highlightAnimationRequests.remove(widget.position);
     _highlightAnimator.forward(from: 0).then((value) {
       animatingHighlight = false;
+      browserController.highlightAnimationDone();
     });
   }
 
