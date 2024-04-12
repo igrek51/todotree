@@ -10,10 +10,12 @@ import 'package:todotree/util/logger.dart';
 void startupApp(AppFactory app) async {
   try {
     _resizeWindow();
+    
     await app.settingsProvider.init();
     await app.treeTraverser.load();
     app.browserController.renderAll();
     app.shortcutHandler.init();
+
     kickstartApp(app);
     logger.info('App initialized');
   } catch (error, stackTrace) {

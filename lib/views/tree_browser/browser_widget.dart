@@ -7,7 +7,6 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:todotree/util/errors.dart';
 import 'package:todotree/services/tree_traverser.dart';
 import 'package:todotree/model/tree_node.dart';
-import 'package:todotree/views/components/highlight_indicator.dart';
 import 'package:todotree/views/components/node_menu_dialog.dart';
 import 'package:todotree/views/components/ripple_indicator.dart';
 import 'package:todotree/views/components/rounded_badge.dart';
@@ -27,7 +26,6 @@ class BrowserWidget extends StatefulWidget {
 
 class _BrowserWidgetState extends State<BrowserWidget> {
   final GlobalKey<RippleIndicatorState> _rippleIndicatorKey = GlobalKey<RippleIndicatorState>();
-  final GlobalKey<HighlightIndicatorState> _highlightIndicatorKey = GlobalKey<HighlightIndicatorState>();
 
   @override
   Widget build(BuildContext context) {
@@ -36,8 +34,7 @@ class _BrowserWidgetState extends State<BrowserWidget> {
     var stack = Stack(
       children: [
         RippleIndicator(key: _rippleIndicatorKey),
-        HighlightIndicator(key: _highlightIndicatorKey),
-        TreeListView(rippleIndicatorKey: _rippleIndicatorKey, highlightIndicatorKey: _highlightIndicatorKey),
+        TreeListView(rippleIndicatorKey: _rippleIndicatorKey),
       ],
     );
 
@@ -54,11 +51,9 @@ class TreeListView extends StatelessWidget {
   const TreeListView({
     super.key,
     required this.rippleIndicatorKey,
-    required this.highlightIndicatorKey,
   });
 
   final GlobalKey<RippleIndicatorState> rippleIndicatorKey;
-  final GlobalKey<HighlightIndicatorState> highlightIndicatorKey;
 
   @override
   Widget build(BuildContext context) {
@@ -88,7 +83,6 @@ class TreeListView extends StatelessWidget {
             position: index,
             treeItem: item,
             rippleIndicatorKey: rippleIndicatorKey,
-            highlightIndicatorKey: highlightIndicatorKey,
           );
         } else {
           return PlusItemWidget(
@@ -106,13 +100,11 @@ class TreeListItemWidget extends StatefulWidget {
     required this.position,
     required this.treeItem,
     required this.rippleIndicatorKey,
-    required this.highlightIndicatorKey,
   });
 
   final int position;
   final TreeNode treeItem;
   final GlobalKey<RippleIndicatorState> rippleIndicatorKey;
-  final GlobalKey<HighlightIndicatorState> highlightIndicatorKey;
 
   @override
   State<TreeListItemWidget> createState() => TreeListItemWidgetState();
@@ -124,8 +116,15 @@ class TreeListItemWidgetState extends State<TreeListItemWidget> with TickerProvi
     vsync: this,
     duration: const Duration(milliseconds: 600),
   );
+  late final AnimationController _highlightAnimator = AnimationController(
+    value: 1,
+    vsync: this,
+    duration: const Duration(milliseconds: 600),
+  );
   late final CurvedAnimation _offsetAnimation = CurvedAnimation(parent: _offsetAnimator, curve: Curves.bounceOut);
+  late final CurvedAnimation _highlightAnimation = CurvedAnimation(parent: _highlightAnimator, curve: Curves.linear);
   double animationTopOffset = 0;
+  bool animatingHighlight = false;
   final _inkWellKey = GlobalKey();
 
   @override
@@ -137,10 +136,6 @@ class TreeListItemWidgetState extends State<TreeListItemWidget> with TickerProvi
       final height = renderBox.size.height;
       final browserController = Provider.of<BrowserController>(context, listen: false);
       browserController.itemHeights[widget.position] = height;
-
-      final treeTraverser = Provider.of<TreeTraverser>(context, listen: false);
-
-      _startHighlightAnimation(browserController, treeTraverser, renderBox);
     });
     super.initState();
   }
@@ -148,23 +143,26 @@ class TreeListItemWidgetState extends State<TreeListItemWidget> with TickerProvi
   @override
   void dispose() {
     _offsetAnimator.dispose();
+    _highlightAnimator.dispose();
     super.dispose();
   }
 
-  void _startHighlightAnimation(BrowserController browserController, TreeTraverser treeTraverser, RenderBox renderBox) {
-    if (!(browserController.highlightAnimationRequests[widget.position] ?? false)) return;
+  void _startHighlightAnimation(BrowserController browserController) {
+    if (!browserController.highlightAnimationRequests.containsKey(widget.position)) return;
+    animatingHighlight = true;
     browserController.highlightAnimationRequests.remove(widget.position);
-
-    Offset globalPosition = renderBox.localToGlobal(Offset.zero);
-    widget.highlightIndicatorKey.currentState
-        ?.animate(globalPosition.dx, globalPosition.dy, renderBox.size.width, renderBox.size.height);
+    _highlightAnimator.forward(from: 0).then((value) {
+      animatingHighlight = false;
+    });
   }
 
   void _startOffsetAnimation(BrowserController browserController) {
     if (!browserController.offsetAnimationRequests.containsKey(widget.position)) return;
     animationTopOffset = browserController.offsetAnimationRequests[widget.position] ?? 0;
     browserController.offsetAnimationRequests.remove(widget.position);
-    _offsetAnimator.forward(from: 0);
+    _offsetAnimator.forward(from: 0).then((value) {
+      animationTopOffset = 0;
+    });
   }
 
   @override
@@ -172,10 +170,11 @@ class TreeListItemWidgetState extends State<TreeListItemWidget> with TickerProvi
     final browserController = Provider.of<BrowserController>(context, listen: false);
     final settingsProvider = Provider.of<SettingsProvider>(context, listen: false);
 
+    _startHighlightAnimation(browserController);
     _startOffsetAnimation(browserController);
 
     var inkWell = AnimatedBuilder(
-      animation: _offsetAnimation,
+      animation: Listenable.merge([_offsetAnimator, _highlightAnimator]), // Listenable triggerring repainting
       builder: (context, child) {
         return Material(
           color: Colors.transparent,
@@ -196,7 +195,7 @@ class TreeListItemWidgetState extends State<TreeListItemWidget> with TickerProvi
               padding: const EdgeInsets.all(0.0),
               margin: EdgeInsets.only(top: (1 - _offsetAnimation.value) * animationTopOffset),
               decoration: BoxDecoration(
-                color: Colors.transparent,
+                color: animatingHighlight ? const Color.fromARGB(199, 53, 156, 240).withOpacity(1 - _highlightAnimation.value) : Colors.transparent,
                 border: Border.symmetric(
                   horizontal: BorderSide(
                     color: const Color(0x44888888),
