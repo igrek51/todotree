@@ -63,7 +63,7 @@ class RippleIndicatorState extends State<RippleIndicator> with TickerProviderSta
     );
   }
 
-  void startRipple(double globalX, double globalY) {
+  void animate(double globalX, double globalY) {
     if (_boxKey.currentContext == null) return;
     RenderBox renderBox = _boxKey.currentContext!.findRenderObject() as RenderBox;
     Offset boxPosition = renderBox.localToGlobal(Offset.zero);

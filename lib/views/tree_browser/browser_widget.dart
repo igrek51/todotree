@@ -180,13 +180,13 @@ class TreeListItemWidgetState extends State<TreeListItemWidget> with TickerProvi
           color: Colors.transparent,
           child: InkWell(
             key: _inkWellKey,
+            onTapUp: (TapUpDetails details) {
+              widget.rippleIndicatorKey.currentState?.animate(details.globalPosition.dx, details.globalPosition.dy);
+            },
             onTap: () {
               safeExecute(() async {
                 await browserController.handleNodeTap(widget.treeItem, widget.position);
               });
-            },
-            onTapUp: (TapUpDetails details) {
-              widget.rippleIndicatorKey.currentState?.startRipple(details.globalPosition.dx, details.globalPosition.dy);
             },
             onLongPress: () {
               showNodeOptionsDialog(context, widget.treeItem, widget.position);
@@ -195,7 +195,9 @@ class TreeListItemWidgetState extends State<TreeListItemWidget> with TickerProvi
               padding: const EdgeInsets.all(0.0),
               margin: EdgeInsets.only(top: (1 - _offsetAnimation.value) * animationTopOffset),
               decoration: BoxDecoration(
-                color: animatingHighlight ? const Color.fromARGB(199, 53, 156, 240).withOpacity(1 - _highlightAnimation.value) : Colors.transparent,
+                color: animatingHighlight
+                    ? const Color.fromARGB(199, 53, 156, 240).withOpacity(1 - _highlightAnimation.value)
+                    : Colors.transparent,
                 border: Border.symmetric(
                   horizontal: BorderSide(
                     color: const Color(0x44888888),
@@ -205,7 +207,11 @@ class TreeListItemWidgetState extends State<TreeListItemWidget> with TickerProvi
                   ),
                 ),
               ),
-              child: TreeItemRow(position: widget.position, treeItem: widget.treeItem),
+              child: TreeItemRow(
+                position: widget.position,
+                treeItem: widget.treeItem,
+                rippleIndicatorKey: widget.rippleIndicatorKey,
+              ),
             ),
           ),
         );
@@ -248,10 +254,12 @@ class TreeItemRow extends StatelessWidget {
     super.key,
     required this.position,
     required this.treeItem,
+    required this.rippleIndicatorKey,
   });
 
   final int position;
   final TreeNode treeItem;
+  final GlobalKey<RippleIndicatorState> rippleIndicatorKey;
 
   @override
   Widget build(BuildContext context) {
@@ -265,7 +273,7 @@ class TreeItemRow extends StatelessWidget {
         buildLeftIcon(selectionMode, isItemSelected, browserController),
         buildMiddleText(context),
         buildMoreActionButton(context),
-        selectionMode ? null : buildMiddleActionButton(browserController),
+        selectionMode ? null : buildMiddleActionButton(context, browserController),
         selectionMode ? null : buildAddButton(browserController),
       ].filterNotNull(),
     );
@@ -295,21 +303,18 @@ class TreeItemRow extends StatelessWidget {
     } else {
       return ReorderableDragStartListener(
         index: position,
-        child: Tooltip(
-          message: 'Drag to reorder',
-          child: IconButton(
-            icon: const Icon(
-              Icons.unfold_more,
-              size: _iconButtonInternalSize,
-              color: Colors.white,
-            ),
-            padding: EdgeInsets.all(_iconButtonPaddingVertical),
-            constraints: BoxConstraints(),
-            style: const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
-            onPressed: () {
-              browserController.onToggleSelectedNode(position);
-            },
+        child: IconButton(
+          icon: const Icon(
+            Icons.unfold_more,
+            size: _iconButtonInternalSize,
+            color: Colors.white,
           ),
+          padding: EdgeInsets.all(_iconButtonPaddingVertical),
+          constraints: BoxConstraints(),
+          style: const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+          onPressed: () {
+            browserController.onToggleSelectedNode(position);
+          },
         ),
       );
     }
@@ -374,11 +379,13 @@ class TreeItemRow extends StatelessWidget {
       style: const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
       onPressed: () {
         showNodeOptionsDialog(context, treeItem, position);
+        var (_, centerY, w, _) = getRenderBoxCoordinates(context);
+        rippleIndicatorKey.currentState?.animate(w - 32 - 32 - 32 / 2, centerY);
       },
     );
   }
 
-  Widget buildMiddleActionButton(BrowserController browserController) {
+  Widget buildMiddleActionButton(BuildContext context, BrowserController browserController) {
     if (treeItem.isLeaf) {
       return Tooltip(
         message: 'Go into',
@@ -394,6 +401,8 @@ class TreeItemRow extends StatelessWidget {
           onPressed: () {
             safeExecute(() {
               browserController.goIntoNode(treeItem);
+              var (_, centerY, w, _) = getRenderBoxCoordinates(context);
+              rippleIndicatorKey.currentState?.animate(w - 32 - 32 / 2, centerY);
             });
           },
         ),
@@ -493,4 +502,12 @@ class PlusItemWidget extends StatelessWidget {
       ),
     );
   }
+}
+
+(double, double, double, double) getRenderBoxCoordinates(BuildContext context) {
+  final RenderBox renderBox = context.findRenderObject() as RenderBox;
+  Offset boxGlobalPos = renderBox.localToGlobal(Offset.zero);
+  final centerX = boxGlobalPos.dx + renderBox.size.width / 2;
+  final centerY = boxGlobalPos.dy + renderBox.size.height / 2;
+  return (centerX, centerY, renderBox.size.width, renderBox.size.height);
 }
