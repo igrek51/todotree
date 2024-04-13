@@ -177,6 +177,7 @@ class EditorWidget extends StatelessWidget {
         },
       ),
       FlatButton(
+        icon: Icon(Icons.keyboard),
         label: editorState.numericKeyboard ? 'ABC' : '123',
         onPressed: () {
           safeExecute(() {

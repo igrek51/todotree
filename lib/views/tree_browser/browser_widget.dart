@@ -17,6 +17,7 @@ import 'package:todotree/views/tree_browser/browser_state.dart';
 const double _iconButtonInternalSize = 24;
 const double _iconButtonPaddingVertical = 8;
 const double _iconButtonPaddingHorizontal = 4;
+const double _reoderButtonPaddingHorizontal = 12;
 
 class BrowserWidget extends StatefulWidget {
   const BrowserWidget({super.key});
@@ -307,7 +308,7 @@ class TreeItemRow extends StatelessWidget {
         );
       }
       return SizedBox(
-        width: 40,
+        width: 48,
         child: sizedBoxChild,
       );
     } else {
@@ -325,7 +326,8 @@ class TreeItemRow extends StatelessWidget {
               size: _iconButtonInternalSize,
               color: Colors.white,
             ),
-            padding: EdgeInsets.all(_iconButtonPaddingVertical),
+            padding:
+                EdgeInsets.symmetric(vertical: _iconButtonPaddingVertical, horizontal: _reoderButtonPaddingHorizontal),
             constraints: BoxConstraints(),
             style: const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
             onPressed: () {
