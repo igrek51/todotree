@@ -64,30 +64,6 @@ List<Widget> buildNodeActions(BuildContext context, TreeNode item, int position)
     ));
   }
   actions.add(ListTile(
-    title: Text('✔️ Select'),
-    onTap: () {
-      Navigator.pop(context, 'select-node');
-    },
-  ));
-  actions.add(ListTile(
-    title: Text('☑️ Select all'),
-    onTap: () {
-      Navigator.pop(context, 'select-all');
-    },
-  ));
-  actions.add(ListTile(
-    title: Text('✏️ Edit'),
-    onTap: () {
-      Navigator.pop(context, 'edit-node');
-    },
-  ));
-  actions.add(ListTile(
-    title: Text('➕ Add above'),
-    onTap: () {
-      Navigator.pop(context, 'add-above');
-    },
-  ));
-  actions.add(ListTile(
     title: Text('✂️ Cut'),
     onTap: () {
       Navigator.pop(context, 'cut');
@@ -113,6 +89,38 @@ List<Widget> buildNodeActions(BuildContext context, TreeNode item, int position)
       },
     ));
   }
+  if (item.isLink) {
+    actions.add(ListTile(
+      title: Text('🔍 Locate linked target'),
+      onTap: () {
+        Navigator.pop(context, 'locate-link');
+      },
+    ));
+  }
+  actions.add(ListTile(
+    title: Text('✔️ Select'),
+    onTap: () {
+      Navigator.pop(context, 'select-node');
+    },
+  ));
+  actions.add(ListTile(
+    title: Text('☑️ Select all'),
+    onTap: () {
+      Navigator.pop(context, 'select-all');
+    },
+  ));
+  actions.add(ListTile(
+    title: Text('✏️ Edit'),
+    onTap: () {
+      Navigator.pop(context, 'edit-node');
+    },
+  ));
+  actions.add(ListTile(
+    title: Text('➕ Add above'),
+    onTap: () {
+      Navigator.pop(context, 'add-above');
+    },
+  ));
   if (item.type == TreeNodeType.text && (item.displayName.contains(',') || item.displayName.contains('\n'))) {
     actions.add(ListTile(
       title: Text('🔪 Split'),

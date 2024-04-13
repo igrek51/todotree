@@ -283,6 +283,8 @@ class BrowserController {
         pushRemoteNodes(position);
       } else if (action == 'remove-remote-node' && node != null && position != null) {
         removeRemoteNodes(position);
+      } else if (action == 'locate-link' && node != null) {
+        locateLinkedTarget(node);
       } else {
         logger.error('Unknown action: $action');
       }
@@ -469,5 +471,12 @@ class BrowserController {
   void highlightAnimationDone() {
     treeTraverser.focusNode = null;
     highlightAnimationRequests.clear();
+  }
+
+  void locateLinkedTarget(TreeNode link) {
+    if (!link.isLink) return;
+    ensureNoSelectionMode();
+    treeTraverser.locateLinkTarget(link);
+    renderAll();
   }
 }

@@ -141,11 +141,20 @@ class TreeTraverser {
   void goToLinkTarget(TreeNode link) {
     final target = findLinkTarget(link.name);
     if (target == null) {
-      InfoService.info('Link is broken: ${link.displayTargetPath}');
+      InfoService.error('Link is broken: ${link.displayTargetPath}');
     } else {
       target2link[target] = link;
       goTo(target);
     }
+  }
+
+  void locateLinkTarget(TreeNode link) {
+    final target = findLinkTarget(link.name);
+    if (target == null) return InfoService.error('Link is broken: ${link.displayTargetPath}');
+    final targetParent = target.parent;
+    if (targetParent == null) return InfoService.error('Link target has no parent');
+    focusNode = target;
+    goTo(targetParent);
   }
 
   bool get selectionMode => selectedIndexes.isNotEmpty;
