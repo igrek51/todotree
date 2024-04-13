@@ -21,7 +21,7 @@ run-android-debug:
 	flutter run --device-id 192.168.0.22:5555
 
 run-android-release:
-	flutter run --device-id 192.168.0.22:5555 --release
+	flutter run --device-id "moto g54 5G" --release
 
 release: run-android-release
 
