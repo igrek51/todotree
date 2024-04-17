@@ -78,9 +78,7 @@ class TreeListView extends StatelessWidget {
           child: child,
         );
       },
-      physics: BouncingScrollPhysics(
-        decelerationRate: ScrollDecelerationRate.fast,
-      ).applyTo(AlwaysScrollableScrollPhysics()),
+      physics: AlwaysScrollableScrollPhysics(),
       itemCount: browserState.items.length + 1,
       itemBuilder: (BuildContext context, int index) {
         if (index < browserState.items.length) {
