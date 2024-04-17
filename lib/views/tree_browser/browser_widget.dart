@@ -78,7 +78,9 @@ class TreeListView extends StatelessWidget {
           child: child,
         );
       },
-      physics: BouncingScrollPhysics().applyTo(AlwaysScrollableScrollPhysics()),
+      physics: BouncingScrollPhysics(
+        decelerationRate: ScrollDecelerationRate.fast,
+      ).applyTo(AlwaysScrollableScrollPhysics()),
       itemCount: browserState.items.length + 1,
       itemBuilder: (BuildContext context, int index) {
         if (index < browserState.items.length) {
@@ -328,8 +330,7 @@ class TreeItemRow extends StatelessWidget {
               size: _iconButtonInternalSize,
               color: Colors.white,
             ),
-            padding:
-                EdgeInsets.symmetric(vertical: _iconButtonPaddingV, horizontal: _reoderButtonPaddingH),
+            padding: EdgeInsets.symmetric(vertical: _iconButtonPaddingV, horizontal: _reoderButtonPaddingH),
             constraints: BoxConstraints(),
             style: const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
             onPressed: () {
