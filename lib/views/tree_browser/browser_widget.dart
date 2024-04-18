@@ -225,7 +225,32 @@ class TreeListItemWidgetState extends State<TreeListItemWidget> with TickerProvi
       },
     );
 
-    if (!settingsProvider.slidableActions) {
+    if (settingsProvider.slidableActions) {
+      return Slidable(
+        groupTag: '0',
+        key: ValueKey(widget.key),
+        endActionPane: ActionPane(
+          motion: BehindMotion(),
+          extentRatio: 0.25,
+          openThreshold: 0.2,
+          closeThreshold: 0.2,
+          children: [
+            SlidableAction(
+              padding: EdgeInsets.zero,
+              onPressed: (BuildContext context) {
+                safeExecute(() {
+                  browserController.removeOneNode(widget.treeItem);
+                });
+              },
+              backgroundColor: Color(0xFFFE4A49),
+              foregroundColor: Colors.white,
+              icon: Icons.delete,
+            ),
+          ],
+        ),
+        child: inkWell,
+      );
+    } else if (settingsProvider.swipeNavigation) {
       return SwipeTo(
         key: UniqueKey(),
         iconOnRightSwipe: Icons.arrow_back,
@@ -241,30 +266,7 @@ class TreeListItemWidgetState extends State<TreeListItemWidget> with TickerProvi
       );
     }
 
-    return Slidable(
-      groupTag: '0',
-      key: ValueKey(widget.key),
-      endActionPane: ActionPane(
-        motion: BehindMotion(),
-        extentRatio: 0.25,
-        openThreshold: 0.2,
-        closeThreshold: 0.2,
-        children: [
-          SlidableAction(
-            padding: EdgeInsets.zero,
-            onPressed: (BuildContext context) {
-              safeExecute(() {
-                browserController.removeOneNode(widget.treeItem);
-              });
-            },
-            backgroundColor: Color(0xFFFE4A49),
-            foregroundColor: Colors.white,
-            icon: Icons.delete,
-          ),
-        ],
-      ),
-      child: inkWell,
-    );
+    return inkWell;
   }
 }
 
