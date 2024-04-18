@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:todotree/services/settings_provider.dart';
 import 'package:todotree/util/collections.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:swipe_to/swipe_to.dart';
 
 import 'package:todotree/util/errors.dart';
 import 'package:todotree/services/tree_traverser.dart';
@@ -225,7 +226,19 @@ class TreeListItemWidgetState extends State<TreeListItemWidget> with TickerProvi
     );
 
     if (!settingsProvider.slidableActions) {
-      return inkWell;
+      return SwipeTo(
+        key: UniqueKey(),
+        iconOnRightSwipe: Icons.arrow_back,
+        onRightSwipe: (details) {
+          browserController.goBack();
+        },
+        iconOnLeftSwipe: Icons.arrow_right,
+        onLeftSwipe: (details) {
+          browserController.goIntoNode(widget.treeItem);
+        },
+        swipeSensitivity: 20,
+        child: inkWell,
+      );
     }
 
     return Slidable(

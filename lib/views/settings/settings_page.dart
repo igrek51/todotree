@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
-
 import 'package:settings_ui/settings_ui.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:todotree/services/info_service.dart';
 import 'package:todotree/services/settings_provider.dart';
 import 'package:todotree/views/components/textfield_dialog.dart';
@@ -16,20 +15,19 @@ class _SettingsPageState extends State<SettingsPage> {
   String _externalBackupLocation = '';
   String _userAuthToken = '';
   bool _firstLevelFolders = false;
-  bool _slidableActions = true;
+  bool _slidableActions = false;
+  bool swipeNavigation = false;
 
-  SharedPreferences? sharedPreferences;
   SettingsProvider settingsProvider = SettingsProvider();
 
   readSharedPrefs() async {
-    sharedPreferences = await SharedPreferences.getInstance();
-    if (sharedPreferences == null) return;
     await settingsProvider.init();
     setState(() {
       _externalBackupLocation = settingsProvider.externalBackupLocation;
       _userAuthToken = settingsProvider.userAuthToken;
       _firstLevelFolders = settingsProvider.firstLevelFolders;
       _slidableActions = settingsProvider.slidableActions;
+      swipeNavigation = settingsProvider.swipeNavigation;
     });
   }
 
@@ -55,7 +53,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   'External backup location',
                   _externalBackupLocation,
                   (String value) {
-                    sharedPreferences?.setString('externalBackupLocation', value);
+                    settingsProvider.externalBackupLocation = value;
                     setState(() {
                       _externalBackupLocation = value;
                     });
@@ -72,7 +70,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   'User Auth Token',
                   _userAuthToken,
                   (String value) {
-                    sharedPreferences?.setString('userAuthToken', value);
+                    settingsProvider.userAuthToken = value;
                     setState(() {
                       _userAuthToken = value;
                     });
@@ -86,21 +84,33 @@ class _SettingsPageState extends State<SettingsPage> {
               description: Text('Treat first-level nodes as folders'),
               initialValue: _firstLevelFolders,
               onToggle: (value) {
-                sharedPreferences?.setBool('firstLevelFolders', value);
+                settingsProvider.firstLevelFolders = value;
                 setState(() {
                   _firstLevelFolders = value;
                 });
               },
             ),
             SettingsTile.switchTile(
-              leading: Icon(Icons.folder),
+              leading: Icon(Icons.swipe),
               title: Text('Swipe menu'),
               description: Text('Slide left or right to perform quick actions on nodes'),
               initialValue: _slidableActions,
               onToggle: (value) {
-                sharedPreferences?.setBool('slidableActions', value);
+                settingsProvider.slidableActions = value;
                 setState(() {
                   _slidableActions = value;
+                });
+              },
+            ),
+            SettingsTile.switchTile(
+              leading: Icon(Icons.swipe_right_alt),
+              title: Text('Swipe navigation'),
+              description: Text('Swipe left to go into the node. Swipe right to go back.'),
+              initialValue: swipeNavigation,
+              onToggle: (value) {
+                settingsProvider.swipeNavigation = value;
+                setState(() {
+                  swipeNavigation = value;
                 });
               },
             ),
