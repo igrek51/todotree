@@ -261,7 +261,7 @@ class TreeListItemWidgetState extends State<TreeListItemWidget> with TickerProvi
         onLeftSwipe: (details) {
           browserController.goIntoNode(widget.treeItem);
         },
-        swipeSensitivity: 20,
+        swipeSensitivity: 5,
         child: inkWell,
       );
     }
@@ -509,7 +509,8 @@ class PlusItemWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final browserController = Provider.of<BrowserController>(context, listen: false);
     final treeTraverser = Provider.of<TreeTraverser>(context, listen: false);
-    return Material(
+    final settingsProvider = Provider.of<SettingsProvider>(context, listen: false);
+    final inkwell = Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: () {
@@ -538,6 +539,18 @@ class PlusItemWidget extends StatelessWidget {
         ),
       ),
     );
+    if (settingsProvider.swipeNavigation) {
+      return SwipeTo(
+        key: UniqueKey(),
+        iconOnRightSwipe: Icons.arrow_back,
+        onRightSwipe: (details) {
+          browserController.goBack();
+        },
+        swipeSensitivity: 5,
+        child: inkwell,
+      );
+    }
+    return inkwell;
   }
 }
 
