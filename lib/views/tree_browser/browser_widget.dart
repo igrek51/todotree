@@ -16,7 +16,6 @@ import 'package:todotree/views/tree_browser/browser_controller.dart';
 import 'package:todotree/views/tree_browser/browser_state.dart';
 
 const double _iconButtonInternalSize = 24;
-const double _iconButtonPaddingV = 11;
 const double _reoderButtonPaddingH = 12;
 const double _moreButtonPaddingH = 11;
 const double _midButtonPaddingH = 4;
@@ -132,6 +131,7 @@ class TreeListItemWidgetState extends State<TreeListItemWidget> with TickerProvi
   double animationTopOffset = 0;
   bool animatingHighlight = false;
   final _inkWellKey = GlobalKey();
+  double _iconButtonPaddingV = 11.0;
 
   @override
   void initState() {
@@ -177,6 +177,11 @@ class TreeListItemWidgetState extends State<TreeListItemWidget> with TickerProvi
     final browserController = Provider.of<BrowserController>(context, listen: false);
     final settingsProvider = Provider.of<SettingsProvider>(context, listen: false);
 
+    _iconButtonPaddingV = switch (settingsProvider.largeFont) {
+      true => 11.0,
+      false => 9.0,
+    };
+
     _startHighlightAnimation(browserController);
     _startOffsetAnimation(browserController);
 
@@ -218,6 +223,7 @@ class TreeListItemWidgetState extends State<TreeListItemWidget> with TickerProvi
                 position: widget.position,
                 treeItem: widget.treeItem,
                 rippleIndicatorKey: widget.rippleIndicatorKey,
+                iconButtonPaddingV: _iconButtonPaddingV,
               ),
             ),
           ),
@@ -276,11 +282,13 @@ class TreeItemRow extends StatelessWidget {
     required this.position,
     required this.treeItem,
     required this.rippleIndicatorKey,
+    required this.iconButtonPaddingV,
   });
 
   final int position;
   final TreeNode treeItem;
   final GlobalKey<RippleIndicatorState> rippleIndicatorKey;
+  final double iconButtonPaddingV;
 
   @override
   Widget build(BuildContext context) {
@@ -343,7 +351,7 @@ class TreeItemRow extends StatelessWidget {
               size: _iconButtonInternalSize,
               color: Colors.white,
             ),
-            padding: EdgeInsets.symmetric(vertical: _iconButtonPaddingV, horizontal: _reoderButtonPaddingH),
+            padding: EdgeInsets.symmetric(vertical: iconButtonPaddingV, horizontal: _reoderButtonPaddingH),
             constraints: BoxConstraints(),
             style: const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
             onPressed: () {
@@ -420,7 +428,7 @@ class TreeItemRow extends StatelessWidget {
         size: _iconButtonInternalSize,
         color: Colors.white,
       ),
-      padding: EdgeInsets.symmetric(vertical: _iconButtonPaddingV, horizontal: _moreButtonPaddingH),
+      padding: EdgeInsets.symmetric(vertical: iconButtonPaddingV, horizontal: _moreButtonPaddingH),
       constraints: BoxConstraints(),
       style: const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
       onPressed: () {
@@ -441,7 +449,7 @@ class TreeItemRow extends StatelessWidget {
             size: _iconButtonInternalSize,
             color: Colors.white,
           ),
-          padding: EdgeInsets.symmetric(vertical: _iconButtonPaddingV, horizontal: _midButtonPaddingH),
+          padding: EdgeInsets.symmetric(vertical: iconButtonPaddingV, horizontal: _midButtonPaddingH),
           constraints: BoxConstraints(),
           style: const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
           onPressed: () {
@@ -462,7 +470,7 @@ class TreeItemRow extends StatelessWidget {
             size: _iconButtonInternalSize,
             color: Colors.white,
           ),
-          padding: EdgeInsets.symmetric(vertical: _iconButtonPaddingV, horizontal: _midButtonPaddingH),
+          padding: EdgeInsets.symmetric(vertical: iconButtonPaddingV, horizontal: _midButtonPaddingH),
           constraints: BoxConstraints(),
           style: const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
           onPressed: () {
@@ -484,7 +492,7 @@ class TreeItemRow extends StatelessWidget {
           size: _iconButtonInternalSize,
           color: Colors.white,
         ),
-        padding: EdgeInsets.symmetric(vertical: _iconButtonPaddingV, horizontal: _addButtonPaddingH),
+        padding: EdgeInsets.symmetric(vertical: iconButtonPaddingV, horizontal: _addButtonPaddingH),
         constraints: BoxConstraints(),
         style: const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
         onPressed: () {
