@@ -253,12 +253,12 @@ class TreeListItemWidgetState extends State<TreeListItemWidget> with TickerProvi
     } else if (settingsProvider.swipeNavigation) {
       return SwipeTo(
         key: UniqueKey(),
-        iconOnRightSwipe: Icons.arrow_back,
-        onRightSwipe: (details) {
+        iconOnLeftSwipe: Icons.arrow_back,
+        onLeftSwipe: (details) {
           browserController.goBack();
         },
-        iconOnLeftSwipe: Icons.arrow_right,
-        onLeftSwipe: (details) {
+        iconOnRightSwipe: Icons.arrow_right,
+        onRightSwipe: (details) {
           browserController.goIntoNode(widget.treeItem);
         },
         swipeSensitivity: 5,

@@ -107,7 +107,7 @@ class _SettingsPageState extends State<SettingsPage> {
             SettingsTile.switchTile(
               leading: Icon(Icons.swipe_right_alt),
               title: Text('Swipe navigation'),
-              description: Text('Swipe left to go into the node. Swipe right to go back.'),
+              description: Text('Swipe right to go into the node. Swipe left to go back.'),
               initialValue: swipeNavigation,
               onToggle: (value) {
                 settingsProvider.swipeNavigation = value;
