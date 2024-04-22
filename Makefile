@@ -20,10 +20,13 @@ run-chrome:
 run-android-debug:
 	flutter run --device-id 192.168.0.22:5555
 
-run-android-release:
+run-android:
 	flutter run --device-id "moto g54 5G" --release
 
-release: run-android-release
+run-android-1:
+	flutter run --device-id "2201117TY" --release
+
+release: run-android
 
 dart-fix-dry:
 	dart fix --dry-run

@@ -559,8 +559,8 @@ class PlusItemWidget extends StatelessWidget {
     if (settingsProvider.swipeNavigation) {
       return SwipeTo(
         key: UniqueKey(),
-        iconOnRightSwipe: Icons.arrow_back,
-        onRightSwipe: (details) {
+        iconOnLeftSwipe: Icons.arrow_back,
+        onLeftSwipe: (details) {
           browserController.goBack();
         },
         swipeSensitivity: 5,

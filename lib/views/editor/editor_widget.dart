@@ -31,48 +31,6 @@ class EditorWidget extends StatelessWidget {
       onSubmitted: (value) => editorController.concludeNumericInput(),
     );
 
-    final rowSaveAuxBtns = [
-      FlatButton(
-        icon: Icon(Icons.check),
-        label: '& Add',
-        onPressed: () {
-          safeExecute(() {
-            editorController.saveAndAddNext();
-          });
-        },
-      ),
-      FlatButton(
-        icon: Icon(Icons.check),
-        label: '& Enter',
-        onPressed: () {
-          safeExecute(() {
-            editorController.saveAndEnter();
-          });
-        },
-      ),
-    ];
-    final rowSaveBtns = [
-      FlatButton(
-        icon: Icon(Icons.check),
-        label: 'Save',
-        expandHeight: true,
-        onPressed: () {
-          safeExecute(() {
-            editorController.saveNode();
-          });
-        },
-      ),
-      FlatButton(
-        icon: Icon(Icons.cancel),
-        label: 'Cancel',
-        expandHeight: true,
-        onPressed: () {
-          safeExecute(() {
-            editorController.cancelEdit();
-          });
-        },
-      ),
-    ];
     final rowCursorBtns = [
       FlatButton(
         icon: Icon(Icons.skip_previous_rounded),
@@ -187,6 +145,50 @@ class EditorWidget extends StatelessWidget {
         },
       ),
     ];
+    final rowSaveAuxBtns = [
+      FlatButton(
+        icon: Icon(Icons.check),
+        label: '& Add',
+        tooltip: 'Save and add a next one right after',
+        onPressed: () {
+          safeExecute(() {
+            editorController.saveAndAddNext();
+          });
+        },
+      ),
+      FlatButton(
+        icon: Icon(Icons.check),
+        label: '& Enter',
+        tooltip: 'Save and go inside this node',
+        onPressed: () {
+          safeExecute(() {
+            editorController.saveAndEnter();
+          });
+        },
+      ),
+    ];
+    final rowSaveBtns = [
+      FlatButton(
+        icon: Icon(Icons.check),
+        label: 'Save',
+        expandHeight: true,
+        onPressed: () {
+          safeExecute(() {
+            editorController.saveNode();
+          });
+        },
+      ),
+      FlatButton(
+        icon: Icon(Icons.cancel),
+        label: 'Cancel',
+        expandHeight: true,
+        onPressed: () {
+          safeExecute(() {
+            editorController.cancelEdit();
+          });
+        },
+      ),
+    ];
 
     return CustomScrollView(
       slivers: [
@@ -222,6 +224,7 @@ class FlatButton extends StatelessWidget {
     required this.onPressed,
     this.flex = 1,
     this.expandHeight = false,
+    this.tooltip = '',
   });
 
   final String? label;
@@ -229,6 +232,7 @@ class FlatButton extends StatelessWidget {
   final VoidCallback onPressed;
   final int flex;
   final bool expandHeight;
+  final String tooltip;
 
   @override
   Widget build(BuildContext context) {
@@ -245,25 +249,35 @@ class FlatButton extends StatelessWidget {
     } else {
       child = Text(label!);
     }
+
+    Widget button = ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        foregroundColor: Colors.white,
+        backgroundColor: Color.fromARGB(255, 60, 60, 60),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(5.0),
+        ),
+        padding: EdgeInsets.symmetric(vertical: 10.0),
+        minimumSize: Size.fromHeight(50.0),
+      ),
+      onPressed: () {
+        onPressed();
+      },
+      child: child,
+    );
+
+    if (tooltip.isNotEmpty) {
+      button = Tooltip(
+        message: tooltip,
+        child: button,
+      );
+    }
+
     return Expanded(
       flex: flex,
       child: Container(
         margin: const EdgeInsets.all(2.0),
-        child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            foregroundColor: Colors.white,
-            backgroundColor: Color.fromARGB(255, 60, 60, 60),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(5.0),
-            ),
-            padding: EdgeInsets.symmetric(vertical: 10.0),
-            minimumSize: Size.fromHeight(50.0),
-          ),
-          onPressed: () {
-            onPressed();
-          },
-          child: child,
-        ),
+        child: button,
       ),
     );
   }
