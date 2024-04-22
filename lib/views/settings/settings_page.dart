@@ -17,6 +17,7 @@ class _SettingsPageState extends State<SettingsPage> {
   bool _firstLevelFolders = false;
   bool _slidableActions = false;
   bool swipeNavigation = false;
+  bool largeFont = false;
 
   SettingsProvider settingsProvider = SettingsProvider();
 
@@ -28,6 +29,7 @@ class _SettingsPageState extends State<SettingsPage> {
       _firstLevelFolders = settingsProvider.firstLevelFolders;
       _slidableActions = settingsProvider.slidableActions;
       swipeNavigation = settingsProvider.swipeNavigation;
+      largeFont = settingsProvider.largeFont;
     });
   }
 
@@ -111,6 +113,18 @@ class _SettingsPageState extends State<SettingsPage> {
                 settingsProvider.swipeNavigation = value;
                 setState(() {
                   swipeNavigation = value;
+                });
+              },
+            ),
+            SettingsTile.switchTile(
+              leading: Icon(Icons.font_download),
+              title: Text('Large font'),
+              description: Text('Enlarge font size'),
+              initialValue: largeFont,
+              onToggle: (value) {
+                settingsProvider.largeFont = value;
+                setState(() {
+                  largeFont = value;
                 });
               },
             ),

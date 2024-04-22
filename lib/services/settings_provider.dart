@@ -46,4 +46,11 @@ class SettingsProvider {
   set swipeNavigation(bool value) {
     sharedPreferences?.setBool('swipeNavigation', value);
   }
+
+  bool get largeFont {
+    return sharedPreferences?.getBool('largeFont') ?? false;
+  }
+  set largeFont(bool value) {
+    sharedPreferences?.setBool('largeFont', value);
+  }
 }

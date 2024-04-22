@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:todotree/services/settings_provider.dart';
 
 import 'package:todotree/util/errors.dart';
 import 'package:todotree/services/main_menu_runner.dart';
@@ -102,6 +103,11 @@ class TitleBar extends StatelessWidget {
   }
 
   Widget _buildTitle(BuildContext context, BrowserState browserState) {
+    final settingsProvider = Provider.of<SettingsProvider>(context, listen: false);
+    final fontSize = switch (settingsProvider.largeFont) {
+      true => 18.0,
+      false => 16.0,
+    };
     List<Widget> rowChildren = [
       Flexible(
         child: Text(
@@ -110,7 +116,7 @@ class TitleBar extends StatelessWidget {
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
-            fontSize: 18,
+            fontSize: fontSize,
           ),
         ),
       ),

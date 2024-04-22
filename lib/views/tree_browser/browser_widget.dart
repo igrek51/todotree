@@ -359,25 +359,34 @@ class TreeItemRow extends StatelessWidget {
 
   Widget buildMiddleText(BuildContext context) {
     final treeTraverser = Provider.of<TreeTraverser>(context, listen: false);
-    var child = switch (true) {
+    final settingsProvider = Provider.of<SettingsProvider>(context, listen: false);
+    final fontSize = switch (settingsProvider.largeFont) {
+      true => 18.0,
+      false => 16.0,
+    };
+    final padding = switch (settingsProvider.largeFont) {
+      true => const EdgeInsets.symmetric(vertical: 10),
+      false => const EdgeInsets.symmetric(vertical: 8),
+    };
+    final child = switch (true) {
       true when treeItem.isLink => Container(
-          padding: const EdgeInsets.symmetric(vertical: 10),
+          padding: padding,
           child: Text(
             treeTraverser.displayLinkName(treeItem),
             style: TextStyle(
               color: Color(0xFFD2D2D2),
-              fontSize: 18,
+              fontSize: fontSize,
               decoration: TextDecoration.underline,
             ),
           ),
         ),
       true when treeItem.isLeaf => Container(
-          padding: const EdgeInsets.symmetric(vertical: 10),
+          padding: padding,
           child: Text(
             treeItem.name,
             style: TextStyle(
               color: Colors.white,
-              fontSize: 18,
+              fontSize: fontSize,
             ),
           ),
         ),
@@ -385,12 +394,12 @@ class TreeItemRow extends StatelessWidget {
           children: [
             Expanded(
               child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 10),
+                padding: padding,
                 child: Text(
                   treeItem.name,
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 18,
+                    fontSize: fontSize,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
