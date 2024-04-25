@@ -169,7 +169,7 @@ class BrowserController {
     }
     treeTraverser.focusNode = null;
     treeTraverser.unsavedChanges = true;
-    remoteService.pushUnsavedRemoteChanges();
+    remoteService.checkUnsavedRemoteChanges();
     renderItems();
   }
 
@@ -178,7 +178,7 @@ class BrowserController {
     final removedHeight = itemHeights[originalPosition] ?? 0;
     final parent = treeTraverser.currentParent;
     treeTraverser.removeFromCurrent(node);
-    remoteService.pushUnsavedRemoteChanges();
+    remoteService.checkUnsavedRemoteChanges();
 
     if (originalPosition != null && originalPosition < treeTraverser.currentParent.size) {
       offsetAnimationRequests[originalPosition] = removedHeight;
@@ -189,7 +189,7 @@ class BrowserController {
 
     InfoService.snackbarAction('Removed: ${node.name}', 'UNDO', () {
       treeTraverser.addChildToNode(parent, node, position: originalPosition);
-      remoteService.pushUnsavedRemoteChanges();
+      remoteService.checkUnsavedRemoteChanges();
       renderItems();
       InfoService.info('Node restored: ${node.name}');
     });
@@ -201,7 +201,7 @@ class BrowserController {
     for (final pair in originalNodePositions) {
       treeTraverser.removeFromCurrent(pair.second);
     }
-    remoteService.pushUnsavedRemoteChanges();
+    remoteService.checkUnsavedRemoteChanges();
     treeTraverser.cancelSelection();
     final parent = treeTraverser.currentParent;
 
@@ -211,7 +211,7 @@ class BrowserController {
       for (final pair in originalNodePositions) {
         treeTraverser.addChildToNode(parent, pair.second, position: pair.first);
       }
-      remoteService.pushUnsavedRemoteChanges();
+      remoteService.checkUnsavedRemoteChanges();
       renderItems();
       InfoService.info('Nodes restored: ${originalNodePositions.length}');
     });
@@ -246,7 +246,7 @@ class BrowserController {
     }
     treeTraverser.removeFromCurrent(link);
     final parent = treeTraverser.currentParent;
-    remoteService.pushUnsavedRemoteChanges();
+    remoteService.checkUnsavedRemoteChanges();
 
     renderItems();
     explosionIndicatorKey.currentState?.animate();
@@ -255,7 +255,7 @@ class BrowserController {
       if (target != null && targetParent != null && originalTargetPosition != null) {
         targetParent.insertAt(originalTargetPosition, target);
       }
-      remoteService.pushUnsavedRemoteChanges();
+      remoteService.checkUnsavedRemoteChanges();
       renderItems();
       InfoService.info('Link & target restored: ${link.name}');
     });
@@ -370,14 +370,14 @@ class BrowserController {
   void pasteAbove(int position) async {
     safeExecute(() async {
       await clipboardManager.pasteItems(treeTraverser, position);
-      remoteService.pushUnsavedRemoteChanges();
+      remoteService.checkUnsavedRemoteChanges();
       renderItems();
     });
   }
 
   void pasteAboveAsLink(int position) {
     clipboardManager.pasteItemsAsLink(treeTraverser, position);
-    remoteService.pushUnsavedRemoteChanges();
+    remoteService.checkUnsavedRemoteChanges();
     renderItems();
   }
 
@@ -409,7 +409,7 @@ class BrowserController {
       treeTraverser.addChildToCurrent(newNode, position: position);
     }
     treeTraverser.unsavedChanges = true;
-    remoteService.pushUnsavedRemoteChanges();
+    remoteService.checkUnsavedRemoteChanges();
     renderItems();
     InfoService.info('Split into ${parts.length} nodes.');
   }

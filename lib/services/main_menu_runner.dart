@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:todotree/app/factory.dart';
+import 'package:todotree/services/commander.dart';
 import 'package:todotree/services/info_service.dart';
 import 'package:todotree/views/settings/settings_page.dart';
 
@@ -68,6 +69,13 @@ class MainMenuRunner {
               builder: (context) => SettingsPage(),
             ),
           );
+        },
+      ),
+      ActionMenuItem(
+        id: 'extra-command',
+        name: '📄 Extra command',
+        action: () async {
+          await Commander(appFactory).promptCommand();
         },
       ),
       ActionMenuItem(

@@ -54,7 +54,7 @@ class EditorController {
       saveNewNode();
     }
     treeTraverser.unsavedChanges = true;
-    remoteService.pushUnsavedRemoteChanges();
+    remoteService.checkUnsavedRemoteChanges();
   }
 
   void saveEditedNode() {
@@ -121,7 +121,7 @@ class EditorController {
     editorState.editTextController.clear();
     editorState.textEditFocus.requestFocus();
     editorState.notify();
-    remoteService.pushUnsavedRemoteChanges();
+    remoteService.checkUnsavedRemoteChanges();
   }
 
   void saveAndEnter() {
@@ -155,7 +155,7 @@ class EditorController {
     editorState.editTextController.clear();
     editorState.textEditFocus.requestFocus();
     editorState.notify();
-    remoteService.pushUnsavedRemoteChanges();
+    remoteService.checkUnsavedRemoteChanges();
   }
 
   void cancelEdit() {

@@ -82,7 +82,7 @@ class RemoteService {
     InfoService.info('Changes saved to remote.');
   }
 
-  void pushUnsavedRemoteChanges() async {
+  void checkUnsavedRemoteChanges() async {
     TreeNode node = treeTraverser.currentParent;
     while (true) {
       final parent = node.parent;
