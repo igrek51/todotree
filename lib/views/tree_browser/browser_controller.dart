@@ -433,6 +433,7 @@ class BrowserController {
       for (final remoteChild in remoteNode.children) {
         localNode.add(remoteChild);
       }
+      localNode.localUpdateTimestamp = localNode.remoteUpdateTimestamp;
       treeTraverser.unsavedChanges = true;
       final remoteUpdateDate = timestampSToString(remoteNode.remoteUpdateTimestamp);
       InfoService.info('Remote node updated.\nLast on $remoteUpdateDate');

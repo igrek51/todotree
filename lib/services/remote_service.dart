@@ -55,7 +55,7 @@ class RemoteService {
       'device_id': localNode.deviceId,
       'children_yaml': childrenYaml,
     };
-    final http.Response response = await http.post(
+    final http.Response response = await http.put(
       Uri.parse(url),
       headers: {
         'Content-Type': 'application/json',
