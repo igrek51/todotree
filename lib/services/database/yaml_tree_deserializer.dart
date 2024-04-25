@@ -1,3 +1,4 @@
+import 'package:todotree/model/remote_node.dart';
 import 'package:yaml/yaml.dart';
 
 import 'package:todotree/model/tree_node.dart';
@@ -25,7 +26,11 @@ class YamlTreeDeserializer {
         treeItem = TreeNode.textNode(name);
       case 'remote':
         final name = node['name'] as String;
-        treeItem = TreeNode.remoteOriginNode(name);
+        final localUpdateTimestamp = (node['local_update_timestamp'] ?? 0) as int;
+        final remoteUpdateTimestamp = (node['remote_update_timestamp'] ?? 0) as int;
+        final nodeId = (node['node_id'] ?? 0) as String;
+        final deviceId = (node['device_id'] ?? 0) as String;
+        treeItem = RemoteNode.newOriginNode(name, localUpdateTimestamp, remoteUpdateTimestamp, nodeId, deviceId);
       case 'link':
         final target = node['target'] as String;
         treeItem = TreeNode.linkNode(target);

@@ -82,6 +82,14 @@ class TreeTraverser {
     focusNode = item;
   }
 
+  void addChildToNode(TreeNode parent, TreeNode child, {int? position}) {
+    final nPosision = position ?? parent.size;
+    child.parent = parent;
+    unsavedChanges = true;
+    parent.insertAt(nPosision, child);
+    focusNode = child;
+  }
+
   void removeFromCurrent(TreeNode item) {
     currentParent.remove(item);
     unsavedChanges = true;

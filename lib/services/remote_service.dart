@@ -1,23 +1,35 @@
 import 'dart:convert';
-import 'package:collection/collection.dart';
 import 'package:http/http.dart' as http;
 import 'package:todotree/model/remote_node.dart';
 import 'package:todotree/model/tree_node.dart';
+import 'package:todotree/services/database/yaml_tree_deserializer.dart';
+import 'package:todotree/services/database/yaml_tree_serializer.dart';
+import 'package:todotree/services/info_service.dart';
 import 'package:todotree/services/settings_provider.dart';
-import 'package:todotree/util/collections.dart';
+import 'package:todotree/services/tree_traverser.dart';
 
 class RemoteService {
   SettingsProvider settingsProvider;
+  TreeTraverser treeTraverser;
 
-  RemoteService(this.settingsProvider);
+  RemoteService(this.settingsProvider, this.treeTraverser);
 
   final String todoApiBase = 'https://todo.igrek.dev/api/v1';
   final String authTokenHeader = 'X-Auth-Token';
 
-  Map<TreeNode, String> remoteItemToId = {};
+  Future<RemoteNode> fetchRemoteNode(RemoteNode localNode) async {
+    final dto = await fetchRemoteNodeDto(localNode);
+    final remoteNode = RemoteNode.newOriginNode(localNode.name, dto.remoteUpdateTimestamp,
+        dto.remoteUpdateTimestamp, localNode.nodeId, localNode.deviceId);
+    final yamlNode = YamlTreeDeserializer().deserializeTree(dto.childrenYaml);
+    for (final child in yamlNode.children) {
+      remoteNode.add(child);
+    }
+    return remoteNode;
+  }
 
-  Future<List<RemoteNode>> fetchRemoteDtoNodes() async {
-    final url = '$todoApiBase/todo';
+  Future<RemoteNodeDto> fetchRemoteNodeDto(RemoteNode localNode) async {
+    final url = '$todoApiBase/deep/node/${localNode.nodeId}';
     final http.Response response = await http.get(
       Uri.parse(url),
       headers: {
@@ -28,53 +40,21 @@ class RemoteService {
       throw Exception('HTTP response ${response.statusCode} for URL $url: ${response.body}');
     }
     String body = Utf8Decoder().convert(response.bodyBytes);
-    Iterable jsons = jsonDecode(body);
-    final nodes = RemoteNode.fromJsons(jsons);
-
-    remoteItemToId.clear();
-    final List<RemoteNode> orderedNodes = nodes.sortedBy<num>((it) => it.createTimestamp);
-    return orderedNodes;
+    dynamic json = jsonDecode(body);
+    final dto = RemoteNodeDto.fromJson(json);
+    return dto;
   }
 
-  Future<Pair<List<TreeNode>, List<RemoteNode>>> fetchRemoteTreeNodes() async {
-    var dtos = await fetchRemoteDtoNodes();
-    final textNodes = <TreeNode>[];
-    for (final dto in dtos) {
-      final textNode = TreeNode.textNode(dto.name);
-      textNodes.add(textNode);
-      remoteItemToId[textNode] = dto.id;
-    }
-    return Pair(textNodes, dtos);
-  }
-
-  Future<void> removeRemoteItem(TreeNode treeNode) async {
-    final id = remoteItemToId[treeNode];
-    if (id == null) {
-      throw Exception('Unknown remote ID for $treeNode');
-    }
-    final url = '$todoApiBase/todo/$id';
-    final http.Response response = await http.delete(
-      Uri.parse(url),
-      headers: {
-        authTokenHeader: settingsProvider.userAuthToken,
-      },
-    );
-    if (response.statusCode >= 300) {
-      throw Exception('HTTP response ${response.statusCode} for URL $url: ${response.body}');
-    }
-  }
-
-  Future<void> pushRemoteItems(List<TreeNode> treeNodes) async {
-    final url = '$todoApiBase/todo/many';
-    final payload = treeNodes.map((node) {
-      if (!node.isText) throw Exception('Only text nodes are supported for pushing to remote');
-      return {
-        'id': '',
-        'content': node.name,
-        'create_timestamp': DateTime.now().millisecondsSinceEpoch / 1000,
-        'device_id': '',
-      };
-    }).toList();
+  Future<void> pushDeepNode(RemoteNode localNode) async {
+    final url = '$todoApiBase/deep/node/${localNode.nodeId}';
+    final childrenYaml = YamlTreeSerializer().serializeTree(localNode);
+    final payload = {
+      'id': localNode.nodeId,
+      'local_update_timestamp': localNode.localUpdateTimestamp,
+      'remote_update_timestamp': localNode.remoteUpdateTimestamp,
+      'device_id': localNode.deviceId,
+      'children_yaml': childrenYaml,
+    };
     final http.Response response = await http.post(
       Uri.parse(url),
       headers: {
@@ -85,6 +65,29 @@ class RemoteService {
     );
     if (response.statusCode >= 300) {
       throw Exception('HTTP response ${response.statusCode} for URL $url: ${response.body}');
+    }
+  }
+
+  Future<void> updateRemoteNode(RemoteNode localNode) async {
+    InfoService.info('Pushing updates…');
+    await pushDeepNode(localNode);
+    localNode.remoteUpdateTimestamp = localNode.localUpdateTimestamp;
+    InfoService.info('Remote node updated.');
+  }
+
+  void pushUnsavedRemoteChanges() async {
+    TreeNode node = treeTraverser.currentParent;
+    while (true) {
+      final parent = node.parent;
+      if (node.isRemote && node is RemoteNode) {
+        node.updateChange();
+        await updateRemoteNode(node);
+        return;
+      } else if (parent == null) {
+        return;
+      } else {
+        node = parent;
+      }
     }
   }
 }

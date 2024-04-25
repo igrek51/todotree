@@ -37,10 +37,6 @@ class TreeNode {
     return TreeNode(name: targetData, type: TreeNodeType.link);
   }
 
-  static TreeNode remoteOriginNode(String text) {
-    return TreeNode(name: text, type: TreeNodeType.remote);
-  }
-
   bool get isText => type == TreeNodeType.text;
   bool get isLink => type == TreeNodeType.link;
   bool get isRemote => type == TreeNodeType.remote;

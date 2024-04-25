@@ -42,7 +42,6 @@ class AppFactory {
 
   void create() {
     settingsProvider = SettingsProvider();
-    remoteService = RemoteService(settingsProvider);
     homeState = HomeState();
     browserState = BrowserState();
     editorState = EditorState();
@@ -52,10 +51,11 @@ class AppFactory {
     treeStorage = TreeStorage(backupManager, settingsProvider);
     clipboardManager = ClipboardManager();
     treeTraverser = TreeTraverser(treeStorage);
+    remoteService = RemoteService(settingsProvider, treeTraverser);
     appLifecycle = AppLifecycle(treeStorage, treeTraverser);
     browserController = BrowserController(
         homeState, browserState, treeTraverser, clipboardManager, appLifecycle, settingsProvider, remoteService);
-    editorController = EditorController(homeState, editorState, treeTraverser, clipboardManager);
+    editorController = EditorController(homeState, editorState, treeTraverser, clipboardManager, remoteService);
     editorController.browserController = browserController;
     browserController.editorController = editorController;
     homeController = HomeController(homeState, treeTraverser, browserController, editorController);

@@ -1,3 +1,4 @@
+import 'package:todotree/model/remote_node.dart';
 import 'package:yaml_writer/yaml_writer.dart';
 
 import 'package:todotree/model/tree_node.dart';
@@ -36,8 +37,12 @@ class YamlTreeSerializer {
   }
 
   void serializeAttributes(Map<String, Object> content, TreeNode node) {
-    if (node.type == TreeNodeType.remote) {
+    if (node.type == TreeNodeType.remote && node is RemoteNode) {
       content['name'] = node.name;
+      content['local_update_timestamp'] = node.localUpdateTimestamp;
+      content['remote_update_timestamp'] = node.remoteUpdateTimestamp;
+      content['node_id'] = node.nodeId;
+      content['device_id'] = node.deviceId;
     } else if (node.type == TreeNodeType.text) {
       content['name'] = node.name;
     } else if (node.type == TreeNodeType.link) {

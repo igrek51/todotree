@@ -39,22 +39,12 @@ List<Widget> buildNodeActions(BuildContext context, TreeNode item, int position)
   final clipboardManager = Provider.of<ClipboardManager>(context, listen: false);
   final actions = <Widget>[];
 
-  if (item.parent?.type != TreeNodeType.remote) {
-    actions.add(ListTile(
-      title: Text('❌ Remove'),
-      onTap: () {
-        Navigator.pop(context, 'remove-nodes');
-      },
-    ));
-  }
-  if (item.parent?.type == TreeNodeType.remote) {
-    actions.add(ListTile(
-      title: Text('❌ Remove from remote'),
-      onTap: () {
-        Navigator.pop(context, 'remove-remote-node');
-      },
-    ));
-  }
+  actions.add(ListTile(
+    title: Text('❌ Remove'),
+    onTap: () {
+      Navigator.pop(context, 'remove-nodes');
+    },
+  ));
   if (item.isLink) {
     actions.add(ListTile(
       title: Text('🗑️ Remove link and target'),
@@ -129,12 +119,6 @@ List<Widget> buildNodeActions(BuildContext context, TreeNode item, int position)
       },
     ));
   }
-  actions.add(ListTile(
-    title: Text('📤 Push to remote'),
-    onTap: () {
-      Navigator.pop(context, 'push-to-remote');
-    },
-  ));
 
   return actions;
 }

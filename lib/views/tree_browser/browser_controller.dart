@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:todotree/model/remote_node.dart';
 
 import 'package:todotree/services/app_lifecycle.dart';
 import 'package:todotree/services/clipboard_manager.dart';
@@ -107,18 +108,14 @@ class BrowserController {
     }
   }
 
-  void doneEditing() {
-    restoreScrollOffset();
-  }
-
   void goIntoNode(TreeNode node) {
     rememberScrollOffset();
     ensureNoSelectionMode();
     if (node.type == TreeNodeType.link) {
       treeTraverser.goToLinkTarget(node);
-    } else if (node.type == TreeNodeType.remote) {
+    } else if (node.type == TreeNodeType.remote && node is RemoteNode) {
       treeTraverser.goTo(node);
-      fetchRemoteNodes(node);
+      fetchRemoteNode(node);
     } else {
       treeTraverser.goTo(node);
     }
@@ -172,13 +169,16 @@ class BrowserController {
     }
     treeTraverser.focusNode = null;
     treeTraverser.unsavedChanges = true;
+    remoteService.pushUnsavedRemoteChanges();
     renderItems();
   }
 
   void removeOneNode(TreeNode node) {
     final originalPosition = treeTraverser.getChildIndex(node);
     final removedHeight = itemHeights[originalPosition] ?? 0;
+    final parent = treeTraverser.currentParent;
     treeTraverser.removeFromCurrent(node);
+    remoteService.pushUnsavedRemoteChanges();
 
     if (originalPosition != null && originalPosition < treeTraverser.currentParent.size) {
       offsetAnimationRequests[originalPosition] = removedHeight;
@@ -186,8 +186,10 @@ class BrowserController {
 
     renderItems();
     explosionIndicatorKey.currentState?.animate();
+
     InfoService.snackbarAction('Removed: ${node.name}', 'UNDO', () {
-      treeTraverser.addChildToCurrent(node, position: originalPosition);
+      treeTraverser.addChildToNode(parent, node, position: originalPosition);
+      remoteService.pushUnsavedRemoteChanges();
       renderItems();
       InfoService.info('Node restored: ${node.name}');
     });
@@ -199,14 +201,17 @@ class BrowserController {
     for (final pair in originalNodePositions) {
       treeTraverser.removeFromCurrent(pair.second);
     }
+    remoteService.pushUnsavedRemoteChanges();
     treeTraverser.cancelSelection();
+    final parent = treeTraverser.currentParent;
 
     renderItems();
     explosionIndicatorKey.currentState?.animate();
     InfoService.snackbarAction('Removed: ${sortedPositions.length}', 'UNDO', () {
       for (final pair in originalNodePositions) {
-        treeTraverser.addChildToCurrent(pair.second, position: pair.first);
+        treeTraverser.addChildToNode(parent, pair.second, position: pair.first);
       }
+      remoteService.pushUnsavedRemoteChanges();
       renderItems();
       InfoService.info('Nodes restored: ${originalNodePositions.length}');
     });
@@ -240,14 +245,17 @@ class BrowserController {
       treeTraverser.removeFromParent(target, targetParent);
     }
     treeTraverser.removeFromCurrent(link);
+    final parent = treeTraverser.currentParent;
+    remoteService.pushUnsavedRemoteChanges();
 
     renderItems();
     explosionIndicatorKey.currentState?.animate();
     InfoService.snackbarAction('Link & target removed: ${link.name}', 'UNDO', () {
-      treeTraverser.addChildToCurrent(link, position: originalLinkPosition);
+      treeTraverser.addChildToNode(parent, link, position: originalLinkPosition);
       if (target != null && targetParent != null && originalTargetPosition != null) {
         targetParent.insertAt(originalTargetPosition, target);
       }
+      remoteService.pushUnsavedRemoteChanges();
       renderItems();
       InfoService.info('Link & target restored: ${link.name}');
     });
@@ -279,10 +287,6 @@ class BrowserController {
         pasteAboveAsLink(position);
       } else if (action == 'split' && node != null && position != null) {
         splitNodeBySeparator(node, position);
-      } else if (action == 'push-to-remote' && node != null && position != null) {
-        pushRemoteNodes(position);
-      } else if (action == 'remove-remote-node' && node != null && position != null) {
-        removeRemoteNodes(position);
       } else if (action == 'locate-link' && node != null) {
         locateLinkedTarget(node);
       } else {
@@ -366,12 +370,14 @@ class BrowserController {
   void pasteAbove(int position) async {
     safeExecute(() async {
       await clipboardManager.pasteItems(treeTraverser, position);
+      remoteService.pushUnsavedRemoteChanges();
       renderItems();
     });
   }
 
   void pasteAboveAsLink(int position) {
     clipboardManager.pasteItemsAsLink(treeTraverser, position);
+    remoteService.pushUnsavedRemoteChanges();
     renderItems();
   }
 
@@ -403,6 +409,7 @@ class BrowserController {
       treeTraverser.addChildToCurrent(newNode, position: position);
     }
     treeTraverser.unsavedChanges = true;
+    remoteService.pushUnsavedRemoteChanges();
     renderItems();
     InfoService.info('Split into ${parts.length} nodes.');
   }
@@ -417,54 +424,25 @@ class BrowserController {
     InfoService.info('Entered random item: ${randomNode.name}');
   }
 
-  void fetchRemoteNodes(TreeNode rootNode) async {
-    InfoService.info('Fetching remote items…');
-    final pair = await remoteService.fetchRemoteTreeNodes();
-    final treeNodes = pair.first;
-    final dtoNodes = pair.second;
-    rootNode.children.clear();
-    for (final treeNode in treeNodes) {
-      rootNode.add(treeNode);
-    }
-    if (treeNodes.isEmpty) {
-      InfoService.info('No remote items');
-    } else {
+  void fetchRemoteNode(RemoteNode localNode) async {
+    InfoService.info('Fetching remote node…');
+    final remoteNode = await remoteService.fetchRemoteNode(localNode);
+
+    if (localNode.localUpdateTimestamp < remoteNode.remoteUpdateTimestamp) {
+      localNode.children.clear();
+      for (final remoteChild in remoteNode.children) {
+        localNode.add(remoteChild);
+      }
       treeTraverser.unsavedChanges = true;
-      final lastTimestamp = dtoNodes.last.createTimestamp;
-      final lastDateStr = timestampSToString(lastTimestamp);
-      InfoService.info('${treeNodes.length} remote items fetched.\nLast on $lastDateStr');
-    }
-    renderItems();
-  }
+      final remoteUpdateDate = timestampSToString(remoteNode.remoteUpdateTimestamp);
+      InfoService.info('Remote node updated.\nLast on $remoteUpdateDate');
+      renderItems();
 
-  void removeRemoteNodes(int position) async {
-    final positions = treeTraverser.selectedIndexes.toSet();
-    if (positions.isEmpty) {
-      positions.add(position);
-    }
-    final nodes = positions.map((index) => treeTraverser.getChild(index)).toList();
-    for (final node in nodes) {
-      await remoteService.removeRemoteItem(node);
-    }
-    removeMultipleNodes(positions.toList());
-    if (nodes.length == 1) {
-      InfoService.info('Item removed remotely: ${nodes.first.name}');
-    } else {
-      InfoService.info('${nodes.length} items removed remotely.');
-    }
-  }
+    } else if (localNode.localUpdateTimestamp == remoteNode.remoteUpdateTimestamp) {
+      InfoService.info('Remote is up-to-date.');
 
-  void pushRemoteNodes(int position) async {
-    final positions = treeTraverser.selectedIndexes.toSet();
-    if (positions.isEmpty) {
-      positions.add(position);
-    }
-    final nodes = positions.map((index) => treeTraverser.getChild(index)).toList();
-    await remoteService.pushRemoteItems(nodes);
-    if (nodes.length == 1) {
-      InfoService.info('Node pushed: ${nodes.first.name}');
-    } else {
-      InfoService.info('${nodes.length} nodes pushed.');
+    } else if (localNode.localUpdateTimestamp > remoteNode.remoteUpdateTimestamp) {
+      remoteService.updateRemoteNode(localNode);
     }
   }
 

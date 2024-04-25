@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:todotree/model/tree_node.dart';
 import 'package:todotree/services/clipboard_manager.dart';
 import 'package:todotree/services/info_service.dart';
+import 'package:todotree/services/remote_service.dart';
 import 'package:todotree/util/numbers.dart';
 import 'package:todotree/views/editor/editor_state.dart';
 import 'package:todotree/services/tree_traverser.dart';
@@ -19,8 +20,9 @@ class EditorController {
 
   ClipboardManager clipboardManager;
   TreeTraverser treeTraverser;
+  RemoteService remoteService;
 
-  EditorController(this.homeState, this.editorState, this.treeTraverser, this.clipboardManager);
+  EditorController(this.homeState, this.editorState, this.treeTraverser, this.clipboardManager, this.remoteService);
 
   void addNodeAt(int position) {
     position = position.clampMax(treeTraverser.currentParent.size);
@@ -52,6 +54,7 @@ class EditorController {
       saveNewNode();
     }
     treeTraverser.unsavedChanges = true;
+    remoteService.pushUnsavedRemoteChanges();
   }
 
   void saveEditedNode() {
@@ -69,7 +72,7 @@ class EditorController {
     homeState.notify();
     editorState.editTextController.clear();
     editorState.notify();
-    browserController.doneEditing();
+    browserController.restoreScrollOffset();
     InfoService.info('Saved: $newName');
   }
 
@@ -86,7 +89,7 @@ class EditorController {
     homeState.notify();
     editorState.editTextController.clear();
     editorState.notify();
-    browserController.doneEditing();
+    browserController.restoreScrollOffset();
     InfoService.info('Added: $newName');
   }
 
@@ -118,6 +121,7 @@ class EditorController {
     editorState.editTextController.clear();
     editorState.textEditFocus.requestFocus();
     editorState.notify();
+    remoteService.pushUnsavedRemoteChanges();
   }
 
   void saveAndEnter() {
@@ -151,6 +155,7 @@ class EditorController {
     editorState.editTextController.clear();
     editorState.textEditFocus.requestFocus();
     editorState.notify();
+    remoteService.pushUnsavedRemoteChanges();
   }
 
   void cancelEdit() {
@@ -160,7 +165,7 @@ class EditorController {
     homeState.notify();
     editorState.editTextController.clear();
     editorState.notify();
-    browserController.doneEditing();
+    browserController.restoreScrollOffset();
   }
 
   int get minSelection =>
