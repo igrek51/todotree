@@ -8,6 +8,7 @@ final navigatorKey = GlobalKey<NavigatorState>();
 class InfoService {
   static void info(String message) {
     logger.info('UI: $message');
+    scaffoldMessengerKey.currentState?.removeCurrentSnackBar();
     scaffoldMessengerKey.currentState?.clearSnackBars();
     scaffoldMessengerKey.currentState?.showSnackBar(
       SnackBar(
@@ -20,6 +21,7 @@ class InfoService {
 
   static void snackbarAction(String message, String actionLabel, VoidCallback action) {
     logger.info('UI: $message');
+    scaffoldMessengerKey.currentState?.removeCurrentSnackBar();
     scaffoldMessengerKey.currentState?.clearSnackBars();
     scaffoldMessengerKey.currentState?.showSnackBar(
       SnackBar(
@@ -43,6 +45,7 @@ class InfoService {
       fullMessage = error.toString();
     }
     logger.error(fullMessage);
+    scaffoldMessengerKey.currentState?.removeCurrentSnackBar();
     scaffoldMessengerKey.currentState?.clearSnackBars();
     scaffoldMessengerKey.currentState?.showSnackBar(
       SnackBar(
