@@ -7,6 +7,7 @@ import 'package:todotree/services/database/yaml_tree_serializer.dart';
 import 'package:todotree/services/info_service.dart';
 import 'package:todotree/services/settings_provider.dart';
 import 'package:todotree/services/tree_traverser.dart';
+import 'package:todotree/util/logger.dart';
 
 class RemoteService {
   SettingsProvider settingsProvider;
@@ -29,6 +30,9 @@ class RemoteService {
   }
 
   Future<RemoteNodeDto> fetchRemoteNodeDto(RemoteNode localNode) async {
+    if (localNode.nodeId.isEmpty) {
+      throw Exception('Remote node has no node_id');
+    }
     final url = '$todoApiBase/deep/node/${localNode.nodeId}';
     final http.Response response = await http.get(
       Uri.parse(url),
@@ -46,6 +50,9 @@ class RemoteService {
   }
 
   Future<void> pushDeepNode(RemoteNode localNode) async {
+    if (localNode.nodeId.isEmpty) {
+      throw Exception('Remote node has no node_id');
+    }
     final url = '$todoApiBase/deep/node/${localNode.nodeId}';
     final childrenYaml = YamlTreeSerializer().serializeTree(localNode);
     final payload = {
@@ -69,10 +76,10 @@ class RemoteService {
   }
 
   Future<void> updateRemoteNode(RemoteNode localNode) async {
-    InfoService.info('Pushing updates…');
+    logger.info('Pushing updates to remote…');
     await pushDeepNode(localNode);
     localNode.remoteUpdateTimestamp = localNode.localUpdateTimestamp;
-    InfoService.info('Remote node updated.');
+    InfoService.info('Changes saved to remote.');
   }
 
   void pushUnsavedRemoteChanges() async {

@@ -265,7 +265,9 @@ class TreeListItemWidgetState extends State<TreeListItemWidget> with TickerProvi
         },
         iconOnRightSwipe: Icons.arrow_right,
         onRightSwipe: (details) {
-          browserController.goIntoNode(widget.treeItem);
+          safeExecute(() async {
+            await browserController.goIntoNode(widget.treeItem);
+          });
         },
         swipeSensitivity: 5,
         child: inkWell,
@@ -453,8 +455,8 @@ class TreeItemRow extends StatelessWidget {
           constraints: BoxConstraints(),
           style: const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
           onPressed: () {
-            safeExecute(() {
-              browserController.goIntoNode(treeItem);
+            safeExecute(() async {
+              await browserController.goIntoNode(treeItem);
               var (_, centerY, w, _) = getRenderBoxCoordinates(context);
               rippleIndicatorKey.currentState?.animate(w - 32 - 32 / 2, centerY);
             });

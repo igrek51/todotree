@@ -108,14 +108,14 @@ class BrowserController {
     }
   }
 
-  void goIntoNode(TreeNode node) {
+  Future<void> goIntoNode(TreeNode node) async {
     rememberScrollOffset();
     ensureNoSelectionMode();
     if (node.type == TreeNodeType.link) {
       treeTraverser.goToLinkTarget(node);
     } else if (node.type == TreeNodeType.remote && node is RemoteNode) {
       treeTraverser.goTo(node);
-      fetchRemoteNode(node);
+      await fetchRemoteNode(node);
     } else {
       treeTraverser.goTo(node);
     }
@@ -385,13 +385,13 @@ class BrowserController {
     if (treeTraverser.selectionMode) {
       onToggleSelectedNode(index);
     } else if (node.isLink) {
-      goIntoNode(node);
+      await goIntoNode(node);
     } else if (node.depth == 1 && settingsProvider.firstLevelFolders) {
-      goIntoNode(node);
+      await goIntoNode(node);
     } else if (node.isLeaf) {
       editNode(node);
     } else {
-      goIntoNode(node);
+      await goIntoNode(node);
     }
   }
 
@@ -414,17 +414,17 @@ class BrowserController {
     InfoService.info('Split into ${parts.length} nodes.');
   }
 
-  void enterRandomItem() {
+  Future<void> enterRandomItem() async {
     final children = treeTraverser.currentParent.children;
     if (children.isEmpty) {
       return InfoService.error('No items to choose from');
     }
     final randomNode = children[Random().nextInt(children.length)];
-    goIntoNode(randomNode);
+    await goIntoNode(randomNode);
     InfoService.info('Entered random item: ${randomNode.name}');
   }
 
-  void fetchRemoteNode(RemoteNode localNode) async {
+  Future<void> fetchRemoteNode(RemoteNode localNode) async {
     InfoService.info('Fetching remote node…');
     final remoteNode = await remoteService.fetchRemoteNode(localNode);
 
@@ -433,10 +433,11 @@ class BrowserController {
       for (final remoteChild in remoteNode.children) {
         localNode.add(remoteChild);
       }
-      localNode.localUpdateTimestamp = localNode.remoteUpdateTimestamp;
+      localNode.localUpdateTimestamp = remoteNode.remoteUpdateTimestamp;
+      localNode.remoteUpdateTimestamp = remoteNode.remoteUpdateTimestamp;
       treeTraverser.unsavedChanges = true;
       final remoteUpdateDate = timestampSToString(remoteNode.remoteUpdateTimestamp);
-      InfoService.info('Remote node updated.\nLast on $remoteUpdateDate');
+      InfoService.info('Remote node updated.\nUpdated at $remoteUpdateDate');
       renderItems();
 
     } else if (localNode.localUpdateTimestamp == remoteNode.remoteUpdateTimestamp) {

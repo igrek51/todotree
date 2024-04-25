@@ -46,8 +46,8 @@ class MainMenuRunner {
       ActionMenuItem(
         id: 'enter-random-item',
         name: '🎲 Enter random item',
-        action: () {
-          appFactory.browserController.enterRandomItem();
+        action: () async {
+          await appFactory.browserController.enterRandomItem();
         },
       ),
       ActionMenuItem(
