@@ -40,6 +40,9 @@ doctor:
 build-apk:
 	flutter build apk --release
 
+build-aab:
+	flutter build appbundle --release
+
 icon:
 	flutter pub run flutter_launcher_icons
 

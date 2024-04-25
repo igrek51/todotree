@@ -63,23 +63,6 @@ class _SettingsPageState extends State<SettingsPage> {
                 );
               },
             ),
-            SettingsTile.navigation(
-              leading: Icon(Icons.token),
-              title: Text('User Auth Token'),
-              value: Text(_userAuthToken),
-              onPressed: (BuildContext context) {
-                TextFieldDialog.show(
-                  'User Auth Token',
-                  _userAuthToken,
-                  (String value) {
-                    settingsProvider.userAuthToken = value;
-                    setState(() {
-                      _userAuthToken = value;
-                    });
-                  },
-                );
-              },
-            ),
             SettingsTile.switchTile(
               leading: Icon(Icons.folder),
               title: Text('First level folders'),
@@ -126,6 +109,23 @@ class _SettingsPageState extends State<SettingsPage> {
                 setState(() {
                   largeFont = value;
                 });
+              },
+            ),
+            SettingsTile.navigation(
+              leading: Icon(Icons.token),
+              title: Text('User Auth Token (for development)'),
+              value: Text(_userAuthToken),
+              onPressed: (BuildContext context) {
+                TextFieldDialog.show(
+                  'User Auth Token',
+                  _userAuthToken,
+                  (String value) {
+                    settingsProvider.userAuthToken = value;
+                    setState(() {
+                      _userAuthToken = value;
+                    });
+                  },
+                );
               },
             ),
             SettingsTile.navigation(
