@@ -2,10 +2,13 @@
 
 ToDo notes in an unlimited tree structure. Written in Flutter.
 
-<p align="center">
+<div align="center">
   <img src="./android/app/src/main/res/drawable-xxhdpi/ic_launcher_foreground.png" />
+</div>
+
+<div align="center">
   <img src="./docs/img/screenshot.png" />
-</p>
+</div>
 
 ## Running
 Run on Android device:
