@@ -28,6 +28,12 @@ run-android-2:
 
 release: run-android-2
 
+emulators:
+	flutter emulators
+
+emulator:
+	flutter emulators --launch Pixel3_API33_T_13_play
+
 dart-fix-dry:
 	dart fix --dry-run
 
@@ -40,7 +46,7 @@ doctor:
 build-apk:
 	flutter build apk --release
 
-build-aab:
+build-bundle:
 	flutter build appbundle --release
 
 icon:
