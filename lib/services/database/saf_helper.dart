@@ -25,13 +25,13 @@ class SafHelper {
       if (result != true) {
         throw Exception('Failed to write to SAF file: $fileUri: $result');
       }
-      logger.debug('SAF: file written: $fileUri');
+      logger.debug('SAF file written: $fileUri');
     } else {
       final doc = await createFileAsString(folderUri, mimeType: 'any', displayName: filename, content: content);
       if (doc == null) {
         throw Exception('Failed to create SAF file: $fileUri');
       }
-      logger.debug('SAF: file created: ${doc.uri}');
+      logger.debug('SAF file created: ${doc.uri}');
     }
 
     logger.debug('external backup saved to $fileUri');

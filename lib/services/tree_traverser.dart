@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:todotree/services/info_service.dart';
 import 'package:todotree/model/tree_node.dart';
 import 'package:todotree/services/database/tree_storage.dart';
+import 'package:todotree/util/logger.dart';
 
 class TreeTraverser {
   TreeStorage treeStorage;
@@ -48,7 +49,10 @@ class TreeTraverser {
   }
 
   Future<void> saveIfChanged() async {
-    if (!unsavedChanges) return;
+    if (!unsavedChanges) {
+      logger.debug('No changes to save');
+      return;
+    }
     if (discardingChanges) return;
     await save();
   }

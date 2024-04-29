@@ -40,8 +40,16 @@ class TreeStorage {
     File dbFile = await _writeDbString(content);
     logger.info('local database saved to ${dbFile.absolute.path}');
     await backupManager.saveLocalBackup(dbFile);
+    // run in background, without awaiting
+    saveExternalBackups(settingsProvider.externalBackupLocation, dbFile, content).catchError((e) {
+      if (e != null) {
+        InfoService.error(e, 'Failed to save external backup');
+      }
+    });
+  }
 
-    final backupLocations = splitLocationPaths(settingsProvider.externalBackupLocation);
+  Future<void> saveExternalBackups(String locationString, File dbFile, String content) async {
+    final backupLocations = splitLocationPaths(locationString);
     if (backupLocations.isNotEmpty) {
       final stopwatch = Stopwatch()..start();
       for (final backupLocation in backupLocations) {
