@@ -119,6 +119,7 @@ class BrowserController {
     } else {
       treeTraverser.goTo(node);
     }
+    browserState.scrollController.jumpTo(0);
     renderAll();
   }
 
