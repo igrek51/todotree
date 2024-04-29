@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import 'package:todotree/app/factory.dart';
 import 'package:todotree/services/clipboard_manager.dart';
+import 'package:todotree/services/database/tree_storage.dart';
 import 'package:todotree/services/info_service.dart';
 import 'package:todotree/services/settings_provider.dart';
 import 'package:todotree/util/logger.dart';
@@ -36,6 +37,7 @@ class _AppWidgetState extends State<AppWidget> with WidgetsBindingObserver {
       Provider<ClipboardManager>(create: (context) => widget.appFactory.clipboardManager),
       Provider<MainMenuRunner>(create: (context) => widget.appFactory.mainMenuRunner),
       Provider<SettingsProvider>(create: (context) => widget.appFactory.settingsProvider),
+      Provider<TreeStorage>(create: (context) => widget.appFactory.treeStorage),
       Provider<AppFactory>(create: (context) => widget.appFactory),
     ];
 

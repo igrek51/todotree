@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
 import 'package:settings_ui/settings_ui.dart';
+import 'package:todotree/services/database/tree_storage.dart';
 
-import 'package:todotree/services/info_service.dart';
 import 'package:todotree/services/settings_provider.dart';
 import 'package:todotree/views/components/textfield_dialog.dart';
 
@@ -41,28 +41,12 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final treeStorage = Provider.of<TreeStorage>(context, listen: false);
     final settingsList = SettingsList(
       sections: [
         SettingsSection(
           title: Text('Common'),
           tiles: <SettingsTile>[
-            SettingsTile.navigation(
-              leading: Icon(Icons.backup),
-              title: Text('External backup locations (comma-separated, folder or file paths)'),
-              value: Text(_externalBackupLocation),
-              onPressed: (BuildContext context) {
-                TextFieldDialog.show(
-                  'External backup location',
-                  _externalBackupLocation,
-                  (String value) {
-                    settingsProvider.externalBackupLocation = value;
-                    setState(() {
-                      _externalBackupLocation = value;
-                    });
-                  },
-                );
-              },
-            ),
             SettingsTile.switchTile(
               leading: Icon(Icons.folder),
               title: Text('First level folders'),
@@ -129,11 +113,31 @@ class _SettingsPageState extends State<SettingsPage> {
               },
             ),
             SettingsTile.navigation(
+              leading: Icon(Icons.backup),
+              title: Text('External backup locations (comma-separated, folder paths)'),
+              value: Text(_externalBackupLocation),
+              onPressed: (BuildContext context) {
+                TextFieldDialog.show(
+                  'External backup locations',
+                  _externalBackupLocation,
+                  (String value) {
+                    settingsProvider.externalBackupLocation = value;
+                    setState(() {
+                      _externalBackupLocation = value;
+                    });
+                  },
+                );
+              },
+            ),
+            SettingsTile.navigation(
               leading: Icon(Icons.perm_device_info),
-              title: Text('Grant storage permissions'),
+              title: Text('Grant permission to a backup folder'),
               onPressed: (BuildContext context) async {
-                var result1 = await Permission.manageExternalStorage.request();
-                InfoService.info('Storage permission status: $result1');
+                final newLocations = await treeStorage.grantBackupLocationUri(settingsProvider.externalBackupLocation);
+                settingsProvider.externalBackupLocation = newLocations;
+                setState(() {
+                  _externalBackupLocation = newLocations;
+                });
               },
             ),
           ],

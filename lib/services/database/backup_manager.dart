@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 
 import 'package:path_provider/path_provider.dart';
 import 'package:todotree/app/factory.dart';
+import 'package:todotree/services/database/saf_helper.dart';
 import 'package:todotree/services/info_service.dart';
 import 'package:todotree/util/files.dart';
 import 'package:todotree/util/logger.dart';
@@ -31,24 +32,21 @@ class BackupManager {
     await _removeOldBackups(localBackupsDir);
   }
 
-  Future<void> saveExternalBackups(File srcFile, String locations) async {
-    final List<String> locationList = locations
-        .split(',')
-        .map((e) => e.trim())
-        .where((e) => e.isNotEmpty)
-        .toList();
-    for (final location in locationList) {
-      File bakFile;
-      if (FileSystemEntity.isDirectorySync(location)) {
-        bakFile = File('$location/${srcFile.name}');
-      } else {
-        bakFile = File(location);
-      }
-      await saveExternalBackup(srcFile, bakFile);
+  Future<void> saveExternalBackup(File srcFile, String content, String location, SafHelper safHelper) async {
+    if (safHelper.isSafUri(location)) {
+      await safHelper.saveFileContent(content, location, srcFile.name);
+    } else {
+      await saveExternalBackupFile(srcFile, location);
     }
   }
 
-  Future<void> saveExternalBackup(File srcFile, File backupFile) async {
+  Future<void> saveExternalBackupFile(File srcFile, String backupPath) async {
+    File backupFile;
+    if (await FileSystemEntity.isDirectory(backupPath)) {
+      backupFile = File('$backupPath/${srcFile.name}');
+    } else {
+      backupFile = File(backupPath);
+    }
     await srcFile.copy(backupFile.absolute.path);
     logger.debug('external backup saved to ${backupFile.absolute.path}');
   }

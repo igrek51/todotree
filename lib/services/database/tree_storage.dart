@@ -6,6 +6,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:todotree/app/factory.dart';
 
 import 'package:todotree/services/database/backup_manager.dart';
+import 'package:todotree/services/database/saf_helper.dart';
 import 'package:todotree/services/database/yaml_tree_deserializer.dart';
 import 'package:todotree/services/database/yaml_tree_serializer.dart';
 import 'package:todotree/model/tree_node.dart';
@@ -19,6 +20,8 @@ class TreeStorage {
   SettingsProvider settingsProvider;
 
   TreeStorage(this.backupManager, this.settingsProvider);
+
+  SafHelper safHelper = SafHelper();
 
   Future<TreeNode> readDbTree({File? file}) async {
     File nFile = file ?? await _localDbFile;
@@ -34,10 +37,18 @@ class TreeStorage {
   Future<void> writeDbTree(TreeNode root) async {
     logger.debug('saving local database...');
     final String content = YamlTreeSerializer().serializeTree(root);
-    final file = await _writeDbString(content);
-    logger.info('local database saved to ${file.absolute.path}');
-    await backupManager.saveLocalBackup(file);
-    await backupManager.saveExternalBackups(file, settingsProvider.externalBackupLocation);
+    File dbFile = await _writeDbString(content);
+    logger.info('local database saved to ${dbFile.absolute.path}');
+    await backupManager.saveLocalBackup(dbFile);
+
+    final backupLocations = splitLocationPaths(settingsProvider.externalBackupLocation);
+    if (backupLocations.isNotEmpty) {
+      final stopwatch = Stopwatch()..start();
+      for (final backupLocation in backupLocations) {
+        await backupManager.saveExternalBackup(dbFile, content, backupLocation, safHelper);
+      }
+      logger.debug('External backups saved in ${stopwatch.elapsed}');
+    }
   }
 
   Future<String> get _localPath async {
@@ -80,5 +91,27 @@ class TreeStorage {
     await app.treeTraverser.loadFromFile(file);
     app.browserController.renderAll();
     InfoService.info('Tree loaded from ${file.absolute.path}');
+  }
+
+  Future<String> grantBackupLocationUri(String locationsString) async {
+    List<String> locations = splitLocationPaths(locationsString);
+
+    final Uri? grantedUri = await safHelper.grantFolderAccess();
+    if (grantedUri == null) {
+      InfoService.info('Cancelled storage permission');
+      return locationsString;
+    }
+    final grantedUriStr = grantedUri.toString();
+    if (!locations.contains(grantedUriStr)){
+      locations.add(grantedUriStr);
+    }
+    final newLocationString = locations.join(',\n');
+
+    InfoService.info('Storage permission granted to: $grantedUriStr');
+    return newLocationString;
+  }
+
+  List<String> splitLocationPaths(String locationString) {
+    return locationString.split(RegExp(r'[\n,]')).map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
   }
 }
