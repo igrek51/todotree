@@ -23,7 +23,10 @@ pluginManagement {
 
 plugins {
     id "dev.flutter.flutter-plugin-loader" version "1.0.0"
+    // AGP version 8.1.4
     id "com.android.application" version "7.3.0" apply false
+    // Kotlin version: 1.8.22
+    id "org.jetbrains.kotlin.android" version "1.8.10" apply false
 }
 
 include ":app"
