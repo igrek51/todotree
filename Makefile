@@ -54,3 +54,6 @@ icon:
 
 clean:
 	flutter clean
+
+upgrade:
+	flutter pub upgrade --major-versions
