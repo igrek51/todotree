@@ -14,7 +14,7 @@ For Android, iOS and Linux.
 </div>
 
 ## Running
-### Run desktop Linux app
+### Run desktop app on Linux
 ```sh
 make run-linux
 ```

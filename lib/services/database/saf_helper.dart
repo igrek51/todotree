@@ -1,3 +1,5 @@
+import 'dart:convert' show utf8;
+import 'dart:typed_data';
 import 'package:collection/collection.dart';
 import 'package:shared_storage/shared_storage.dart';
 import 'package:todotree/util/logger.dart';
@@ -19,15 +21,16 @@ class SafHelper {
   Future<void> saveFileContent(String content, String folderSafUri, String filename) async {
     final folderUri = Uri.parse(folderSafUri);
     final (bool fileExists, Uri fileUri) = await getChildFileUri(folderSafUri, folderUri, filename);
+    final Uint8List contentBytes = utf8.encode(content);
 
     if (fileExists) {
-      final result = await writeToFileAsString(fileUri, content: content);
+      final result = await writeToFileAsBytes(fileUri, bytes: contentBytes);
       if (result != true) {
         throw Exception('Failed to write to SAF file: $fileUri: $result');
       }
       logger.debug('SAF file written: $fileUri');
     } else {
-      final doc = await createFileAsString(folderUri, mimeType: 'any', displayName: filename, content: content);
+      final doc = await createFileAsBytes(folderUri, mimeType: 'any', displayName: filename, bytes: contentBytes);
       if (doc == null) {
         throw Exception('Failed to create SAF file: $fileUri');
       }
