@@ -50,7 +50,7 @@ class _SettingsPageState extends State<SettingsPage> {
             SettingsTile.switchTile(
               leading: Icon(Icons.folder),
               title: Text('First level folders'),
-              description: Text('Treat first-level nodes as folders'),
+              description: Text('Always go inside first-level nodes on tap'),
               initialValue: _firstLevelFolders,
               onToggle: (value) {
                 settingsProvider.firstLevelFolders = value;
