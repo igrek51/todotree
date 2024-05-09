@@ -41,7 +41,7 @@ flutter:
         - asset: fonts/RobotoMono-Regular.ttf
 
 flutter_launcher_icons:
-  image_path: "assets/icon.jpeg" 
+  image_path: "docs/img/icon/icon.jpeg" 
   android: true
   adaptive_icon_background: "#f7f6f1"
-  adaptive_icon_foreground: "assets/icon.jpeg"
+  adaptive_icon_foreground: "docs/img/icon/icon.jpeg"
