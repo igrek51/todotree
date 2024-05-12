@@ -50,6 +50,7 @@ class EditorWidget extends StatelessWidget {
       ),
       FlatButton(
         icon: Icon(Icons.select_all),
+        tooltip: 'Select all',
         onPressed: () {
           safeExecute(() {
             editorController.selectAll();
@@ -113,6 +114,7 @@ class EditorWidget extends StatelessWidget {
     final rowToolkitBtns = [
       FlatButton(
         label: '.',
+        tooltip: 'Insert dot',
         onPressed: () {
           safeExecute(() {
             editorController.insertDot();
@@ -121,6 +123,7 @@ class EditorWidget extends StatelessWidget {
       ),
       FlatButton(
         label: ':',
+        tooltip: 'Insert colon',
         onPressed: () {
           safeExecute(() {
             editorController.insertColon();
@@ -129,6 +132,7 @@ class EditorWidget extends StatelessWidget {
       ),
       FlatButton(
         label: '-',
+        tooltip: 'Insert dash',
         onPressed: () {
           safeExecute(() {
             editorController.insertDash();
@@ -138,6 +142,7 @@ class EditorWidget extends StatelessWidget {
       FlatButton(
         icon: Icon(Icons.keyboard),
         label: editorState.numericKeyboard ? 'ABC' : '123',
+        tooltip: 'Toggle numeric / alphabetical keyboard',
         onPressed: () {
           safeExecute(() {
             editorController.toggleNumericKeyboard(context);
@@ -147,22 +152,21 @@ class EditorWidget extends StatelessWidget {
     ];
     final rowSaveAuxBtns = [
       FlatButton(
-        icon: Icon(Icons.check),
-        label: '& Add',
-        tooltip: 'Save and add a next one right after',
+        icon: Icon(Icons.cancel),
+        label: 'Cancel',
         onPressed: () {
           safeExecute(() {
-            editorController.saveAndAddNext();
+            editorController.cancelEdit();
           });
         },
       ),
       FlatButton(
         icon: Icon(Icons.check),
-        label: '& Enter',
-        tooltip: 'Save and go inside this node',
+        label: '& Next',
+        tooltip: 'Save and add a next item right after',
         onPressed: () {
           safeExecute(() {
-            editorController.saveAndEnter();
+            editorController.saveAndAddNext();
           });
         },
       ),
@@ -175,16 +179,6 @@ class EditorWidget extends StatelessWidget {
         onPressed: () {
           safeExecute(() {
             editorController.saveNode();
-          });
-        },
-      ),
-      FlatButton(
-        icon: Icon(Icons.cancel),
-        label: 'Cancel',
-        expandHeight: true,
-        onPressed: () {
-          safeExecute(() {
-            editorController.cancelEdit();
           });
         },
       ),
