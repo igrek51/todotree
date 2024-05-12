@@ -43,8 +43,8 @@ class TitleBar extends StatelessWidget {
                   color: Colors.white,
                 ),
                 onPressed: () {
-                  safeExecute(() {
-                    homeController.goBack();
+                  safeExecute(() async {
+                    await homeController.goBack();
                   });
                 },
               ),

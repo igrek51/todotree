@@ -14,7 +14,7 @@ class HomeController {
   HomeController(this.homeState, this.treeTraverser, this.browserController,
       this.editorController);
 
-  void goBack() {
+  Future<void> goBack() async {
     if (homeState.pageView == HomePageView.treeBrowser) {
       if (browserController.treeTraverser.selectionMode) {
         browserController.ensureNoSelectionMode();
@@ -22,7 +22,7 @@ class HomeController {
         browserController.goBack();
       }
     } else if (homeState.pageView == HomePageView.itemEditor) {
-      editorController.cancelEdit();
+      await editorController.quitEditor();
     }
   }
 
@@ -37,7 +37,7 @@ class HomeController {
         }
       }
     } else if (homeState.pageView == HomePageView.itemEditor) {
-      editorController.cancelEdit();
+      await editorController.quitEditor();
     }
   }
 

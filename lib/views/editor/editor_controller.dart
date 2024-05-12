@@ -7,6 +7,7 @@ import 'package:todotree/services/clipboard_manager.dart';
 import 'package:todotree/services/info_service.dart';
 import 'package:todotree/services/remote_service.dart';
 import 'package:todotree/util/numbers.dart';
+import 'package:todotree/views/components/confirmation_dialog.dart';
 import 'package:todotree/views/editor/editor_state.dart';
 import 'package:todotree/services/tree_traverser.dart';
 import 'package:todotree/views/home/home_state.dart';
@@ -159,6 +160,9 @@ class EditorController {
   }
 
   void cancelEdit() {
+    if (hasUnsavedChanges()) {
+      InfoService.info('Changes discarded');
+    }
     treeTraverser.focusNode = editorState.editedNode;
     browserController.renderItems();
     homeState.pageView = HomePageView.treeBrowser;
@@ -166,6 +170,36 @@ class EditorController {
     editorState.editTextController.clear();
     editorState.notify();
     browserController.restoreScrollOffset();
+  }
+
+  Future<void> quitEditor() async {
+    if (hasUnsavedChanges()) {
+      int result = await ConfirmationDialog.ask(
+        title: 'Unsaved changes',
+        content: 'You have unsaved changes, would you like to save them?',
+        confirmActionLabel: 'Save',
+        altActionLabel: 'Discard',
+      );
+      switch (result) {
+        case 1:
+          saveNode();
+        case 2:
+          cancelEdit();
+        default:
+          return;
+      }
+    } else {
+      cancelEdit();
+    }
+  }
+
+  bool hasUnsavedChanges() {
+    final content = editorState.editTextController.text;
+    if (editorState.editedNode != null) {
+      return editorState.editedNode?.name != content;
+    } else {
+      return content.isNotEmpty;
+    }
   }
 
   int get minSelection =>
