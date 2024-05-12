@@ -106,6 +106,12 @@ List<Widget> buildNodeActions(BuildContext context, TreeNode item, int position)
     },
   ));
   actions.add(ListTile(
+    title: Text('➡️ Go inside'),
+    onTap: () {
+      Navigator.pop(context, 'go-inside');
+    },
+  ));
+  actions.add(ListTile(
     title: Text('➕ Add above'),
     onTap: () {
       Navigator.pop(context, 'add-above');

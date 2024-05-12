@@ -9,7 +9,7 @@ import 'package:todotree/util/errors.dart';
 import 'package:todotree/services/tree_traverser.dart';
 import 'package:todotree/model/tree_node.dart';
 import 'package:todotree/views/components/explosion_indicator.dart';
-import 'package:todotree/views/components/node_menu_dialog.dart';
+import 'package:todotree/services/node_menu_dialog.dart';
 import 'package:todotree/views/components/ripple_indicator.dart';
 import 'package:todotree/views/components/rounded_badge.dart';
 import 'package:todotree/views/tree_browser/browser_controller.dart';
@@ -444,7 +444,7 @@ class TreeItemRow extends StatelessWidget {
   Widget buildMiddleActionButton(BuildContext context, BrowserController browserController) {
     if (treeItem.isLeaf) {
       return Tooltip(
-        message: 'Go into',
+        message: 'Go inside',
         child: IconButton(
           icon: const Icon(
             Icons.arrow_right,

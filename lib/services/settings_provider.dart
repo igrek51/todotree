@@ -34,7 +34,7 @@ class SettingsProvider {
   }
 
   bool get slidableActions {
-    return sharedPreferences?.getBool('slidableActions') ?? false;
+    return sharedPreferences?.getBool('slidableActions') ?? true;
   }
   set slidableActions(bool value) {
     sharedPreferences?.setBool('slidableActions', value);

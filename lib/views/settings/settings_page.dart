@@ -62,7 +62,7 @@ class _SettingsPageState extends State<SettingsPage> {
             SettingsTile.switchTile(
               leading: Icon(Icons.swipe),
               title: Text('Swipe menu'),
-              description: Text('Slide left or right to perform quick actions on nodes'),
+              description: Text('Slide left to perform quick actions on nodes. Exclusive with "Swipe navigation"'),
               initialValue: _slidableActions,
               onToggle: (value) {
                 settingsProvider.slidableActions = value;
@@ -74,7 +74,7 @@ class _SettingsPageState extends State<SettingsPage> {
             SettingsTile.switchTile(
               leading: Icon(Icons.swipe_right_alt),
               title: Text('Swipe navigation'),
-              description: Text('Swipe right to go into the node. Swipe left to go back.'),
+              description: Text('Swipe right to go inside the node. Swipe left to go back. Exclusive with "Swipe menu"'),
               initialValue: swipeNavigation,
               onToggle: (value) {
                 settingsProvider.swipeNavigation = value;

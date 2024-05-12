@@ -263,11 +263,13 @@ class BrowserController {
   }
 
   void runNodeMenuAction(String action, {TreeNode? node, int? position}) {
-    safeExecute(() {
+    safeExecute(() async {
       if (action == 'remove-nodes' && position != null) {
         removeNodesAt(position);
       } else if (action == 'edit-node' && node != null) {
         editNode(node);
+      } else if (action == 'go-inside' && node != null) {
+        await goIntoNode(node);
       } else if (action == 'add-above' && position != null) {
         addNodeAt(position);
       } else if (action == 'select-node' && position != null) {
