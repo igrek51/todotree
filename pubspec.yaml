@@ -2,7 +2,7 @@ name: todotree
 description: "ToDo notes in an unlimited tree structure"
 publish_to: 'none'
 
-version: '2.3.2+17'
+version: '2.3.3+18'
 
 environment:
   sdk: '>=3.2.6 <4.0.0'
