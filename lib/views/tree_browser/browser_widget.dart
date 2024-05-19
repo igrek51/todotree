@@ -33,8 +33,6 @@ class _BrowserWidgetState extends State<BrowserWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final settingsProvider = Provider.of<SettingsProvider>(context, listen: false);
-
     var stack = Stack(
       children: [
         RippleIndicator(key: _rippleIndicatorKey),
@@ -43,12 +41,7 @@ class _BrowserWidgetState extends State<BrowserWidget> {
       ],
     );
 
-    if (!settingsProvider.slidableActions) {
-      return stack;
-    }
-    return SlidableAutoCloseBehavior(
-      child: stack,
-    );
+    return stack;
   }
 }
 
@@ -64,8 +57,9 @@ class TreeListView extends StatelessWidget {
   Widget build(BuildContext context) {
     final browserState = context.watch<BrowserState>();
     final browserController = Provider.of<BrowserController>(context, listen: false);
+    final settingsProvider = Provider.of<SettingsProvider>(context, listen: false);
 
-    return ReorderableListView.builder(
+    Widget listview = ReorderableListView.builder(
       onReorder: (int oldIndex, int newIndex) {
         browserController.reorderNodes(oldIndex, newIndex);
       },
@@ -74,7 +68,7 @@ class TreeListView extends StatelessWidget {
       proxyDecorator: (Widget child, int index, Animation<double> animation) {
         return Material(
           elevation: 4.0,
-          color: Color.fromARGB(90, 190, 190, 190),
+          color: Color(0x5ABEBEBE),
           child: child,
         );
       },
@@ -96,6 +90,14 @@ class TreeListView extends StatelessWidget {
         }
       },
     );
+
+    if (settingsProvider.slidableActions) {
+      listview = SlidableAutoCloseBehavior(
+        child: listview,
+      );
+    }
+
+    return listview;
   }
 }
 
@@ -527,7 +529,6 @@ class PlusItemWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final browserController = Provider.of<BrowserController>(context, listen: false);
-    final treeTraverser = Provider.of<TreeTraverser>(context, listen: false);
     final settingsProvider = Provider.of<SettingsProvider>(context, listen: false);
     final inkwell = Material(
       color: Colors.transparent,
@@ -538,16 +539,8 @@ class PlusItemWidget extends StatelessWidget {
           });
         },
         onLongPress: () {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return NodeMenuDialog.buildForPlus(context);
-            },
-          ).then((value) {
-            if (value != null) {
-              final plusPosition = treeTraverser.currentParent.size;
-              browserController.runNodeMenuAction(value, position: plusPosition);
-            }
+          safeExecute(() {
+            showMoreOptions(context);
           });
         },
         child: SizedBox(
@@ -558,6 +551,7 @@ class PlusItemWidget extends StatelessWidget {
         ),
       ),
     );
+
     if (settingsProvider.swipeNavigation) {
       return SwipeTo(
         key: UniqueKey(),
@@ -568,8 +562,50 @@ class PlusItemWidget extends StatelessWidget {
         swipeSensitivity: 5,
         child: inkwell,
       );
+    } else if (settingsProvider.slidableActions) {
+      return Slidable(
+        groupTag: '0',
+        key: ValueKey('plus'),
+        endActionPane: ActionPane(
+          motion: BehindMotion(),
+          extentRatio: 0.25,
+          openThreshold: 0.2,
+          closeThreshold: 0.2,
+          children: [
+            SlidableAction(
+              padding: EdgeInsets.zero,
+              onPressed: (BuildContext context) {
+                safeExecute(() {
+                  showMoreOptions(context);
+                });
+              },
+              backgroundColor: Color.fromARGB(255, 73, 115, 254),
+              foregroundColor: Colors.white,
+              icon: Icons.more_vert,
+            ),
+          ],
+        ),
+        child: inkwell,
+      );
     }
+
     return inkwell;
+  }
+
+  void showMoreOptions(BuildContext context) {
+    final browserController = Provider.of<BrowserController>(context, listen: false);
+    final treeTraverser = Provider.of<TreeTraverser>(context, listen: false);
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return NodeMenuDialog.buildForPlus(context);
+      },
+    ).then((value) {
+      if (value != null) {
+        final plusPosition = treeTraverser.currentParent.size;
+        browserController.runNodeMenuAction(value, position: plusPosition);
+      }
+    });
   }
 }
 
