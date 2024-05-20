@@ -18,6 +18,7 @@ class _SettingsPageState extends State<SettingsPage> {
   bool _slidableActions = false;
   bool swipeNavigation = false;
   bool largeFont = false;
+  bool cursorNavigator = false;
 
   SettingsProvider settingsProvider = SettingsProvider();
 
@@ -30,6 +31,7 @@ class _SettingsPageState extends State<SettingsPage> {
       _slidableActions = settingsProvider.slidableActions;
       swipeNavigation = settingsProvider.swipeNavigation;
       largeFont = settingsProvider.largeFont;
+      cursorNavigator = settingsProvider.cursorNavigator;
     });
   }
 
@@ -92,6 +94,18 @@ class _SettingsPageState extends State<SettingsPage> {
                 settingsProvider.largeFont = value;
                 setState(() {
                   largeFont = value;
+                });
+              },
+            ),
+            SettingsTile.switchTile(
+              leading: Icon(Icons.navigation),
+              title: Text('Cursor Navigator'),
+              description: Text('Navigate with a one-hand swipe panel'),
+              initialValue: cursorNavigator,
+              onToggle: (value) {
+                settingsProvider.cursorNavigator = value;
+                setState(() {
+                  cursorNavigator = value;
                 });
               },
             ),

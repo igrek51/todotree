@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:todotree/services/settings_provider.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:todotree/util/collections.dart';
 
-import 'package:todotree/util/logger.dart';
 import 'package:todotree/views/components/cursor_indicator.dart';
 import 'package:todotree/views/components/explosion_indicator.dart';
 import 'package:todotree/views/components/ripple_indicator.dart';
@@ -25,13 +25,17 @@ class _BrowserWidgetState extends State<BrowserWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final settingsProvider = Provider.of<SettingsProvider>(context, listen: false);
+    final cursorIndicator = settingsProvider.cursorNavigator
+        ? CursorIndicator(key: _cursorIndicatorKey, rippleIndicatorKey: _rippleIndicatorKey)
+        : null;
     return Stack(
       children: [
         RippleIndicator(key: _rippleIndicatorKey),
-        CursorIndicator(key: _cursorIndicatorKey, rippleIndicatorKey: _rippleIndicatorKey),
+        cursorIndicator,
         ExplosionIndicator(key: explosionIndicatorKey),
         TreeListView(rippleIndicatorKey: _rippleIndicatorKey, cursorIndicatorKey: _cursorIndicatorKey),
-      ],
+      ].filterNotNull(),
     );
   }
 }
@@ -90,32 +94,31 @@ class TreeListView extends StatelessWidget {
       );
     }
 
-    listview = Column(
-      children: [
-        Expanded(child: listview),
-        GestureDetector(
-          onTap: () {
-            cursorIndicatorKey.currentState?.onTap(browserController);
-          },
-          onPanDown: (details) {
-            logger.debug('Gesture: onPanDown');
-          },
-          onPanStart: (DragStartDetails details) {
-            cursorIndicatorKey.currentState?.onDragStart(details);
-          },
-          onPanUpdate: (DragUpdateDetails details) {
-            cursorIndicatorKey.currentState?.onDragUpdate(details);
-          },
-          onPanEnd: (DragEndDetails details) {
-            cursorIndicatorKey.currentState?.onDragEnd(details, browserController);
-          },
-          child: Container(
-            height: 200,
-            color: Color(0x5ABEBEBE),
+    if (settingsProvider.cursorNavigator) {
+      listview = Column(
+        children: [
+          Expanded(child: listview),
+          GestureDetector(
+            onTap: () {
+              cursorIndicatorKey.currentState?.onTap(browserController);
+            },
+            onPanStart: (DragStartDetails details) {
+              cursorIndicatorKey.currentState?.onDragStart(details);
+            },
+            onPanUpdate: (DragUpdateDetails details) {
+              cursorIndicatorKey.currentState?.onDragUpdate(details);
+            },
+            onPanEnd: (DragEndDetails details) {
+              cursorIndicatorKey.currentState?.onDragEnd(details, browserController);
+            },
+            child: Container(
+              height: 200,
+              color: Color(0x5ABEBEBE),
+            ),
           ),
-        ),
-      ],
-    );
+        ],
+      );
+    }
 
     return listview;
   }

@@ -53,4 +53,11 @@ class SettingsProvider {
   set largeFont(bool value) {
     sharedPreferences?.setBool('largeFont', value);
   }
+
+  bool get cursorNavigator {
+    return sharedPreferences?.getBool('cursorNavigator') ?? false;
+  }
+  set cursorNavigator(bool value) {
+    sharedPreferences?.setBool('cursorNavigator', value);
+  }
 }

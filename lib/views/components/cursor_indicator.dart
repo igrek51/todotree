@@ -24,9 +24,11 @@ class CursorIndicator extends StatefulWidget {
 
 const double diameter = 25;
 const brakeFactor = 0.999;
-const alignFactor = 0.1;
-const velocityTransmission = 1.0;
+const alignFactor = 0.2;
+const velocityTransmission = 1.1;
+const dragTransmission = 1.4;
 const overscrollTransmission = 4;
+const swipeAngleThreshold = 30;
 
 class CursorIndicatorState extends State<CursorIndicator> with TickerProviderStateMixin {
   late final AnimationController _animController = AnimationController(
@@ -70,7 +72,7 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
       double velocityX = _velocity.dx * pow(1 - brakeFactor, timeScale);
       double velocityY = _velocity.dy * pow(1 - brakeFactor, timeScale);
 
-      offsetX += (w / 2 - offsetX) * alignFactor;
+      offsetX += (w / 2 - offsetX) * alignFactor * timeScale;
 
       _offset = Offset(offsetX, offsetY);
       _velocity = Offset(velocityX, velocityY);
@@ -80,7 +82,7 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
       double scroll = browserState.scrollController.offset;
 
       final overscrollUp = 100 - _offset.dy;
-      if (overscrollUp > 0) {
+      if (overscrollUp > 0 && scroll > 0) {
         browserState.scrollController.jumpTo(
           scroll - overscrollUp * overscrollTransmission * timeScale,
         );
@@ -92,7 +94,7 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
         );
       }
     }
-
+ 
     lastTickTimestampUs = nowUs;
   }
 
@@ -134,7 +136,7 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
     var dx = details.delta.dx;
     var dy = details.delta.dy;
 
-    _offset = Offset(_offset.dx + dx, _offset.dy + dy);
+    _offset = Offset(_offset.dx + dx * dragTransmission, _offset.dy + dy * dragTransmission);
     _velocity = Offset.zero;
 
     dragDelta = details.globalPosition - dragStartPos;
@@ -150,7 +152,6 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
     _velocity = details.velocity.pixelsPerSecond;
 
     if (dragDelta.distance >= 100.0) {
-      const swipeAngleThreshold = 20;
       final angle = dragDelta.direction * 180.0 / pi; // [0; 180] on top, [0; -180] on bottom
 
       if (angle >= 180 - swipeAngleThreshold || angle <= -180 + swipeAngleThreshold) {
