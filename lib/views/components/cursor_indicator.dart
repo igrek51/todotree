@@ -3,12 +3,20 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
+import 'package:todotree/util/errors.dart';
 import 'package:todotree/util/logger.dart';
 import 'package:todotree/util/numbers.dart';
+import 'package:todotree/views/components/ripple_indicator.dart';
+import 'package:todotree/views/tree_browser/browser_controller.dart';
 import 'package:todotree/views/tree_browser/browser_state.dart';
 
 class CursorIndicator extends StatefulWidget {
-  CursorIndicator({super.key});
+  CursorIndicator({
+    super.key,
+    required this.rippleIndicatorKey,
+  });
+
+  final GlobalKey<RippleIndicatorState> rippleIndicatorKey;
 
   @override
   State<CursorIndicator> createState() => CursorIndicatorState();
@@ -16,7 +24,9 @@ class CursorIndicator extends StatefulWidget {
 
 const double diameter = 25;
 const brakeFactor = 0.999;
+const alignFactor = 0.1;
 const velocityTransmission = 1.0;
+const overscrollTransmission = 4;
 
 class CursorIndicatorState extends State<CursorIndicator> with TickerProviderStateMixin {
   late final AnimationController _animController = AnimationController(
@@ -31,6 +41,8 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
   bool dragging = false;
   Offset dragStartPos = Offset.zero;
   Offset dragDelta = Offset.zero;
+  double w = 0;
+  double h = 0;
 
   @override
   void dispose() {
@@ -47,8 +59,8 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
     double timeScale = durationUs / 1000000.0;
 
     final RenderBox? renderBox = context.findRenderObject() as RenderBox?;
-    double w = renderBox?.size.width ?? 0;
-    double h = ((renderBox?.size.height ?? 0) - 200).clampMin(0);
+    w = renderBox?.size.width ?? 0;
+    h = ((renderBox?.size.height ?? 0) - 200).clampMin(0);
 
     final browserState = Provider.of<BrowserState>(context, listen: false);
 
@@ -58,23 +70,25 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
       double velocityX = _velocity.dx * pow(1 - brakeFactor, timeScale);
       double velocityY = _velocity.dy * pow(1 - brakeFactor, timeScale);
 
+      offsetX += (w / 2 - offsetX) * alignFactor;
+
       _offset = Offset(offsetX, offsetY);
       _velocity = Offset(velocityX, velocityY);
     }
 
-    if (dragging && browserState.scrollController.hasClients) {
+    if (browserState.scrollController.hasClients) {
       double scroll = browserState.scrollController.offset;
 
       final overscrollUp = 100 - _offset.dy;
       if (overscrollUp > 0) {
         browserState.scrollController.jumpTo(
-          scroll - overscrollUp * timeScale,
+          scroll - overscrollUp * overscrollTransmission * timeScale,
         );
       }
       final overscrollDown = _offset.dy + 100 - h;
       if (overscrollDown > 0) {
         browserState.scrollController.jumpTo(
-          scroll + overscrollDown * timeScale,
+          scroll + overscrollDown * overscrollTransmission * timeScale,
         );
       }
     }
@@ -82,14 +96,30 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
     lastTickTimestampUs = nowUs;
   }
 
-  void onTap() {
+  void onTap(BrowserController browserController) {
     dragging = false;
     if (_velocity.distance > 1.0) {
       logger.debug('Gesture: TAP - stop velocity');
       _velocity = Offset.zero;
     } else {
-      logger.debug('Gesture: TAP - click item');
       _velocity = Offset.zero;
+
+      double scroll = 0;
+      if (browserController.browserState.scrollController.hasClients) {
+        scroll = browserController.browserState.scrollController.offset;
+      }
+      int itemsCount = browserController.browserState.items.length;
+      var itemIndex = findItemIndexByOffset(_offset.dy + scroll, itemsCount, browserController.itemHeights);
+
+      logger.debug('Gesture: TAP - click item: $itemIndex');
+      widget.rippleIndicatorKey.currentState?.animateLocal(_offset.dx, _offset.dy);
+
+      if (itemIndex != null) {
+        var treeItem = browserController.browserState.items[itemIndex];
+        safeExecute(() async {
+          await browserController.handleNodeTap(treeItem, itemIndex);
+        });
+      }
     }
   }
 
@@ -113,22 +143,53 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
     _animController.forward(from: 0);
   }
 
-  void onDragEnd(DragEndDetails details) {
+  void onDragEnd(DragEndDetails details, BrowserController browserController) {
     logger.debug('Gesture: onPanEnd: ${details.velocity}');
     dragging = false;
 
     _velocity = details.velocity.pixelsPerSecond;
 
     if (dragDelta.distance >= 100.0) {
-      const swipeAngleThreshold = 30;
+      const swipeAngleThreshold = 20;
       final angle = dragDelta.direction * 180.0 / pi; // [0; 180] on top, [0; -180] on bottom
-      logger.debug('Gesture: angle: $angle');
+
       if (angle >= 180 - swipeAngleThreshold || angle <= -180 + swipeAngleThreshold) {
         logger.debug('Gesture: Swipe left');
+        _velocity = Offset.zero;
+
+        browserController.goBack();
       } else if (angle <= swipeAngleThreshold && angle >= -swipeAngleThreshold) {
-        logger.debug('Gesture: Swipe right');
+        double scroll = 0;
+        if (browserController.browserState.scrollController.hasClients) {
+          scroll = browserController.browserState.scrollController.offset;
+        }
+        int itemsCount = browserController.browserState.items.length;
+        var itemIndex = findItemIndexByOffset(_offset.dy + scroll, itemsCount, browserController.itemHeights);
+
+        logger.debug('Gesture: Swipe right on item: $itemIndex');
+        widget.rippleIndicatorKey.currentState?.animateLocal(_offset.dx, _offset.dy);
+        if (itemIndex != null) {
+          _velocity = Offset.zero;
+
+          var treeItem = browserController.browserState.items[itemIndex];
+          safeExecute(() async {
+            await browserController.goIntoNode(treeItem);
+          });
+        }
       }
     }
+  }
+
+  int? findItemIndexByOffset(double y, int itemsCount, Map<int, double> itemHeights) {
+    double bufferY = y;
+    for (var i = 0; i < itemsCount; i++) {
+      var itemHeight = itemHeights[i] ?? 0;
+      if (bufferY < itemHeight) {
+        return i;
+      }
+      bufferY -= itemHeight;
+    }
+    return null;
   }
 
   @override

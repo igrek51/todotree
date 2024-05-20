@@ -72,4 +72,12 @@ class RippleIndicatorState extends State<RippleIndicator> with TickerProviderSta
     });
     _rippleController.forward(from: 0);
   }
+
+  void animateLocal(double localX, double localY) {
+    if (_boxKey.currentContext == null) return;
+    setState(() {
+      _offset = Offset(localX - 125, localY - 125);
+    });
+    _rippleController.forward(from: 0);
+  }
 }

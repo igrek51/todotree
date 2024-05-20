@@ -28,7 +28,7 @@ class _BrowserWidgetState extends State<BrowserWidget> {
     return Stack(
       children: [
         RippleIndicator(key: _rippleIndicatorKey),
-        CursorIndicator(key: _cursorIndicatorKey),
+        CursorIndicator(key: _cursorIndicatorKey, rippleIndicatorKey: _rippleIndicatorKey),
         ExplosionIndicator(key: explosionIndicatorKey),
         TreeListView(rippleIndicatorKey: _rippleIndicatorKey, cursorIndicatorKey: _cursorIndicatorKey),
       ],
@@ -95,7 +95,7 @@ class TreeListView extends StatelessWidget {
         Expanded(child: listview),
         GestureDetector(
           onTap: () {
-            cursorIndicatorKey.currentState?.onTap();
+            cursorIndicatorKey.currentState?.onTap(browserController);
           },
           onPanDown: (details) {
             logger.debug('Gesture: onPanDown');
@@ -107,7 +107,7 @@ class TreeListView extends StatelessWidget {
             cursorIndicatorKey.currentState?.onDragUpdate(details);
           },
           onPanEnd: (DragEndDetails details) {
-            cursorIndicatorKey.currentState?.onDragEnd(details);
+            cursorIndicatorKey.currentState?.onDragEnd(details, browserController);
           },
           child: Container(
             height: 200,
