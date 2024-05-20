@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
+import 'package:todotree/services/settings_provider.dart';
 import 'package:todotree/util/errors.dart';
 import 'package:todotree/util/logger.dart';
 import 'package:todotree/util/numbers.dart';
@@ -23,8 +24,8 @@ class CursorIndicator extends StatefulWidget {
 }
 
 const double diameter = 25;
-const brakeFactor = 0.999;
-const alignFactor = 0.2;
+const brakeFactor = 0.99;
+const alignFactor = 1.1;
 const velocityTransmission = 1.1;
 const dragTransmission = 1.4;
 const overscrollTransmission = 4;
@@ -195,6 +196,11 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
 
   @override
   Widget build(BuildContext context) {
+    final settingsProvider = Provider.of<SettingsProvider>(context, listen: false);
+    if (!settingsProvider.cursorNavigator) {
+      return Container();
+    }
+
     return AnimatedBuilder(
       animation: CurvedAnimation(parent: _animController, curve: Curves.linear),
       builder: (context, child) {

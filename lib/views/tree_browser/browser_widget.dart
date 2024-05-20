@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:todotree/services/settings_provider.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:todotree/util/collections.dart';
 
 import 'package:todotree/views/components/cursor_indicator.dart';
 import 'package:todotree/views/components/explosion_indicator.dart';
@@ -25,17 +24,13 @@ class _BrowserWidgetState extends State<BrowserWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final settingsProvider = Provider.of<SettingsProvider>(context, listen: false);
-    final cursorIndicator = settingsProvider.cursorNavigator
-        ? CursorIndicator(key: _cursorIndicatorKey, rippleIndicatorKey: _rippleIndicatorKey)
-        : null;
     return Stack(
       children: [
         RippleIndicator(key: _rippleIndicatorKey),
-        cursorIndicator,
+        CursorIndicator(key: _cursorIndicatorKey, rippleIndicatorKey: _rippleIndicatorKey),
         ExplosionIndicator(key: explosionIndicatorKey),
         TreeListView(rippleIndicatorKey: _rippleIndicatorKey, cursorIndicatorKey: _cursorIndicatorKey),
-      ].filterNotNull(),
+      ],
     );
   }
 }
