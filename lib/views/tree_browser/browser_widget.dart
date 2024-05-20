@@ -1,25 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:todotree/services/settings_provider.dart';
-import 'package:todotree/util/collections.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:swipe_to/swipe_to.dart';
 
-import 'package:todotree/util/errors.dart';
-import 'package:todotree/services/tree_traverser.dart';
-import 'package:todotree/model/tree_node.dart';
+import 'package:todotree/util/logger.dart';
+import 'package:todotree/views/components/cursor_indicator.dart';
 import 'package:todotree/views/components/explosion_indicator.dart';
-import 'package:todotree/services/node_menu_dialog.dart';
 import 'package:todotree/views/components/ripple_indicator.dart';
-import 'package:todotree/views/components/rounded_badge.dart';
 import 'package:todotree/views/tree_browser/browser_controller.dart';
 import 'package:todotree/views/tree_browser/browser_state.dart';
-
-const double _iconButtonInternalSize = 24;
-const double _reoderButtonPaddingH = 12;
-const double _moreButtonPaddingH = 11;
-const double _midButtonPaddingH = 4;
-const double _addButtonPaddingH = 4;
+import 'package:todotree/views/tree_browser/plus_item.dart';
+import 'package:todotree/views/tree_browser/tree_item.dart';
 
 class BrowserWidget extends StatefulWidget {
   const BrowserWidget({super.key});
@@ -30,18 +21,18 @@ class BrowserWidget extends StatefulWidget {
 
 class _BrowserWidgetState extends State<BrowserWidget> {
   final GlobalKey<RippleIndicatorState> _rippleIndicatorKey = GlobalKey<RippleIndicatorState>();
+  final GlobalKey<CursorIndicatorState> _cursorIndicatorKey = GlobalKey<CursorIndicatorState>();
 
   @override
   Widget build(BuildContext context) {
-    var stack = Stack(
+    return Stack(
       children: [
         RippleIndicator(key: _rippleIndicatorKey),
+        CursorIndicator(key: _cursorIndicatorKey),
         ExplosionIndicator(key: explosionIndicatorKey),
-        TreeListView(rippleIndicatorKey: _rippleIndicatorKey),
+        TreeListView(rippleIndicatorKey: _rippleIndicatorKey, cursorIndicatorKey: _cursorIndicatorKey),
       ],
     );
-
-    return stack;
   }
 }
 
@@ -49,9 +40,11 @@ class TreeListView extends StatelessWidget {
   const TreeListView({
     super.key,
     required this.rippleIndicatorKey,
+    required this.cursorIndicatorKey,
   });
 
   final GlobalKey<RippleIndicatorState> rippleIndicatorKey;
+  final GlobalKey<CursorIndicatorState> cursorIndicatorKey;
 
   @override
   Widget build(BuildContext context) {
@@ -97,522 +90,33 @@ class TreeListView extends StatelessWidget {
       );
     }
 
+    listview = Column(
+      children: [
+        Expanded(child: listview),
+        GestureDetector(
+          onTap: () {
+            cursorIndicatorKey.currentState?.onTap();
+          },
+          onPanDown: (details) {
+            logger.debug('Gesture: onPanDown');
+          },
+          onPanStart: (DragStartDetails details) {
+            cursorIndicatorKey.currentState?.onDragStart(details);
+          },
+          onPanUpdate: (DragUpdateDetails details) {
+            cursorIndicatorKey.currentState?.onDragUpdate(details);
+          },
+          onPanEnd: (DragEndDetails details) {
+            cursorIndicatorKey.currentState?.onDragEnd(details);
+          },
+          child: Container(
+            height: 200,
+            color: Color(0x5ABEBEBE),
+          ),
+        ),
+      ],
+    );
+
     return listview;
   }
-}
-
-class TreeListItemWidget extends StatefulWidget {
-  const TreeListItemWidget({
-    super.key,
-    required this.position,
-    required this.treeItem,
-    required this.rippleIndicatorKey,
-  });
-
-  final int position;
-  final TreeNode treeItem;
-  final GlobalKey<RippleIndicatorState> rippleIndicatorKey;
-
-  @override
-  State<TreeListItemWidget> createState() => TreeListItemWidgetState();
-}
-
-class TreeListItemWidgetState extends State<TreeListItemWidget> with TickerProviderStateMixin {
-  late final AnimationController _offsetAnimator = AnimationController(
-    value: 1,
-    vsync: this,
-    duration: const Duration(milliseconds: 600),
-  );
-  late final AnimationController _highlightAnimator = AnimationController(
-    value: 1,
-    vsync: this,
-    duration: const Duration(milliseconds: 600),
-  );
-  late final CurvedAnimation _offsetAnimation = CurvedAnimation(parent: _offsetAnimator, curve: Curves.bounceOut);
-  late final CurvedAnimation _highlightAnimation = CurvedAnimation(parent: _highlightAnimator, curve: Curves.linear);
-  double animationTopOffset = 0;
-  bool animatingHighlight = false;
-  final _inkWellKey = GlobalKey();
-  double _iconButtonPaddingV = 11.0;
-
-  @override
-  void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final context = _inkWellKey.currentContext;
-      if (context == null) return;
-      final renderBox = context.findRenderObject() as RenderBox;
-      final height = renderBox.size.height;
-      final browserController = Provider.of<BrowserController>(context, listen: false);
-      browserController.itemHeights[widget.position] = height;
-    });
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _offsetAnimator.dispose();
-    _highlightAnimator.dispose();
-    super.dispose();
-  }
-
-  void _startHighlightAnimation(BrowserController browserController) {
-    if (!browserController.highlightAnimationRequests.containsKey(widget.position)) return;
-    animatingHighlight = true;
-    browserController.highlightAnimationRequests.remove(widget.position);
-    _highlightAnimator.forward(from: 0).then((value) {
-      animatingHighlight = false;
-      browserController.highlightAnimationDone();
-    });
-  }
-
-  void _startOffsetAnimation(BrowserController browserController) {
-    if (!browserController.offsetAnimationRequests.containsKey(widget.position)) return;
-    animationTopOffset = browserController.offsetAnimationRequests[widget.position] ?? 0;
-    browserController.offsetAnimationRequests.remove(widget.position);
-    _offsetAnimator.forward(from: 0).then((value) {
-      animationTopOffset = 0;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final browserController = Provider.of<BrowserController>(context, listen: false);
-    final settingsProvider = Provider.of<SettingsProvider>(context, listen: false);
-
-    _iconButtonPaddingV = switch (settingsProvider.largeFont) {
-      true => 11.0,
-      false => 9.0,
-    };
-
-    _startHighlightAnimation(browserController);
-    _startOffsetAnimation(browserController);
-
-    var inkWell = AnimatedBuilder(
-      animation: Listenable.merge([_offsetAnimator, _highlightAnimator]), // Listenable triggerring repainting
-      builder: (context, child) {
-        return Material(
-          color: Colors.transparent,
-          child: InkWell(
-            key: _inkWellKey,
-            onTapUp: (TapUpDetails details) {
-              widget.rippleIndicatorKey.currentState?.animate(details.globalPosition.dx, details.globalPosition.dy);
-            },
-            onTap: () {
-              safeExecute(() async {
-                await browserController.handleNodeTap(widget.treeItem, widget.position);
-              });
-            },
-            onLongPress: () {
-              showNodeOptionsDialog(context, widget.treeItem, widget.position);
-            },
-            child: Container(
-              padding: const EdgeInsets.all(0.0),
-              margin: EdgeInsets.only(top: (1 - _offsetAnimation.value) * animationTopOffset),
-              decoration: BoxDecoration(
-                color: animatingHighlight
-                    ? const Color.fromARGB(199, 53, 156, 240).withOpacity(1 - _highlightAnimation.value)
-                    : Colors.transparent,
-                border: Border.symmetric(
-                  horizontal: BorderSide(
-                    color: const Color(0x44888888),
-                    width: 0.5,
-                    style: BorderStyle.solid,
-                    strokeAlign: BorderSide.strokeAlignInside,
-                  ),
-                ),
-              ),
-              child: TreeItemRow(
-                position: widget.position,
-                treeItem: widget.treeItem,
-                rippleIndicatorKey: widget.rippleIndicatorKey,
-                iconButtonPaddingV: _iconButtonPaddingV,
-              ),
-            ),
-          ),
-        );
-      },
-    );
-
-    if (settingsProvider.slidableActions) {
-      return Slidable(
-        groupTag: '0',
-        key: ValueKey(widget.key),
-        endActionPane: ActionPane(
-          motion: BehindMotion(),
-          extentRatio: 0.25,
-          openThreshold: 0.2,
-          closeThreshold: 0.2,
-          children: [
-            SlidableAction(
-              padding: EdgeInsets.zero,
-              onPressed: (BuildContext context) {
-                safeExecute(() {
-                  browserController.removeOneNode(widget.treeItem);
-                });
-              },
-              backgroundColor: Color(0xFFFE4A49),
-              foregroundColor: Colors.white,
-              icon: Icons.delete,
-            ),
-          ],
-        ),
-        child: inkWell,
-      );
-    } else if (settingsProvider.swipeNavigation) {
-      return SwipeTo(
-        key: UniqueKey(),
-        iconOnLeftSwipe: Icons.arrow_back,
-        onLeftSwipe: (details) {
-          browserController.goBack();
-        },
-        iconOnRightSwipe: Icons.arrow_right,
-        onRightSwipe: (details) {
-          safeExecute(() async {
-            await browserController.goIntoNode(widget.treeItem);
-          });
-        },
-        swipeSensitivity: 5,
-        child: inkWell,
-      );
-    }
-
-    return inkWell;
-  }
-}
-
-class TreeItemRow extends StatelessWidget {
-  const TreeItemRow({
-    super.key,
-    required this.position,
-    required this.treeItem,
-    required this.rippleIndicatorKey,
-    required this.iconButtonPaddingV,
-  });
-
-  final int position;
-  final TreeNode treeItem;
-  final GlobalKey<RippleIndicatorState> rippleIndicatorKey;
-  final double iconButtonPaddingV;
-
-  @override
-  Widget build(BuildContext context) {
-    final browserState = context.watch<BrowserState>();
-    final selectionMode = browserState.selectedIndexes.isNotEmpty;
-    final isItemSelected = browserState.selectedIndexes.contains(position);
-    final browserController = Provider.of<BrowserController>(context, listen: false);
-
-    return Row(
-      children: [
-        buildLeftIcon(selectionMode, isItemSelected, browserController),
-        buildMiddleText(context),
-        buildMoreActionButton(context),
-        selectionMode ? null : buildMiddleActionButton(context, browserController),
-        selectionMode ? null : buildAddButton(browserController),
-      ].filterNotNull(),
-    );
-  }
-
-  Widget buildLeftIcon(bool selectionMode, bool isItemSelected, BrowserController browserController) {
-    if (selectionMode) {
-      Widget sizedBoxChild = GestureDetector(
-        onLongPress: () {
-          safeExecute(() {
-            browserController.onLongToggleSelectedNode(position);
-          });
-        },
-        child: Checkbox(
-          value: isItemSelected,
-          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          onChanged: (bool? value) {
-            safeExecute(() {
-              browserController.onToggleSelectedNode(position);
-            });
-          },
-        ),
-      );
-      if (isItemSelected) {
-        sizedBoxChild = ReorderableDragStartListener(
-          index: position,
-          child: sizedBoxChild,
-        );
-      }
-      return SizedBox(
-        width: 48,
-        child: sizedBoxChild,
-      );
-    } else {
-      return ReorderableDragStartListener(
-        index: position,
-        child: GestureDetector(
-          onLongPress: () {
-            safeExecute(() {
-              browserController.onToggleSelectedNode(position);
-            });
-          },
-          child: IconButton(
-            icon: const Icon(
-              Icons.unfold_more,
-              size: _iconButtonInternalSize,
-              color: Colors.white,
-            ),
-            padding: EdgeInsets.symmetric(vertical: iconButtonPaddingV, horizontal: _reoderButtonPaddingH),
-            constraints: BoxConstraints(),
-            style: const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
-            onPressed: () {
-              safeExecute(() {
-                browserController.onToggleSelectedNode(position);
-              });
-            },
-          ),
-        ),
-      );
-    }
-  }
-
-  Widget buildMiddleText(BuildContext context) {
-    final treeTraverser = Provider.of<TreeTraverser>(context, listen: false);
-    final settingsProvider = Provider.of<SettingsProvider>(context, listen: false);
-    final fontSize = switch (settingsProvider.largeFont) {
-      true => 18.0,
-      false => 16.0,
-    };
-    final padding = switch (settingsProvider.largeFont) {
-      true => const EdgeInsets.symmetric(vertical: 10),
-      false => const EdgeInsets.symmetric(vertical: 8),
-    };
-    final child = switch (true) {
-      true when treeItem.isLink => Container(
-          padding: padding,
-          child: Text(
-            treeTraverser.displayLinkName(treeItem),
-            style: TextStyle(
-              color: Color(0xFFD2D2D2),
-              fontSize: fontSize,
-              decoration: TextDecoration.underline,
-            ),
-          ),
-        ),
-      true when treeItem.isLeaf => Container(
-          padding: padding,
-          child: Text(
-            treeItem.name,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: fontSize,
-            ),
-          ),
-        ),
-      _ => Row(
-          children: [
-            Expanded(
-              child: Container(
-                padding: padding,
-                child: Text(
-                  treeItem.name,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: fontSize,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(width: 2),
-            RoundedBadge(text: treeItem.size.toString()),
-          ],
-        )
-    };
-    return Expanded(child: child);
-  }
-
-  Widget buildMoreActionButton(BuildContext context) {
-    return IconButton(
-      icon: const Icon(
-        Icons.more_vert,
-        size: _iconButtonInternalSize,
-        color: Colors.white,
-      ),
-      padding: EdgeInsets.symmetric(vertical: iconButtonPaddingV, horizontal: _moreButtonPaddingH),
-      constraints: BoxConstraints(),
-      style: const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
-      onPressed: () {
-        showNodeOptionsDialog(context, treeItem, position);
-        var (_, centerY, w, _) = getRenderBoxCoordinates(context);
-        rippleIndicatorKey.currentState?.animate(w - 32 - 32 - 32 / 2, centerY);
-      },
-    );
-  }
-
-  Widget buildMiddleActionButton(BuildContext context, BrowserController browserController) {
-    if (treeItem.isLeaf) {
-      return Tooltip(
-        message: 'Go inside',
-        child: IconButton(
-          icon: const Icon(
-            Icons.arrow_right,
-            size: _iconButtonInternalSize,
-            color: Colors.white,
-          ),
-          padding: EdgeInsets.symmetric(vertical: iconButtonPaddingV, horizontal: _midButtonPaddingH),
-          constraints: BoxConstraints(),
-          style: const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
-          onPressed: () {
-            safeExecute(() async {
-              await browserController.goIntoNode(treeItem);
-              var (_, centerY, w, _) = getRenderBoxCoordinates(context);
-              rippleIndicatorKey.currentState?.animate(w - 32 - 32 / 2, centerY);
-            });
-          },
-        ),
-      );
-    } else {
-      return Tooltip(
-        message: 'Edit',
-        child: IconButton(
-          icon: const Icon(
-            Icons.edit,
-            size: _iconButtonInternalSize,
-            color: Colors.white,
-          ),
-          padding: EdgeInsets.symmetric(vertical: iconButtonPaddingV, horizontal: _midButtonPaddingH),
-          constraints: BoxConstraints(),
-          style: const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
-          onPressed: () {
-            safeExecute(() {
-              browserController.editNode(treeItem);
-            });
-          },
-        ),
-      );
-    }
-  }
-
-  Widget buildAddButton(BrowserController browserController) {
-    return Tooltip(
-      message: 'Add above',
-      child: IconButton(
-        icon: const Icon(
-          Icons.add,
-          size: _iconButtonInternalSize,
-          color: Colors.white,
-        ),
-        padding: EdgeInsets.symmetric(vertical: iconButtonPaddingV, horizontal: _addButtonPaddingH),
-        constraints: BoxConstraints(),
-        style: const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
-        onPressed: () {
-          safeExecute(() {
-            browserController.addNodeAt(position);
-          });
-        },
-      ),
-    );
-  }
-}
-
-void showNodeOptionsDialog(BuildContext context, TreeNode treeItem, int position) {
-  final browserController = Provider.of<BrowserController>(context, listen: false);
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return NodeMenuDialog.buildForNode(context, treeItem, position);
-    },
-  ).then((value) {
-    if (value != null) {
-      browserController.runNodeMenuAction(value, node: treeItem, position: position);
-    }
-  });
-}
-
-class PlusItemWidget extends StatelessWidget {
-  const PlusItemWidget({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final browserController = Provider.of<BrowserController>(context, listen: false);
-    final settingsProvider = Provider.of<SettingsProvider>(context, listen: false);
-    final inkwell = Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () {
-          safeExecute(() {
-            browserController.addNodeToTheEnd();
-          });
-        },
-        onLongPress: () {
-          safeExecute(() {
-            showMoreOptions(context);
-          });
-        },
-        child: SizedBox(
-          height: 55,
-          child: Center(
-            child: const Icon(Icons.add),
-          ),
-        ),
-      ),
-    );
-
-    if (settingsProvider.swipeNavigation) {
-      return SwipeTo(
-        key: UniqueKey(),
-        iconOnLeftSwipe: Icons.arrow_back,
-        onLeftSwipe: (details) {
-          browserController.goBack();
-        },
-        swipeSensitivity: 5,
-        child: inkwell,
-      );
-    } else if (settingsProvider.slidableActions) {
-      return Slidable(
-        groupTag: '0',
-        key: ValueKey('plus'),
-        endActionPane: ActionPane(
-          motion: BehindMotion(),
-          extentRatio: 0.25,
-          openThreshold: 0.2,
-          closeThreshold: 0.2,
-          children: [
-            SlidableAction(
-              padding: EdgeInsets.zero,
-              onPressed: (BuildContext context) {
-                safeExecute(() {
-                  showMoreOptions(context);
-                });
-              },
-              backgroundColor: Color.fromARGB(255, 73, 115, 254),
-              foregroundColor: Colors.white,
-              icon: Icons.more_vert,
-            ),
-          ],
-        ),
-        child: inkwell,
-      );
-    }
-
-    return inkwell;
-  }
-
-  void showMoreOptions(BuildContext context) {
-    final browserController = Provider.of<BrowserController>(context, listen: false);
-    final treeTraverser = Provider.of<TreeTraverser>(context, listen: false);
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return NodeMenuDialog.buildForPlus(context);
-      },
-    ).then((value) {
-      if (value != null) {
-        final plusPosition = treeTraverser.currentParent.size;
-        browserController.runNodeMenuAction(value, position: plusPosition);
-      }
-    });
-  }
-}
-
-(double, double, double, double) getRenderBoxCoordinates(BuildContext context) {
-  final RenderBox renderBox = context.findRenderObject() as RenderBox;
-  Offset boxGlobalPos = renderBox.localToGlobal(Offset.zero);
-  final centerX = boxGlobalPos.dx + renderBox.size.width / 2;
-  final centerY = boxGlobalPos.dy + renderBox.size.height / 2;
-  return (centerX, centerY, renderBox.size.width, renderBox.size.height);
 }

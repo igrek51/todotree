@@ -14,3 +14,15 @@ extension IntExtension on int {
     return this;
   }
 }
+
+extension DoubleExtension on double {
+  double clampMin(double lowerLimit) {
+    if (this < lowerLimit) return lowerLimit;
+    return this;
+  }
+
+  double clampMax(double upperLimit) {
+    if (this > upperLimit) return upperLimit;
+    return this;
+  }
+}
