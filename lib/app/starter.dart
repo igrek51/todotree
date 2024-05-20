@@ -7,7 +7,7 @@ import 'package:todotree/app/factory.dart';
 import 'package:todotree/util/errors.dart';
 import 'package:todotree/util/logger.dart';
 
-void startupApp(AppFactory app) async {
+Future<void> startupApp(AppFactory app) async {
   try {
     _resizeWindow();
     

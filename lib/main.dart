@@ -8,9 +8,9 @@ import 'package:todotree/app/factory.dart';
 import 'package:todotree/util/errors.dart';
 
 void main() async {
-  runZonedGuarded(() {
+  runZonedGuarded(() async {
     final appFactory = AppFactory()..create();
-    startupApp(appFactory);
+    await startupApp(appFactory);
     runApp(AppWidget(appFactory: appFactory));
 
   }, (error, stackTrace) {
