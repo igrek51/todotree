@@ -35,6 +35,8 @@ class BrowserController {
   Map<int, bool> highlightAnimationRequests = {};
   Map<int, double> offsetAnimationRequests = {};
   int lastSelectedIndex = -1;
+  double cursorIndicatorX = 0;
+  double cursorIndicatorY = 0;
 
   BrowserController(this.homeState, this.browserState, this.treeTraverser, this.clipboardManager, this.appLifecycle,
       this.settingsProvider, this.remoteService);

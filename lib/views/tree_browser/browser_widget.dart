@@ -29,8 +29,15 @@ class _BrowserWidgetState extends State<BrowserWidget> {
   @override
   Widget build(BuildContext context) {
     final settingsProvider = Provider.of<SettingsProvider>(context, listen: false);
+    final browserController = Provider.of<BrowserController>(context, listen: false);
+    final browserState = Provider.of<BrowserState>(context, listen: false);
     var cursorIndicator = settingsProvider.cursorNavigator
-        ? CursorIndicator(key: _cursorIndicatorKey, rippleIndicatorKey: _rippleIndicatorKey)
+        ? CursorIndicator(
+            key: _cursorIndicatorKey,
+            rippleIndicatorKey: _rippleIndicatorKey,
+            browserController: browserController,
+            browserState: browserState,
+          )
         : null;
     return Stack(
       children: [
@@ -104,7 +111,7 @@ class TreeListView extends StatelessWidget {
           Expanded(child: listview),
           GestureDetector(
             onTap: () {
-              cursorIndicatorKey.currentState?.onTap(browserController);
+              cursorIndicatorKey.currentState?.onTap();
             },
             onPanStart: (DragStartDetails details) {
               cursorIndicatorKey.currentState?.onDragStart(details);
@@ -113,7 +120,7 @@ class TreeListView extends StatelessWidget {
               cursorIndicatorKey.currentState?.onDragUpdate(details);
             },
             onPanEnd: (DragEndDetails details) {
-              cursorIndicatorKey.currentState?.onDragEnd(details, browserController);
+              cursorIndicatorKey.currentState?.onDragEnd(details);
             },
             child: Card(
               color: Color(0x5ABEBEBE),
@@ -137,7 +144,7 @@ class TreeListView extends StatelessWidget {
                           icon: Icon(Icons.keyboard_arrow_right, size: 32),
                           onPressed: () {
                             safeExecute(() {
-                              cursorIndicatorKey.currentState?.goIntoHoveredItem(browserController);
+                              cursorIndicatorKey.currentState?.goIntoHoveredItem();
                             });
                           },
                         ),
@@ -145,7 +152,7 @@ class TreeListView extends StatelessWidget {
                           icon: Icon(Icons.add, size: 32),
                           onPressed: () {
                             safeExecute(() {
-                              cursorIndicatorKey.currentState?.addAboveHoveredItem(browserController);
+                              cursorIndicatorKey.currentState?.addAboveHoveredItem();
                             });
                           },
                         ),
@@ -153,7 +160,7 @@ class TreeListView extends StatelessWidget {
                           icon: Icon(Icons.more_vert, size: 32),
                           onPressed: () {
                             safeExecute(() {
-                              cursorIndicatorKey.currentState?.moreOptionsOnHoveredItem(browserController);
+                              cursorIndicatorKey.currentState?.moreOptionsOnHoveredItem();
                             });
                           },
                         ),

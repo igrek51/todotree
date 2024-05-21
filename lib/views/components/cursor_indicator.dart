@@ -15,9 +15,13 @@ class CursorIndicator extends StatefulWidget {
   CursorIndicator({
     super.key,
     required this.rippleIndicatorKey,
+    required this.browserController,
+    required this.browserState,
   });
 
   final GlobalKey<RippleIndicatorState> rippleIndicatorKey;
+  final BrowserController browserController;
+  final BrowserState browserState;
 
   @override
   State<CursorIndicator> createState() => CursorIndicatorState();
@@ -40,7 +44,6 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
     duration: const Duration(milliseconds: 2000),
     lowerBound: 0.0,
   );
-  Offset _offset = Offset.zero;
   Offset _velocity = Offset.zero;
   GlobalKey _boxKey = GlobalKey();
   int lastTickTimestampUs = 0;
@@ -65,47 +68,53 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
     double timeScale = durationUs / 1000000.0;
 
     final RenderBox? renderBox = context.findRenderObject() as RenderBox?;
-    if (w == 0) {
+    if (w == 0 && widget.browserController.cursorIndicatorX == 0) {
       w = renderBox?.size.width ?? 0;
-      _offset = Offset(w/2, _offset.dy);
+      widget.browserController.cursorIndicatorX = w / 2;
+      widget.browserController.cursorIndicatorY = -cursrorDiameter;
     }
     w = renderBox?.size.width ?? 0;
     h = ((renderBox?.size.height ?? 0) - touchpadHeight).clampMin(0);
 
-    final browserState = Provider.of<BrowserState>(context, listen: false);
+    if (w > 0) {
+      final browserState = Provider.of<BrowserState>(context, listen: false);
 
-    if (!dragging) {
-      double offsetX = (_offset.dx + _velocity.dx * velocityTransmission * timeScale).clamp(0, w);
-      double offsetY = (_offset.dy + _velocity.dy * velocityTransmission * timeScale).clamp(0, h);
-      double velocityX = _velocity.dx * pow(1 - brakeFactor, timeScale);
-      double velocityY = _velocity.dy * pow(1 - brakeFactor, timeScale);
-      offsetX += (w / 2 - offsetX) * alignFactor * timeScale;
+      if (!dragging) {
+        double offsetX =
+            (widget.browserController.cursorIndicatorX + _velocity.dx * velocityTransmission * timeScale).clamp(0, w);
+        double offsetY =
+            (widget.browserController.cursorIndicatorY + _velocity.dy * velocityTransmission * timeScale).clamp(0, h);
+        double velocityX = _velocity.dx * pow(1 - brakeFactor, timeScale);
+        double velocityY = _velocity.dy * pow(1 - brakeFactor, timeScale);
+        offsetX += (w / 2 - offsetX) * alignFactor * timeScale;
 
-      _offset = Offset(offsetX, offsetY);
-      _velocity = Offset(velocityX, velocityY);
+        widget.browserController.cursorIndicatorX = offsetX;
+        widget.browserController.cursorIndicatorY = offsetY;
+        _velocity = Offset(velocityX, velocityY);
+      }
+
+      if (browserState.scrollController.hasClients) {
+        double scroll = browserState.scrollController.offset;
+
+        final overscrollUp = overscrollArea - widget.browserController.cursorIndicatorY;
+        if (overscrollUp > 0 && scroll > 0) {
+          browserState.scrollController.jumpTo(
+            scroll - overscrollUp * overscrollTransmission * timeScale,
+          );
+        }
+        final overscrollDown = widget.browserController.cursorIndicatorY + overscrollArea - h;
+        if (overscrollDown > 0) {
+          browserState.scrollController.jumpTo(
+            scroll + overscrollDown * overscrollTransmission * timeScale,
+          );
+        }
+      }
     }
 
-    if (browserState.scrollController.hasClients) {
-      double scroll = browserState.scrollController.offset;
-
-      final overscrollUp = overscrollArea - _offset.dy;
-      if (overscrollUp > 0 && scroll > 0) {
-        browserState.scrollController.jumpTo(
-          scroll - overscrollUp * overscrollTransmission * timeScale,
-        );
-      }
-      final overscrollDown = _offset.dy + overscrollArea - h;
-      if (overscrollDown > 0) {
-        browserState.scrollController.jumpTo(
-          scroll + overscrollDown * overscrollTransmission * timeScale,
-        );
-      }
-    }
- 
     lastTickTimestampUs = nowUs;
   }
 
-  void onTap(BrowserController browserController) {
+  void onTap() {
     dragging = false;
     if (_velocity.distance > 50.0) {
       logger.debug('Gesture: TAP - stop velocity');
@@ -114,13 +123,14 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
     }
 
     _velocity = Offset.zero;
-    final (itemIndex, treeItem) = findHoveredItem(browserController);
-
+    final (itemIndex, treeItem) = findHoveredItem();
     logger.debug('Gesture: TAP - click item: $itemIndex');
-    widget.rippleIndicatorKey.currentState?.animateLocal(_offset.dx, _offset.dy);
+    final dx = widget.browserController.cursorIndicatorX;
+    final dy = widget.browserController.cursorIndicatorY;
+    widget.rippleIndicatorKey.currentState?.animateLocal(dx, dy);
     if (treeItem != null && itemIndex != null) {
       safeExecute(() async {
-        await browserController.handleNodeTap(treeItem, itemIndex);
+        await widget.browserController.handleNodeTap(treeItem, itemIndex);
       });
     }
   }
@@ -134,7 +144,8 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
     var dx = details.delta.dx;
     var dy = details.delta.dy;
 
-    _offset = Offset(_offset.dx + dx * dragTransmission, _offset.dy + dy * dragTransmission);
+    widget.browserController.cursorIndicatorX += dx * dragTransmission;
+    widget.browserController.cursorIndicatorY += dy * dragTransmission;
     _velocity = Offset.zero;
 
     dragDelta = details.globalPosition - dragStartPos;
@@ -143,7 +154,7 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
     _animController.forward(from: 0);
   }
 
-  void onDragEnd(DragEndDetails details, BrowserController browserController) {
+  void onDragEnd(DragEndDetails details) {
     dragging = false;
 
     _velocity = details.velocity.pixelsPerSecond;
@@ -154,70 +165,74 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
       if (angle >= 180 - swipeAngleThreshold || angle <= -180 + swipeAngleThreshold) {
         logger.debug('Gesture: Swipe left');
         _velocity = Offset.zero;
-        browserController.goBack();
-
+        widget.browserController.goBack();
       } else if (angle <= swipeAngleThreshold && angle >= -swipeAngleThreshold) {
-        final (itemIndex, treeItem) = findHoveredItem(browserController);
+        final (itemIndex, treeItem) = findHoveredItem();
         if (itemIndex != null && treeItem != null) {
           _velocity = Offset.zero;
           logger.debug('Gesture: Swipe right on item: $itemIndex');
-          widget.rippleIndicatorKey.currentState?.animateLocal(_offset.dx, _offset.dy);
+          final dx = widget.browserController.cursorIndicatorX;
+          final dy = widget.browserController.cursorIndicatorY;
+          widget.rippleIndicatorKey.currentState?.animateLocal(dx, dy);
           safeExecute(() async {
-            await browserController.goIntoNode(treeItem);
+            await widget.browserController.goIntoNode(treeItem);
           });
         }
       }
     }
   }
 
-  void goIntoHoveredItem(BrowserController browserController) {
-    final (itemIndex, treeItem) = findHoveredItem(browserController);
+  void goIntoHoveredItem() {
+    final (itemIndex, treeItem) = findHoveredItem();
     if (itemIndex != null && treeItem != null) {
       safeExecute(() async {
-        await browserController.goIntoNode(treeItem);
+        await widget.browserController.goIntoNode(treeItem);
       });
     }
   }
 
-  void addAboveHoveredItem(BrowserController browserController) {
-    final (itemIndex, treeItem) = findHoveredItem(browserController);
+  void addAboveHoveredItem() {
+    final (itemIndex, treeItem) = findHoveredItem();
     if (itemIndex != null && treeItem != null) {
       safeExecute(() {
-        browserController.addNodeAt(itemIndex);
+        widget.browserController.addNodeAt(itemIndex);
       });
     } else {
       safeExecute(() {
-        browserController.addNodeToTheEnd();
+        widget.browserController.addNodeToTheEnd();
       });
     }
   }
 
-  void moreOptionsOnHoveredItem(BrowserController browserController) {
-    final (itemIndex, treeItem) = findHoveredItem(browserController);
+  void moreOptionsOnHoveredItem() {
+    final (itemIndex, treeItem) = findHoveredItem();
     if (itemIndex != null && treeItem != null) {
       safeExecute(() {
-        browserController.showItemOptionsDialog(treeItem, itemIndex);
+        widget.browserController.showItemOptionsDialog(treeItem, itemIndex);
       });
     } else {
       safeExecute(() {
-        browserController.showPlusOptionsDialog();
+        widget.browserController.showPlusOptionsDialog();
       });
     }
   }
 
-  (int?, TreeNode?) findHoveredItem(BrowserController browserController) {
+  (int?, TreeNode?) findHoveredItem() {
     double scroll = 0;
-    if (browserController.browserState.scrollController.hasClients) {
-      scroll = browserController.browserState.scrollController.offset;
+    final browserController = widget.browserController;
+    final browserState = widget.browserState;
+    if (browserState.scrollController.hasClients) {
+      scroll = browserState.scrollController.offset;
     }
-    int itemsCount = browserController.browserState.items.length;
-    var itemIndex = findItemIndexByOffset(_offset.dy + scroll, itemsCount, browserController.itemHeights);
+    int itemsCount = browserState.items.length;
+    var itemIndex = findItemIndexByOffset(
+        widget.browserController.cursorIndicatorY + scroll, itemsCount, browserController.itemHeights);
 
     if (itemIndex == null) {
       return (null, null);
     }
 
-    var treeItem = browserController.browserState.items[itemIndex];
+    var treeItem = browserState.items[itemIndex];
     return (itemIndex, treeItem);
   }
 
@@ -243,8 +258,8 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
           key: _boxKey,
           children: [
             Positioned(
-              left: _offset.dx - cursrorDiameter / 2,
-              top: _offset.dy - cursrorDiameter / 2,
+              left: widget.browserController.cursorIndicatorX - cursrorDiameter / 2,
+              top: widget.browserController.cursorIndicatorY - cursrorDiameter / 2,
               child: Container(
                 width: cursrorDiameter,
                 height: cursrorDiameter,
