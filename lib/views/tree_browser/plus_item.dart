@@ -5,8 +5,6 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:swipe_to/swipe_to.dart';
 
 import 'package:todotree/util/errors.dart';
-import 'package:todotree/services/tree_traverser.dart';
-import 'package:todotree/services/node_menu_dialog.dart';
 import 'package:todotree/views/tree_browser/browser_controller.dart';
 
 class PlusItemWidget extends StatelessWidget {
@@ -26,7 +24,7 @@ class PlusItemWidget extends StatelessWidget {
         },
         onLongPress: () {
           safeExecute(() {
-            showMoreOptions(context);
+            browserController.showPlusOptionsDialog();
           });
         },
         child: SizedBox(
@@ -62,7 +60,7 @@ class PlusItemWidget extends StatelessWidget {
               padding: EdgeInsets.zero,
               onPressed: (BuildContext context) {
                 safeExecute(() {
-                  showMoreOptions(context);
+                  browserController.showPlusOptionsDialog();
                 });
               },
               backgroundColor: Color.fromARGB(255, 73, 115, 254),
@@ -76,21 +74,5 @@ class PlusItemWidget extends StatelessWidget {
     }
 
     return inkwell;
-  }
-
-  void showMoreOptions(BuildContext context) {
-    final browserController = Provider.of<BrowserController>(context, listen: false);
-    final treeTraverser = Provider.of<TreeTraverser>(context, listen: false);
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return NodeMenuDialog.buildForPlus(context);
-      },
-    ).then((value) {
-      if (value != null) {
-        final plusPosition = treeTraverser.currentParent.size;
-        browserController.runNodeMenuAction(value, position: plusPosition);
-      }
-    });
   }
 }

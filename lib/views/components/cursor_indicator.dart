@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
+import 'package:todotree/model/tree_node.dart';
 import 'package:todotree/util/errors.dart';
 import 'package:todotree/util/logger.dart';
 import 'package:todotree/util/numbers.dart';
@@ -113,18 +114,11 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
     }
 
     _velocity = Offset.zero;
-    double scroll = 0;
-    if (browserController.browserState.scrollController.hasClients) {
-      scroll = browserController.browserState.scrollController.offset;
-    }
-    int itemsCount = browserController.browserState.items.length;
-    var itemIndex = findItemIndexByOffset(_offset.dy + scroll, itemsCount, browserController.itemHeights);
+    final (itemIndex, treeItem) = findHoveredItem(browserController);
 
     logger.debug('Gesture: TAP - click item: $itemIndex');
     widget.rippleIndicatorKey.currentState?.animateLocal(_offset.dx, _offset.dy);
-
-    if (itemIndex != null) {
-      var treeItem = browserController.browserState.items[itemIndex];
+    if (treeItem != null && itemIndex != null) {
       safeExecute(() async {
         await browserController.handleNodeTap(treeItem, itemIndex);
       });
@@ -132,13 +126,11 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
   }
 
   void onDragStart(DragStartDetails details) {
-    logger.debug('Gesture: onPanStart: ${details.globalPosition}');
     dragging = true;
     dragStartPos = details.globalPosition;
   }
 
   void onDragUpdate(DragUpdateDetails details) {
-    logger.debug('Gesture: onPanUpdate: ${details.delta}, ${details.globalPosition}');
     var dx = details.delta.dx;
     var dy = details.delta.dy;
 
@@ -152,7 +144,6 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
   }
 
   void onDragEnd(DragEndDetails details, BrowserController browserController) {
-    logger.debug('Gesture: onPanEnd: ${details.velocity}');
     dragging = false;
 
     _velocity = details.velocity.pixelsPerSecond;
@@ -163,28 +154,71 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
       if (angle >= 180 - swipeAngleThreshold || angle <= -180 + swipeAngleThreshold) {
         logger.debug('Gesture: Swipe left');
         _velocity = Offset.zero;
-
         browserController.goBack();
+
       } else if (angle <= swipeAngleThreshold && angle >= -swipeAngleThreshold) {
-        double scroll = 0;
-        if (browserController.browserState.scrollController.hasClients) {
-          scroll = browserController.browserState.scrollController.offset;
-        }
-        int itemsCount = browserController.browserState.items.length;
-        var itemIndex = findItemIndexByOffset(_offset.dy + scroll, itemsCount, browserController.itemHeights);
-
-        logger.debug('Gesture: Swipe right on item: $itemIndex');
-        widget.rippleIndicatorKey.currentState?.animateLocal(_offset.dx, _offset.dy);
-        if (itemIndex != null) {
+        final (itemIndex, treeItem) = findHoveredItem(browserController);
+        if (itemIndex != null && treeItem != null) {
           _velocity = Offset.zero;
-
-          var treeItem = browserController.browserState.items[itemIndex];
+          logger.debug('Gesture: Swipe right on item: $itemIndex');
+          widget.rippleIndicatorKey.currentState?.animateLocal(_offset.dx, _offset.dy);
           safeExecute(() async {
             await browserController.goIntoNode(treeItem);
           });
         }
       }
     }
+  }
+
+  void goIntoHoveredItem(BrowserController browserController) {
+    final (itemIndex, treeItem) = findHoveredItem(browserController);
+    if (itemIndex != null && treeItem != null) {
+      safeExecute(() async {
+        await browserController.goIntoNode(treeItem);
+      });
+    }
+  }
+
+  void addAboveHoveredItem(BrowserController browserController) {
+    final (itemIndex, treeItem) = findHoveredItem(browserController);
+    if (itemIndex != null && treeItem != null) {
+      safeExecute(() {
+        browserController.addNodeAt(itemIndex);
+      });
+    } else {
+      safeExecute(() {
+        browserController.addNodeToTheEnd();
+      });
+    }
+  }
+
+  void moreOptionsOnHoveredItem(BrowserController browserController) {
+    final (itemIndex, treeItem) = findHoveredItem(browserController);
+    if (itemIndex != null && treeItem != null) {
+      safeExecute(() {
+        browserController.showItemOptionsDialog(treeItem, itemIndex);
+      });
+    } else {
+      safeExecute(() {
+        browserController.showPlusOptionsDialog();
+      });
+    }
+  }
+
+  (int?, TreeNode?) findHoveredItem(BrowserController browserController) {
+    double scroll = 0;
+    if (browserController.browserState.scrollController.hasClients) {
+      scroll = browserController.browserState.scrollController.offset;
+    }
+    int itemsCount = browserController.browserState.items.length;
+    var itemIndex = findItemIndexByOffset(_offset.dy + scroll, itemsCount, browserController.itemHeights);
+
+    if (itemIndex == null) {
+      return (null, null);
+    }
+
+    var treeItem = browserController.browserState.items[itemIndex];
+    return (itemIndex, treeItem);
   }
 
   int? findItemIndexByOffset(double y, int itemsCount, Map<int, double> itemHeights) {

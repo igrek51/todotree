@@ -11,7 +11,6 @@ import 'package:todotree/views/components/ripple_indicator.dart';
 import 'package:todotree/views/components/rounded_badge.dart';
 import 'package:todotree/views/tree_browser/browser_controller.dart';
 import 'package:todotree/views/tree_browser/browser_state.dart';
-import 'package:todotree/views/tree_browser/tree_item.dart';
 
 const double _iconButtonInternalSize = 24;
 const double _reoderButtonPaddingH = 12;
@@ -175,7 +174,10 @@ class TreeItemRow extends StatelessWidget {
       constraints: BoxConstraints(),
       style: const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
       onPressed: () {
-        showNodeOptionsDialog(context, treeItem, position);
+        final browserController = Provider.of<BrowserController>(context, listen: false);
+        safeExecute(() {
+          browserController.showItemOptionsDialog(treeItem, position);
+        });
         var (_, centerY, w, _) = getRenderBoxCoordinates(context);
         final xOffset = w - _moreButtonPaddingH - _iconButtonInternalSize / 2;
         rippleIndicatorKey.currentState?.animate(xOffset, centerY);

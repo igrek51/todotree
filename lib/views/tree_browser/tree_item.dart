@@ -6,7 +6,6 @@ import 'package:swipe_to/swipe_to.dart';
 
 import 'package:todotree/util/errors.dart';
 import 'package:todotree/model/tree_node.dart';
-import 'package:todotree/services/node_menu_dialog.dart';
 import 'package:todotree/views/components/ripple_indicator.dart';
 import 'package:todotree/views/tree_browser/browser_controller.dart';
 import 'package:todotree/views/tree_browser/tree_item_row.dart';
@@ -113,7 +112,9 @@ class TreeListItemWidgetState extends State<TreeListItemWidget> with TickerProvi
               });
             },
             onLongPress: () {
-              showNodeOptionsDialog(context, widget.treeItem, widget.position);
+              safeExecute(() {
+                browserController.showItemOptionsDialog(widget.treeItem, widget.position);
+              });
             },
             child: Container(
               padding: const EdgeInsets.all(0.0),
@@ -188,18 +189,4 @@ class TreeListItemWidgetState extends State<TreeListItemWidget> with TickerProvi
 
     return inkWell;
   }
-}
-
-void showNodeOptionsDialog(BuildContext context, TreeNode treeItem, int position) {
-  final browserController = Provider.of<BrowserController>(context, listen: false);
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return NodeMenuDialog.buildForNode(context, treeItem, position);
-    },
-  ).then((value) {
-    if (value != null) {
-      browserController.runNodeMenuAction(value, node: treeItem, position: position);
-    }
-  });
 }

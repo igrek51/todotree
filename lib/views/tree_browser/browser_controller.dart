@@ -4,6 +4,7 @@ import 'package:todotree/model/remote_node.dart';
 
 import 'package:todotree/services/app_lifecycle.dart';
 import 'package:todotree/services/clipboard_manager.dart';
+import 'package:todotree/services/node_menu_dialog.dart';
 import 'package:todotree/services/remote_service.dart';
 import 'package:todotree/services/settings_provider.dart';
 import 'package:todotree/util/errors.dart';
@@ -442,11 +443,9 @@ class BrowserController {
       final remoteUpdateDate = timestampSToString(remoteNode.remoteUpdateTimestamp);
       InfoService.info('Remote node updated.\nUpdated at $remoteUpdateDate');
       renderItems();
-
     } else if (localNode.localUpdateTimestamp == remoteNode.remoteUpdateTimestamp) {
       final remoteUpdateDate = timestampSToString(remoteNode.remoteUpdateTimestamp);
       InfoService.info('Remote is up-to-date. Updated at $remoteUpdateDate');
-
     } else if (localNode.localUpdateTimestamp > remoteNode.remoteUpdateTimestamp) {
       remoteService.updateRemoteNode(localNode);
     }
@@ -462,5 +461,32 @@ class BrowserController {
     ensureNoSelectionMode();
     treeTraverser.locateLinkTarget(link);
     renderAll();
+  }
+
+  void showItemOptionsDialog(TreeNode treeItem, int position) {
+    showDialog(
+      context: navigatorKey.currentContext!,
+      builder: (BuildContext context) {
+        return NodeMenuDialog.buildForNode(context, treeItem, position);
+      },
+    ).then((value) {
+      if (value != null) {
+        runNodeMenuAction(value, node: treeItem, position: position);
+      }
+    });
+  }
+
+  void showPlusOptionsDialog() {
+    showDialog(
+      context: navigatorKey.currentContext!,
+      builder: (BuildContext context) {
+        return NodeMenuDialog.buildForPlus(context);
+      },
+    ).then((value) {
+      if (value != null) {
+        final plusPosition = treeTraverser.currentParent.size;
+        runNodeMenuAction(value, position: plusPosition);
+      }
+    });
   }
 }

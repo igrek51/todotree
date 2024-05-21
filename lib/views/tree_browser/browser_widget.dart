@@ -3,11 +3,13 @@ import 'package:provider/provider.dart';
 import 'package:todotree/services/settings_provider.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:todotree/util/collections.dart';
+import 'package:todotree/util/errors.dart';
 
 import 'package:todotree/views/components/cursor_indicator.dart';
 import 'package:todotree/views/components/cursor_indicator.dart' as cursor_indicator;
 import 'package:todotree/views/components/explosion_indicator.dart';
 import 'package:todotree/views/components/ripple_indicator.dart';
+import 'package:todotree/views/home/home_controller.dart';
 import 'package:todotree/views/tree_browser/browser_controller.dart';
 import 'package:todotree/views/tree_browser/browser_state.dart';
 import 'package:todotree/views/tree_browser/plus_item.dart';
@@ -96,6 +98,7 @@ class TreeListView extends StatelessWidget {
     }
 
     if (settingsProvider.cursorNavigator) {
+      final homeController = Provider.of<HomeController>(context, listen: false);
       listview = Column(
         children: [
           Expanded(child: listview),
@@ -112,9 +115,53 @@ class TreeListView extends StatelessWidget {
             onPanEnd: (DragEndDetails details) {
               cursorIndicatorKey.currentState?.onDragEnd(details, browserController);
             },
-            child: Container(
-              height: cursor_indicator.touchpadHeight,
+            child: Card(
               color: Color(0x5ABEBEBE),
+              child: SizedBox(
+                height: cursor_indicator.touchpadHeight,
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.keyboard_arrow_left, size: 32),
+                      onPressed: () {
+                        safeExecute(() async {
+                          await homeController.goBack();
+                        });
+                      },
+                    ),
+                    Spacer(),
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: Icon(Icons.keyboard_arrow_right, size: 32),
+                          onPressed: () {
+                            safeExecute(() {
+                              cursorIndicatorKey.currentState?.goIntoHoveredItem(browserController);
+                            });
+                          },
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.add, size: 32),
+                          onPressed: () {
+                            safeExecute(() {
+                              cursorIndicatorKey.currentState?.addAboveHoveredItem(browserController);
+                            });
+                          },
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.more_vert, size: 32),
+                          onPressed: () {
+                            safeExecute(() {
+                              cursorIndicatorKey.currentState?.moreOptionsOnHoveredItem(browserController);
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ],
