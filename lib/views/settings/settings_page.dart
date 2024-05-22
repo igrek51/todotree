@@ -52,7 +52,7 @@ class _SettingsPageState extends State<SettingsPage> {
             SettingsTile.switchTile(
               leading: Icon(Icons.folder),
               title: Text('First level folders'),
-              description: Text('Always go inside first-level nodes on tap'),
+              description: Text('Always go inside first-level nodes on tap even if they\'re empty'),
               initialValue: _firstLevelFolders,
               onToggle: (value) {
                 settingsProvider.firstLevelFolders = value;
@@ -100,7 +100,7 @@ class _SettingsPageState extends State<SettingsPage> {
             SettingsTile.switchTile(
               leading: Icon(Icons.navigation),
               title: Text('Cursor Navigator'),
-              description: Text('Navigate with a one-hand swipe panel'),
+              description: Text('Navigate with a one-hand touchpad panel'),
               initialValue: cursorNavigator,
               onToggle: (value) {
                 settingsProvider.cursorNavigator = value;
@@ -145,7 +145,7 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             SettingsTile.navigation(
               leading: Icon(Icons.perm_device_info),
-              title: Text('Grant permission to a backup folder'),
+              title: Text('Grant permission to a new backup folder'),
               onPressed: (BuildContext context) async {
                 final newLocations = await treeStorage.grantBackupLocationUri(settingsProvider.externalBackupLocation);
                 settingsProvider.externalBackupLocation = newLocations;
