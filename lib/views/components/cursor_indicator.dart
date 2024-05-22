@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:provider/provider.dart';
 import 'package:todotree/model/tree_node.dart';
 import 'package:todotree/util/errors.dart';
 import 'package:todotree/util/logger.dart';
@@ -29,19 +28,20 @@ class CursorIndicator extends StatefulWidget {
 
 const double cursrorDiameter = 20;
 const double brakeFactor = 0.99;
-const double alignFactor = 1.1;
+const double alignFactor = 0.9;
 const double velocityTransmission = 1.1;
 const double dragTransmission = 1.4;
 const double overscrollTransmission = 4;
 const double swipeDistanceThreshold = 90.0;
 const double swipeAngleThreshold = 30;
 const double overscrollArea = 100;
+const double touchpadWidth = 250;
 const double touchpadHeight = 200;
 
 class CursorIndicatorState extends State<CursorIndicator> with TickerProviderStateMixin {
   late final AnimationController _animController = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: 2000),
+    duration: const Duration(milliseconds: 2500),
     lowerBound: 0.0,
   );
   Offset _velocity = Offset.zero;
@@ -52,6 +52,9 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
   Offset dragDelta = Offset.zero;
   double w = 0;
   double h = 0;
+
+  double get cursorX => widget.browserController.cursorIndicatorX;
+  double get cursorY => widget.browserController.cursorIndicatorY;
 
   @override
   void dispose() {
@@ -68,7 +71,7 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
     double timeScale = durationUs / 1000000.0;
 
     final RenderBox? renderBox = context.findRenderObject() as RenderBox?;
-    if (w == 0 && widget.browserController.cursorIndicatorX == 0) {
+    if (w == 0 && cursorX == 0) {
       w = renderBox?.size.width ?? 0;
       widget.browserController.cursorIndicatorX = w / 2;
       widget.browserController.cursorIndicatorY = -cursrorDiameter;
@@ -77,13 +80,9 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
     h = ((renderBox?.size.height ?? 0) - touchpadHeight).clampMin(0);
 
     if (w > 0) {
-      final browserState = Provider.of<BrowserState>(context, listen: false);
-
       if (!dragging) {
-        double offsetX =
-            (widget.browserController.cursorIndicatorX + _velocity.dx * velocityTransmission * timeScale).clamp(0, w);
-        double offsetY =
-            (widget.browserController.cursorIndicatorY + _velocity.dy * velocityTransmission * timeScale).clamp(0, h);
+        double offsetX = (cursorX + _velocity.dx * velocityTransmission * timeScale).clamp(0, w);
+        double offsetY = (cursorY + _velocity.dy * velocityTransmission * timeScale).clamp(0, h);
         double velocityX = _velocity.dx * pow(1 - brakeFactor, timeScale);
         double velocityY = _velocity.dy * pow(1 - brakeFactor, timeScale);
         offsetX += (w / 2 - offsetX) * alignFactor * timeScale;
@@ -93,18 +92,19 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
         _velocity = Offset(velocityX, velocityY);
       }
 
-      if (browserState.scrollController.hasClients) {
-        double scroll = browserState.scrollController.offset;
+      final scrollController = widget.browserState.scrollController;
+      if (scrollController.hasClients) {
+        double scroll = scrollController.offset;
 
-        final overscrollUp = overscrollArea - widget.browserController.cursorIndicatorY;
+        final overscrollUp = overscrollArea - cursorY;
         if (overscrollUp > 0 && scroll > 0) {
-          browserState.scrollController.jumpTo(
+          scrollController.jumpTo(
             scroll - overscrollUp * overscrollTransmission * timeScale,
           );
         }
-        final overscrollDown = widget.browserController.cursorIndicatorY + overscrollArea - h;
+        final overscrollDown = cursorY + overscrollArea - h;
         if (overscrollDown > 0) {
-          browserState.scrollController.jumpTo(
+          scrollController.jumpTo(
             scroll + overscrollDown * overscrollTransmission * timeScale,
           );
         }
@@ -117,17 +117,14 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
   void onTap() {
     dragging = false;
     if (_velocity.distance > 50.0) {
-      logger.debug('Gesture: TAP - stop velocity');
       _velocity = Offset.zero;
       return;
     }
 
     _velocity = Offset.zero;
     final (itemIndex, treeItem) = findHoveredItem();
-    logger.debug('Gesture: TAP - click item: $itemIndex');
-    final dx = widget.browserController.cursorIndicatorX;
-    final dy = widget.browserController.cursorIndicatorY;
-    widget.rippleIndicatorKey.currentState?.animateLocal(dx, dy);
+    logger.debug('Gesture: Tap item: $itemIndex');
+    widget.rippleIndicatorKey.currentState?.animateLocal(cursorX, cursorY);
     if (treeItem != null && itemIndex != null) {
       safeExecute(() async {
         await widget.browserController.handleNodeTap(treeItem, itemIndex);
@@ -143,20 +140,16 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
   void onDragUpdate(DragUpdateDetails details) {
     var dx = details.delta.dx;
     var dy = details.delta.dy;
-
     widget.browserController.cursorIndicatorX += dx * dragTransmission;
     widget.browserController.cursorIndicatorY += dy * dragTransmission;
     _velocity = Offset.zero;
-
     dragDelta = details.globalPosition - dragStartPos;
-
     lastTickTimestampUs = DateTime.now().microsecondsSinceEpoch;
     _animController.forward(from: 0);
   }
 
   void onDragEnd(DragEndDetails details) {
     dragging = false;
-
     _velocity = details.velocity.pixelsPerSecond;
 
     if (dragDelta.distance >= swipeDistanceThreshold) {
@@ -171,9 +164,7 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
         if (itemIndex != null && treeItem != null) {
           _velocity = Offset.zero;
           logger.debug('Gesture: Swipe right on item: $itemIndex');
-          final dx = widget.browserController.cursorIndicatorX;
-          final dy = widget.browserController.cursorIndicatorY;
-          widget.rippleIndicatorKey.currentState?.animateLocal(dx, dy);
+          widget.rippleIndicatorKey.currentState?.animateLocal(cursorX, cursorY);
           safeExecute(() async {
             await widget.browserController.goIntoNode(treeItem);
           });
@@ -225,8 +216,7 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
       scroll = browserState.scrollController.offset;
     }
     int itemsCount = browserState.items.length;
-    var itemIndex = findItemIndexByOffset(
-        widget.browserController.cursorIndicatorY + scroll, itemsCount, browserController.itemHeights);
+    var itemIndex = findItemIndexByOffset(cursorY + scroll, itemsCount, browserController.itemHeights);
 
     if (itemIndex == null) {
       return (null, null);
@@ -258,8 +248,8 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
           key: _boxKey,
           children: [
             Positioned(
-              left: widget.browserController.cursorIndicatorX - cursrorDiameter / 2,
-              top: widget.browserController.cursorIndicatorY - cursrorDiameter / 2,
+              left: cursorX - cursrorDiameter / 2,
+              top: cursorY - cursrorDiameter / 2,
               child: Container(
                 width: cursrorDiameter,
                 height: cursrorDiameter,
