@@ -100,7 +100,7 @@ class _SettingsPageState extends State<SettingsPage> {
             SettingsTile.switchTile(
               leading: Icon(Icons.navigation),
               title: Text('Cursor Navigator'),
-              description: Text('Navigate with a one-hand touchpad panel'),
+              description: Text('Traverse with a one-hand navigator pad. Requires restart.'),
               initialValue: cursorNavigator,
               onToggle: (value) {
                 settingsProvider.cursorNavigator = value;
