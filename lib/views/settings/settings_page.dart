@@ -5,6 +5,7 @@ import 'package:todotree/services/database/tree_storage.dart';
 
 import 'package:todotree/services/settings_provider.dart';
 import 'package:todotree/views/components/textfield_dialog.dart';
+import 'package:todotree/views/tree_browser/browser_state.dart';
 
 class SettingsPage extends StatefulWidget {
   @override
@@ -44,6 +45,7 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     final treeStorage = Provider.of<TreeStorage>(context, listen: false);
+    final browserState = Provider.of<BrowserState>(context, listen: false);
     final settingsList = SettingsList(
       sections: [
         SettingsSection(
@@ -100,13 +102,15 @@ class _SettingsPageState extends State<SettingsPage> {
             SettingsTile.switchTile(
               leading: Icon(Icons.navigation),
               title: Text('Cursor Navigator'),
-              description: Text('Traverse with a one-hand navigator pad. Requires restart.'),
+              description: Text('Traverse with a one-hand navigator pad.'),
               initialValue: cursorNavigator,
               onToggle: (value) {
                 settingsProvider.cursorNavigator = value;
                 setState(() {
                   cursorNavigator = value;
                 });
+                browserState.cursorNavigator = value;
+                browserState.notify();
               },
             ),
             SettingsTile.navigation(

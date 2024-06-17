@@ -30,13 +30,15 @@ const double cursrorDiameter = 20;
 const double brakeFactor = 0.99;
 const double alignFactor = 0.9;
 const double velocityTransmission = 1.1;
-const double dragTransmission = 1.4;
-const double overscrollTransmission = 4;
+const double dragTransmission = 1.5;
+const double overscrollTransmission = 2.5;
+const double localOverscrollTransmission = 700;
 const double swipeDistanceThreshold = 70.0;
 const double swipeAngleThreshold = 30;
-const double overscrollArea = 100;
+const double overscrollArea = 70;
 const double touchpadWidth = 250;
 const double touchpadHeight = 200;
+const double localScrollThreshold = 0.25;
 
 class CursorIndicatorState extends State<CursorIndicator> with TickerProviderStateMixin {
   late final AnimationController _animController = AnimationController(
@@ -48,6 +50,7 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
   GlobalKey _boxKey = GlobalKey();
   int lastTickTimestampUs = 0;
   bool dragging = false;
+  double dragLocalY = 0.5;
   Offset dragStartPos = Offset.zero;
   Offset dragDelta = Offset.zero;
   double w = 0;
@@ -96,14 +99,24 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
       if (scrollController.hasClients) {
         double scroll = scrollController.offset;
 
+        final localOverscrollUp = ((localScrollThreshold - dragLocalY) / localScrollThreshold).clampMax(1);
+        final localOverscrollDown = ((dragLocalY - (1 - localScrollThreshold)) / localScrollThreshold).clampMax(1);
         final overscrollUp = overscrollArea - cursorY;
-        if (overscrollUp > 0 && scroll > 0) {
+        final overscrollDown = cursorY + overscrollArea - h;
+
+        if (dragging && localOverscrollUp > 0 && scroll > 0) {
+          scrollController.jumpTo(
+            scroll - localOverscrollUp * localOverscrollTransmission * timeScale,
+          );
+        } else if (dragging && localOverscrollDown > 0) {
+          scrollController.jumpTo(
+            scroll + localOverscrollDown * localOverscrollTransmission * timeScale,
+          );
+        } else if (overscrollUp > 0 && scroll > 0) {
           scrollController.jumpTo(
             scroll - overscrollUp * overscrollTransmission * timeScale,
           );
-        }
-        final overscrollDown = cursorY + overscrollArea - h;
-        if (overscrollDown > 0) {
+        } else if (overscrollDown > 0) {
           scrollController.jumpTo(
             scroll + overscrollDown * overscrollTransmission * timeScale,
           );
@@ -135,6 +148,7 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
   void onDragStart(DragStartDetails details) {
     dragging = true;
     dragStartPos = details.globalPosition;
+    dragLocalY = 0.5;
   }
 
   void onDragUpdate(DragUpdateDetails details) {
@@ -146,6 +160,7 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
     dragDelta = details.globalPosition - dragStartPos;
     lastTickTimestampUs = DateTime.now().microsecondsSinceEpoch;
     _animController.forward(from: 0);
+    dragLocalY = details.localPosition.dy / touchpadHeight;
   }
 
   void onDragEnd(DragEndDetails details) {
