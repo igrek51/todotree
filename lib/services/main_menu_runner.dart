@@ -36,6 +36,16 @@ class MainMenuRunner {
       ));
     }
 
+    if (appFactory.browserController.nodeTrash.isNotEmpty()) {
+      menuActions.add(ActionMenuItem(
+        id: 'restore-from-trash',
+        name: '🗑️ Restore from trash',
+        action: () {
+          appFactory.browserController.restoreFromTrash();
+        },
+      ));
+    }
+
     menuActions.addAll([
       ActionMenuItem(
         id: 'go-step-up',

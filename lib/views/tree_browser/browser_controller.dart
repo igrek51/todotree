@@ -5,6 +5,7 @@ import 'package:todotree/model/remote_node.dart';
 import 'package:todotree/services/app_lifecycle.dart';
 import 'package:todotree/services/clipboard_manager.dart';
 import 'package:todotree/services/node_menu_dialog.dart';
+import 'package:todotree/services/node_trash.dart';
 import 'package:todotree/services/remote_service.dart';
 import 'package:todotree/services/settings_provider.dart';
 import 'package:todotree/util/errors.dart';
@@ -37,6 +38,7 @@ class BrowserController {
   int lastSelectedIndex = -1;
   double cursorIndicatorX = 0;
   double cursorIndicatorY = 0;
+  NodeTrash nodeTrash = NodeTrash();
 
   BrowserController(this.homeState, this.browserState, this.treeTraverser, this.clipboardManager, this.appLifecycle,
       this.settingsProvider, this.remoteService);
@@ -178,13 +180,14 @@ class BrowserController {
   }
 
   void removeOneNode(TreeNode node) {
-    final originalPosition = treeTraverser.getChildIndex(node);
+    final originalPosition = treeTraverser.getChildIndex(node) ?? 0;
     final removedHeight = itemHeights[originalPosition] ?? 0;
     final parent = treeTraverser.currentParent;
     treeTraverser.removeFromCurrent(node);
     remoteService.checkUnsavedRemoteChanges();
+    nodeTrash.putToTrash(node, originalPosition, parent);
 
-    if (originalPosition != null && originalPosition < treeTraverser.currentParent.size) {
+    if (originalPosition < treeTraverser.currentParent.size) {
       offsetAnimationRequests[originalPosition] = removedHeight;
     }
 
@@ -192,32 +195,28 @@ class BrowserController {
     explosionIndicatorKey.currentState?.animate();
 
     InfoService.snackbarAction('Removed: ${node.name}', 'UNDO', () {
-      treeTraverser.addChildToNode(parent, node, position: originalPosition);
-      remoteService.checkUnsavedRemoteChanges();
+      nodeTrash.restore(this);
       renderItems();
-      InfoService.info('Node restored: ${node.name}');
     });
   }
 
   void removeMultipleNodes(List<int> sortedPositions) {
     List<Pair<int, TreeNode>> originalNodePositions =
         sortedPositions.map((index) => Pair(index, treeTraverser.getChild(index))).toList();
+    final parent = treeTraverser.currentParent;
+    nodeTrash.emptyBin(parent: parent);
     for (final pair in originalNodePositions) {
       treeTraverser.removeFromCurrent(pair.second);
+      nodeTrash.addToTrash(pair.second, pair.first);
     }
     remoteService.checkUnsavedRemoteChanges();
     treeTraverser.cancelSelection();
-    final parent = treeTraverser.currentParent;
 
     renderItems();
     explosionIndicatorKey.currentState?.animate();
     InfoService.snackbarAction('Removed: ${sortedPositions.length}', 'UNDO', () {
-      for (final pair in originalNodePositions) {
-        treeTraverser.addChildToNode(parent, pair.second, position: pair.first);
-      }
-      remoteService.checkUnsavedRemoteChanges();
+      nodeTrash.restore(this);
       renderItems();
-      InfoService.info('Nodes restored: ${originalNodePositions.length}');
     });
   }
 
@@ -240,28 +239,24 @@ class BrowserController {
   }
 
   void removeLinkAndTarget(TreeNode link) {
-    final originalLinkPosition = treeTraverser.getChildIndex(link);
-    final target = treeTraverser.findLinkTarget(link.name);
-    final targetParent = target?.parent;
+    final originalLinkPosition = treeTraverser.getChildIndex(link) ?? 0;
+    final linkTarget = treeTraverser.findLinkTarget(link.name);
+    final linkTargetParent = linkTarget?.parent;
     int? originalTargetPosition;
-    if (target != null && targetParent != null) {
-      originalTargetPosition = targetParent.children.indexOf(target).nonNegative();
-      treeTraverser.removeFromParent(target, targetParent);
+    if (linkTarget != null && linkTargetParent != null) {
+      originalTargetPosition = linkTargetParent.children.indexOf(linkTarget).nonNegative();
+      treeTraverser.removeFromParent(linkTarget, linkTargetParent);
     }
     treeTraverser.removeFromCurrent(link);
     final parent = treeTraverser.currentParent;
     remoteService.checkUnsavedRemoteChanges();
+    nodeTrash.putLinkAndTarget(link, originalLinkPosition, parent, linkTarget, originalTargetPosition, linkTargetParent);
 
     renderItems();
     explosionIndicatorKey.currentState?.animate();
     InfoService.snackbarAction('Link & target removed: ${link.name}', 'UNDO', () {
-      treeTraverser.addChildToNode(parent, link, position: originalLinkPosition);
-      if (target != null && targetParent != null && originalTargetPosition != null) {
-        targetParent.insertAt(originalTargetPosition, target);
-      }
-      remoteService.checkUnsavedRemoteChanges();
+      nodeTrash.restore(this);
       renderItems();
-      InfoService.info('Link & target restored: ${link.name}');
     });
   }
 
@@ -490,5 +485,10 @@ class BrowserController {
         runNodeMenuAction(value, position: plusPosition);
       }
     });
+  }
+
+  void restoreFromTrash() {
+    nodeTrash.restore(this);
+    renderItems();
   }
 }
