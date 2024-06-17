@@ -29,8 +29,9 @@ class _BrowserWidgetState extends State<BrowserWidget> {
   Widget build(BuildContext context) {
     final settingsProvider = Provider.of<SettingsProvider>(context, listen: false);
     final browserController = Provider.of<BrowserController>(context, listen: false);
-    final browserState = Provider.of<BrowserState>(context, listen: false);
-    var cursorIndicator = settingsProvider.cursorNavigator
+    final browserState = context.watch<BrowserState>();
+    browserState.cursorNavigator = settingsProvider.cursorNavigator;
+    var cursorIndicator = browserState.cursorNavigator
         ? CursorIndicator(
             key: _cursorIndicatorKey,
             rippleIndicatorKey: _rippleIndicatorKey,
@@ -103,7 +104,7 @@ class TreeListView extends StatelessWidget {
       );
     }
 
-    if (settingsProvider.cursorNavigator) {
+    if (browserState.cursorNavigator) {
       final homeController = Provider.of<HomeController>(context, listen: false);
       listview = Column(
         children: [
