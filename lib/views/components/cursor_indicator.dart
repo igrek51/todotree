@@ -36,12 +36,13 @@ const double localOverscrollTransmission = 700;
 const double swipeDistanceThreshold = 70.0;
 const double swipeAngleThreshold = 30;
 const double overscrollArea = 70;
-const double touchpadWidth = 250;
+const double touchpadWidth = 150;
 const double touchpadHeight = 200;
 const double localScrollThreshold = 0.25;
 
 class CursorIndicatorState extends State<CursorIndicator> with TickerProviderStateMixin {
   late final AnimationController _animController = AnimationController(
+    value: 1.0,
     vsync: this,
     duration: const Duration(milliseconds: 2500),
     lowerBound: 0.0,
@@ -88,7 +89,7 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
         double offsetY = (cursorY + _velocity.dy * velocityTransmission * timeScale).clamp(0, h);
         double velocityX = _velocity.dx * pow(1 - brakeFactor, timeScale);
         double velocityY = _velocity.dy * pow(1 - brakeFactor, timeScale);
-        offsetX += (w / 2 - offsetX) * alignFactor * timeScale;
+        // offsetX += (w / 2 - offsetX) * alignFactor * timeScale;
 
         widget.browserController.cursorIndicatorX = offsetX;
         widget.browserController.cursorIndicatorY = offsetY;
@@ -104,7 +105,7 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
         final overscrollUp = overscrollArea - cursorY;
         final overscrollDown = cursorY + overscrollArea - h;
 
-        if (dragging && localOverscrollUp > 0 && scroll > 0) {
+        if (dragging && localOverscrollUp > 0) {
           scrollController.jumpTo(
             scroll - localOverscrollUp * localOverscrollTransmission * timeScale,
           );
@@ -253,6 +254,18 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
     return null;
   }
 
+  void collapseNavigatorPad() {
+    final browserState = widget.browserState;
+    browserState.cursorNavigatorCollapsed = true;
+    browserState.notify();
+  }
+
+  void expandNavigatorPad() {
+    final browserState = widget.browserState;
+    browserState.cursorNavigatorCollapsed = false;
+    browserState.notify();
+  }
+
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
@@ -270,7 +283,7 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
                 height: cursrorDiameter,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Color.fromARGB(255, 241, 165, 77).withOpacity(0.6 * (1 - _animController.value) + 0.1),
+                  color: Color.fromARGB(255, 241, 165, 77).withOpacity(0.7 * (1 - _animController.value)),
                 ),
               ),
             )
