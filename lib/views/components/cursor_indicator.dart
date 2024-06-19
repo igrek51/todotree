@@ -33,12 +33,13 @@ const double velocityTransmission = 1.1;
 const double dragTransmission = 1.6;
 const double overscrollTransmission = 2.5;
 const double localOverscrollTransmission = 700;
-const double swipeDistanceThreshold = 70.0;
+const double swipeDistanceThreshold = 60.0;
 const double swipeAngleThreshold = 30;
 const double overscrollArea = 70;
 const double touchpadWidth = 150;
 const double touchpadHeight = 200;
 const double localScrollThreshold = 0.25;
+const bool swipeRightEnabled = false;
 
 class CursorIndicatorState extends State<CursorIndicator> with TickerProviderStateMixin {
   late final AnimationController _animController = AnimationController(
@@ -105,7 +106,7 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
         final overscrollUp = overscrollArea - cursorY;
         final overscrollDown = cursorY + overscrollArea - h;
 
-        if (dragging && localOverscrollUp > 0) {
+        if (dragging && localOverscrollUp > 0 && scroll > 0) {
           scrollController.jumpTo(
             scroll - localOverscrollUp * localOverscrollTransmission * timeScale,
           );
@@ -174,8 +175,9 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
       if (angle >= 180 - swipeAngleThreshold || angle <= -180 + swipeAngleThreshold) {
         logger.debug('Gesture: Swipe left');
         _velocity = Offset.zero;
+        widget.browserController.cursorIndicatorX = w / 2;
         widget.browserController.goBack();
-      } else if (angle <= swipeAngleThreshold && angle >= -swipeAngleThreshold) {
+      } else if (angle <= swipeAngleThreshold && angle >= -swipeAngleThreshold && swipeRightEnabled) {
         final (itemIndex, treeItem) = findHoveredItem();
         if (itemIndex != null && treeItem != null) {
           _velocity = Offset.zero;
