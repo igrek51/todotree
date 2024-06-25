@@ -37,9 +37,9 @@ const double overscrollArea = 60;
 const double touchpadWidth = 150; // empty space inside
 const double touchpadHeight = 200;
 const double localScrollThreshold = 0.25;
-const int gestureTimeMs = 300;
-const bool swipeRightEnabled = true;
-const double swipeDistanceThreshold = 0.7;
+const int gestureTimeMs = 250;
+const bool swipeRightEnabled = false;
+const double swipeDistanceThreshold = 0.5;
 const double swipeAngleThreshold = 30;
 
 class CursorIndicatorState extends State<CursorIndicator> with TickerProviderStateMixin {
@@ -188,6 +188,7 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
         final angle = atan2(dy, dx) * 180.0 / pi; // [0; 180] on top, [0; -180] on bottom
         final detected = detectGesturesStep2(angle);
         if (detected) {
+          _velocity = Offset.zero;
           gesturePoints.clear();
         }
       }
@@ -197,7 +198,6 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
   bool detectGesturesStep2(double angle) {
     if (angle >= 180 - swipeAngleThreshold || angle <= -180 + swipeAngleThreshold) {
       logger.debug('Gesture: Swipe left');
-      _velocity = Offset.zero;
       widget.browserController.cursorIndicatorX = w / 2;
       widget.browserController.goBack();
       return true;
@@ -205,8 +205,7 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
       final (itemIndex, treeItem) = findHoveredItem();
       if (itemIndex != null && treeItem != null) {
         logger.debug('Gesture: Swipe right on item: $itemIndex');
-        gesturePoints.clear();
-        _velocity = Offset.zero;
+        widget.browserController.cursorIndicatorX = w / 2;
         widget.rippleIndicatorKey.currentState?.animateLocal(cursorX, cursorY);
         safeExecute(() async {
           await widget.browserController.goIntoNode(treeItem);
