@@ -33,13 +33,14 @@ const double velocityTransmission = 1.1;
 const double dragTransmission = 1.6;
 const double overscrollTransmission = 3.0;
 const double localOverscrollTransmission = 700;
-const double swipeDistanceThreshold = 60.0;
-const double swipeAngleThreshold = 30;
 const double overscrollArea = 60;
-const double touchpadWidth = 150;
+const double touchpadWidth = 150; // empty space inside
 const double touchpadHeight = 200;
 const double localScrollThreshold = 0.25;
-const bool swipeRightEnabled = false;
+const int gestureTimeMs = 300;
+const bool swipeRightEnabled = true;
+const double swipeDistanceThreshold = 0.7;
+const double swipeAngleThreshold = 30;
 
 class CursorIndicatorState extends State<CursorIndicator> with TickerProviderStateMixin {
   late final AnimationController _animController = AnimationController(
@@ -57,6 +58,7 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
   Offset dragDelta = Offset.zero;
   double w = 0;
   double h = 0;
+  List<GesturePoint> gesturePoints = [];
 
   double get cursorX => widget.browserController.cursorIndicatorX;
   double get cursorY => widget.browserController.cursorIndicatorY;
@@ -131,6 +133,7 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
 
   void onTap() {
     dragging = false;
+    gesturePoints.clear();
     if (_velocity.distance > 50.0) {
       _velocity = Offset.zero;
       return;
@@ -151,6 +154,10 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
     dragging = true;
     dragStartPos = details.globalPosition;
     dragLocalY = 0.5;
+    gesturePoints.clear();
+    final localRelX = details.localPosition.dx / touchpadHeight;
+    final localRelY = details.localPosition.dy / touchpadHeight;
+    gesturePoints.add(GesturePoint(x: localRelX, y: localRelY));
   }
 
   void onDragUpdate(DragUpdateDetails details) {
@@ -163,32 +170,57 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
     lastTickTimestampUs = DateTime.now().microsecondsSinceEpoch;
     _animController.forward(from: 0);
     dragLocalY = details.localPosition.dy / touchpadHeight;
+
+    final localRelX = details.localPosition.dx / touchpadHeight;
+    final localRelY = details.localPosition.dy / touchpadHeight;
+    gesturePoints.add(GesturePoint(x: localRelX, y: localRelY));
+    detectGestures();
+  }
+
+  void detectGestures() {
+    final timeCutOff = DateTime.now().millisecondsSinceEpoch - gestureTimeMs;
+    gesturePoints.removeWhere((point) => point.timeMs < timeCutOff);
+    if (gesturePoints.length >= 2) {
+      final dx = gesturePoints.last.x - gesturePoints.first.x;
+      final dy = gesturePoints.last.y - gesturePoints.first.y;
+      final dragDeltaDistance = sqrt(dx * dx + dy * dy);
+      if (dragDeltaDistance >= swipeDistanceThreshold) {
+        final angle = atan2(dy, dx) * 180.0 / pi; // [0; 180] on top, [0; -180] on bottom
+        final detected = detectGesturesStep2(angle);
+        if (detected) {
+          gesturePoints.clear();
+        }
+      }
+    }
+  }
+
+  bool detectGesturesStep2(double angle) {
+    if (angle >= 180 - swipeAngleThreshold || angle <= -180 + swipeAngleThreshold) {
+      logger.debug('Gesture: Swipe left');
+      _velocity = Offset.zero;
+      widget.browserController.cursorIndicatorX = w / 2;
+      widget.browserController.goBack();
+      return true;
+    } else if (angle <= swipeAngleThreshold && angle >= -swipeAngleThreshold && swipeRightEnabled) {
+      final (itemIndex, treeItem) = findHoveredItem();
+      if (itemIndex != null && treeItem != null) {
+        logger.debug('Gesture: Swipe right on item: $itemIndex');
+        gesturePoints.clear();
+        _velocity = Offset.zero;
+        widget.rippleIndicatorKey.currentState?.animateLocal(cursorX, cursorY);
+        safeExecute(() async {
+          await widget.browserController.goIntoNode(treeItem);
+        });
+        return true;
+      }
+    }
+    return false;
   }
 
   void onDragEnd(DragEndDetails details) {
     dragging = false;
     _velocity = details.velocity.pixelsPerSecond;
-
-    if (dragDelta.distance >= swipeDistanceThreshold) {
-      final angle = dragDelta.direction * 180.0 / pi; // [0; 180] on top, [0; -180] on bottom
-
-      if (angle >= 180 - swipeAngleThreshold || angle <= -180 + swipeAngleThreshold) {
-        logger.debug('Gesture: Swipe left');
-        _velocity = Offset.zero;
-        widget.browserController.cursorIndicatorX = w / 2;
-        widget.browserController.goBack();
-      } else if (angle <= swipeAngleThreshold && angle >= -swipeAngleThreshold && swipeRightEnabled) {
-        final (itemIndex, treeItem) = findHoveredItem();
-        if (itemIndex != null && treeItem != null) {
-          _velocity = Offset.zero;
-          logger.debug('Gesture: Swipe right on item: $itemIndex');
-          widget.rippleIndicatorKey.currentState?.animateLocal(cursorX, cursorY);
-          safeExecute(() async {
-            await widget.browserController.goIntoNode(treeItem);
-          });
-        }
-      }
-    }
+    gesturePoints.clear();
   }
 
   void goIntoHoveredItem() {
@@ -294,4 +326,13 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
       },
     );
   }
+}
+
+class GesturePoint {
+  double x;
+  double y;
+  int timeMs;
+
+  GesturePoint({required this.x, required this.y, int? timeMs})
+      : timeMs = timeMs ?? DateTime.now().millisecondsSinceEpoch;
 }
