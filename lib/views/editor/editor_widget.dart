@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:todotree/services/settings_provider.dart';
 
 import 'package:todotree/util/errors.dart';
 import 'package:todotree/views/editor/editor_controller.dart';
@@ -12,6 +13,7 @@ class EditorWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final editorState = context.watch<EditorState>();
     final editorController = Provider.of<EditorController>(context, listen: false);
+    final settingsProvider = Provider.of<SettingsProvider>(context, listen: false);
 
     final textField = TextField(
       controller: editorState.editTextController,
@@ -171,6 +173,18 @@ class EditorWidget extends StatelessWidget {
         },
       ),
     ];
+    if (settingsProvider.showSaveAndGoInside) {
+      rowSaveAuxBtns.add(FlatButton(
+        icon: Icon(Icons.check),
+        label: '& Go Inside',
+        tooltip: 'Save and enter into this item',
+        onPressed: () {
+          safeExecute(() {
+            editorController.saveAndEnter();
+          });
+        },
+      ));
+    }
     final rowSaveBtns = [
       FlatButton(
         icon: Icon(Icons.check),

@@ -60,4 +60,11 @@ class SettingsProvider {
   set cursorNavigator(bool value) {
     sharedPreferences?.setBool('cursorNavigator', value);
   }
+
+  bool get showSaveAndGoInside {
+    return sharedPreferences?.getBool('showSaveAndGoInside') ?? false;
+  }
+  set showSaveAndGoInside(bool value) {
+    sharedPreferences?.setBool('showSaveAndGoInside', value);
+  }
 }

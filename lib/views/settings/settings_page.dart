@@ -20,6 +20,7 @@ class _SettingsPageState extends State<SettingsPage> {
   bool swipeNavigation = false;
   bool largeFont = false;
   bool cursorNavigator = false;
+  bool showSaveAndGoInside = false;
 
   SettingsProvider settingsProvider = SettingsProvider();
 
@@ -33,6 +34,7 @@ class _SettingsPageState extends State<SettingsPage> {
       swipeNavigation = settingsProvider.swipeNavigation;
       largeFont = settingsProvider.largeFont;
       cursorNavigator = settingsProvider.cursorNavigator;
+      showSaveAndGoInside = settingsProvider.showSaveAndGoInside;
     });
   }
 
@@ -111,6 +113,18 @@ class _SettingsPageState extends State<SettingsPage> {
                 });
                 browserState.cursorNavigator = value;
                 browserState.notify();
+              },
+            ),
+            SettingsTile.switchTile(
+              leading: Icon(Icons.navigation),
+              title: Text('Save & Go Inside'),
+              description: Text('Show Save & Go Inside button in the editor'),
+              initialValue: showSaveAndGoInside,
+              onToggle: (value) {
+                settingsProvider.showSaveAndGoInside = value;
+                setState(() {
+                  showSaveAndGoInside = value;
+                });
               },
             ),
             SettingsTile.navigation(
