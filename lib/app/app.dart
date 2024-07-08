@@ -30,6 +30,7 @@ class _AppWidgetState extends State<AppWidget> with WidgetsBindingObserver {
       ChangeNotifierProvider(create: (context) => widget.appFactory.homeState),
       ChangeNotifierProvider(create: (context) => widget.appFactory.browserState),
       ChangeNotifierProvider(create: (context) => widget.appFactory.editorState),
+      ChangeNotifierProvider(create: (context) => widget.appFactory.cursorState),
       Provider<HomeController>(create: (context) => widget.appFactory.homeController),
       Provider<BrowserController>(create: (context) => widget.appFactory.browserController),
       Provider<EditorController>(create: (context) => widget.appFactory.editorController),

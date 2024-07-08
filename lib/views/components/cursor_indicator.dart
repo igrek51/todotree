@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:provider/provider.dart';
 import 'package:todotree/model/tree_node.dart';
 import 'package:todotree/util/errors.dart';
 import 'package:todotree/util/logger.dart';
@@ -9,17 +10,20 @@ import 'package:todotree/util/numbers.dart';
 import 'package:todotree/views/components/ripple_indicator.dart';
 import 'package:todotree/views/tree_browser/browser_controller.dart';
 import 'package:todotree/views/tree_browser/browser_state.dart';
+import 'package:todotree/views/tree_browser/cursor_state.dart';
 
 class CursorIndicator extends StatefulWidget {
   CursorIndicator({
     super.key,
     required this.rippleIndicatorKey,
     required this.browserController,
+    required this.cursorState,
     required this.browserState,
   });
 
   final GlobalKey<RippleIndicatorState> rippleIndicatorKey;
   final BrowserController browserController;
+  final CursorState cursorState;
   final BrowserState browserState;
 
   @override
@@ -38,7 +42,7 @@ const double touchpadWidth = 150; // empty space inside
 const double touchpadHeight = 200;
 const double localScrollThreshold = 0.25;
 const int gestureTimeMs = 250;
-const bool swipeRightEnabled = false;
+const bool swipeRightEnabled = true;
 const double swipeDistanceThreshold = 0.5;
 const double swipeAngleThreshold = 30;
 
@@ -288,19 +292,22 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
   }
 
   void collapseNavigatorPad() {
-    final browserState = widget.browserState;
-    browserState.cursorNavigatorCollapsed = true;
-    browserState.notify();
+    widget.cursorState.cursorNavigatorCollapsed = true;
+    widget.cursorState.notify();
   }
 
   void expandNavigatorPad() {
-    final browserState = widget.browserState;
-    browserState.cursorNavigatorCollapsed = false;
-    browserState.notify();
+    widget.cursorState.cursorNavigatorCollapsed = false;
+    widget.cursorState.notify();
   }
 
   @override
   Widget build(BuildContext context) {
+    final cursorState = context.watch<CursorState>();
+    if (!cursorState.cursorNavigator || cursorState.cursorNavigatorCollapsed) {
+      return Container();
+    }
+
     return AnimatedBuilder(
       animation: CurvedAnimation(parent: _animController, curve: Curves.linear),
       builder: (context, child) {

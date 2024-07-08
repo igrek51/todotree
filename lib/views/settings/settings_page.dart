@@ -5,7 +5,7 @@ import 'package:todotree/services/database/tree_storage.dart';
 
 import 'package:todotree/services/settings_provider.dart';
 import 'package:todotree/views/components/textfield_dialog.dart';
-import 'package:todotree/views/tree_browser/browser_state.dart';
+import 'package:todotree/views/tree_browser/cursor_state.dart';
 
 class SettingsPage extends StatefulWidget {
   @override
@@ -47,7 +47,7 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     final treeStorage = Provider.of<TreeStorage>(context, listen: false);
-    final browserState = Provider.of<BrowserState>(context, listen: false);
+    final cursorState = Provider.of<CursorState>(context, listen: false);
     final settingsList = SettingsList(
       sections: [
         SettingsSection(
@@ -111,8 +111,8 @@ class _SettingsPageState extends State<SettingsPage> {
                 setState(() {
                   cursorNavigator = value;
                 });
-                browserState.cursorNavigator = value;
-                browserState.notify();
+                cursorState.cursorNavigator = value;
+                cursorState.notify();
               },
             ),
             SettingsTile.switchTile(

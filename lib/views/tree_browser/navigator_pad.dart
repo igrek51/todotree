@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:todotree/views/components/cursor_indicator.dart';
 import 'package:todotree/views/components/cursor_indicator.dart' as cursor_indicator;
 import 'package:todotree/views/home/home_controller.dart';
-import 'package:todotree/views/tree_browser/browser_state.dart';
+import 'package:todotree/views/tree_browser/cursor_state.dart';
 
 class NavigatorPad extends StatelessWidget {
   const NavigatorPad({
@@ -19,9 +19,9 @@ class NavigatorPad extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final browserState = context.watch<BrowserState>();
+    final cursorState = context.watch<CursorState>();
 
-    if (browserState.cursorNavigatorCollapsed) {
+    if (cursorState.cursorNavigatorCollapsed) {
       return Card(
         color: const Color(0x39BEBEBE),
         child: Row(

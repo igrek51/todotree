@@ -16,11 +16,13 @@ import 'package:todotree/views/tree_browser/browser_controller.dart';
 import 'package:todotree/views/tree_browser/browser_state.dart';
 import 'package:todotree/views/home/home_controller.dart';
 import 'package:todotree/views/editor/editor_state.dart';
+import 'package:todotree/views/tree_browser/cursor_state.dart';
 
 class AppFactory {
   late final HomeState homeState;
   late final BrowserState browserState;
   late final EditorState editorState;
+  late final CursorState cursorState;
 
   late final HomeController homeController;
   late final BrowserController browserController;
@@ -45,6 +47,7 @@ class AppFactory {
     homeState = HomeState();
     browserState = BrowserState();
     editorState = EditorState();
+    cursorState = CursorState();
     yamlTreeSerializer = YamlTreeSerializer();
     yamlTreeDeserializer = YamlTreeDeserializer();
     backupManager = BackupManager();

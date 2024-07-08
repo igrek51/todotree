@@ -10,6 +10,7 @@ import 'package:todotree/views/components/ripple_indicator.dart';
 import 'package:todotree/views/home/home_controller.dart';
 import 'package:todotree/views/tree_browser/browser_controller.dart';
 import 'package:todotree/views/tree_browser/browser_state.dart';
+import 'package:todotree/views/tree_browser/cursor_state.dart';
 import 'package:todotree/views/tree_browser/navigator_pad.dart';
 import 'package:todotree/views/tree_browser/plus_item.dart';
 import 'package:todotree/views/tree_browser/tree_item.dart';
@@ -29,20 +30,29 @@ class _BrowserWidgetState extends State<BrowserWidget> {
   Widget build(BuildContext context) {
     final settingsProvider = Provider.of<SettingsProvider>(context, listen: false);
     final browserController = Provider.of<BrowserController>(context, listen: false);
-    final browserState = context.watch<BrowserState>();
-    browserState.cursorNavigator = settingsProvider.cursorNavigator;
-    var cursorIndicator = browserState.cursorNavigator
-        ? CursorIndicator(
-            key: _cursorIndicatorKey,
-            rippleIndicatorKey: _rippleIndicatorKey,
-            browserController: browserController,
-            browserState: browserState,
-          )
-        : null;
+    final browserStateImmut = Provider.of<BrowserState>(context, listen: false);
+    final cursorStateImmut = Provider.of<CursorState>(context, listen: false);
+    cursorStateImmut.cursorNavigator = settingsProvider.cursorNavigator;
+    // final cursorState = context.watch<CursorState>();
+    // var cursorIndicator = cursorStateImmut.cursorNavigator
+    //     ? CursorIndicator(
+    //         key: _cursorIndicatorKey,
+    //         rippleIndicatorKey: _rippleIndicatorKey,
+    //         browserController: browserController,
+    //         cursorState: cursorState,
+    //         browserState: browserStateImmut,
+    //       )
+    //     : null;
     return Stack(
       children: [
         RippleIndicator(key: _rippleIndicatorKey),
-        cursorIndicator,
+        CursorIndicator(
+            key: _cursorIndicatorKey,
+            rippleIndicatorKey: _rippleIndicatorKey,
+            browserController: browserController,
+            cursorState: cursorStateImmut,
+            browserState: browserStateImmut,
+          ),
         ExplosionIndicator(key: explosionIndicatorKey),
         TreeListView(rippleIndicatorKey: _rippleIndicatorKey, cursorIndicatorKey: _cursorIndicatorKey),
       ].filterNotNull(),
@@ -63,6 +73,7 @@ class TreeListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final browserState = context.watch<BrowserState>();
+    final cursorState = context.watch<CursorState>();
     final browserController = Provider.of<BrowserController>(context, listen: false);
     final settingsProvider = Provider.of<SettingsProvider>(context, listen: false);
 
@@ -104,7 +115,7 @@ class TreeListView extends StatelessWidget {
       );
     }
 
-    if (browserState.cursorNavigator) {
+    if (cursorState.cursorNavigator) {
       final homeController = Provider.of<HomeController>(context, listen: false);
       listview = Column(
         children: [

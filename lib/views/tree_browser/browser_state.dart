@@ -8,8 +8,6 @@ class BrowserState extends ChangeNotifier {
   bool atRoot = false;
   Set<int> selectedIndexes = {};
   ScrollController scrollController = ScrollController();
-  bool cursorNavigator = false;
-  bool cursorNavigatorCollapsed = true;
 
   void notify() {
     notifyListeners();
