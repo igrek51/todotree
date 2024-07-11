@@ -38,12 +38,12 @@ const double overscrollTransmission = 3.0;
 const double localOverscrollTransmission = 700;
 const double overscrollArea = 60;
 const double touchpadWidth = 150; // empty space inside
-const double touchpadHeight = 200;
+const double touchpadHeight = 250;
 const double localScrollThreshold = 0.25;
-const int gestureTimeMs = 250;
-const int gestureCooldownMs = 350;
+const int gestureTimeMs = 300;
+const int gestureCooldownMs = 500;
 const bool swipeRightEnabled = true;
-const double swipeDistanceThreshold = 0.5;
+const double swipeDistanceThreshold = 0.4;
 const double swipeAngleThreshold = 30;
 
 class CursorIndicatorState extends State<CursorIndicator> with TickerProviderStateMixin {
@@ -186,36 +186,46 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
     final timeCutOff = now - gestureTimeMs;
     gesturePoints.removeWhere((point) => point.timeMs < timeCutOff);
     if (gesturePoints.length < 2) return;
-    final dx = gesturePoints.last.x - gesturePoints.first.x;
-    final dy = gesturePoints.last.y - gesturePoints.first.y;
-    final dragDeltaDistance = sqrt(dx * dx + dy * dy);
     if (now - lastGestureActivationTimeMs < gestureCooldownMs) return;
-    if (dragDeltaDistance < swipeDistanceThreshold) return;
+
+    final lastPoint = gesturePoints.last;
+    for (int i = gesturePoints.length - 2; i >= 0; i--) {
+      final iPoint = gesturePoints[i];
+      final dx = lastPoint.x - iPoint.x;
+      final dy = lastPoint.y - iPoint.y;
+      final detected = detectGesturesStep2(dx, dy, now);
+      if (detected) return;
+    }
+  }
+
+  bool detectGesturesStep2(double dx, dy, int now) {
+    final dragDeltaDistance = sqrt(dx * dx + dy * dy);
+    if (dragDeltaDistance < swipeDistanceThreshold) return false;
     final angle = atan2(dy, dx) * 180.0 / pi; // [0; 180] on top, [0; -180] on bottom
-    final detected = detectGesturesStep2(angle);
-    if (!detected) return;
+    final detected = detectGesturesStep3(angle);
+    if (!detected) return false;
     _velocity = Offset.zero;
     gesturePoints.clear();
     lastGestureActivationTimeMs = now;
+    return true;
   }
 
-  bool detectGesturesStep2(double angle) {
+  bool detectGesturesStep3(double angle) {
     if (angle >= 180 - swipeAngleThreshold || angle <= -180 + swipeAngleThreshold) {
       logger.debug('Gesture: Swipe left');
-      widget.browserController.cursorIndicatorX = w / 2;
+      // widget.browserController.cursorIndicatorX = w / 2;
       widget.browserController.goBack();
       return true;
     } else if (angle <= swipeAngleThreshold && angle >= -swipeAngleThreshold && swipeRightEnabled) {
       final (itemIndex, treeItem) = findHoveredItem();
-      if (itemIndex != null && treeItem != null) {
-        logger.debug('Gesture: Swipe right on item: $itemIndex');
-        widget.browserController.cursorIndicatorX = w / 2;
-        widget.rippleIndicatorKey.currentState?.animateLocal(cursorX, cursorY);
-        safeExecute(() async {
-          await widget.browserController.goIntoNode(treeItem);
-        });
-        return true;
-      }
+      if (itemIndex == null || treeItem == null) return true;
+      logger.debug('Gesture: Swipe right on item: $itemIndex');
+      // widget.browserController.cursorIndicatorX = w / 2;
+      widget.rippleIndicatorKey.currentState?.animateLocal(cursorX, cursorY);
+      safeExecute(() async {
+        await widget.browserController.goIntoNode(treeItem);
+      });
+      return true;
     }
     return false;
   }
