@@ -47,8 +47,7 @@ class ClipboardManager {
     copyItems(treeTraverser, treeTraverser.selectedIndexes, info: true);
   }
 
-  void copyItems(TreeTraverser treeTraverser, Set<int> itemPositions,
-      {bool info = true, bool cut = false}) {
+  void copyItems(TreeTraverser treeTraverser, Set<int> itemPositions, {bool info = true, bool cut = false}) {
     if (itemPositions.isEmpty) {
       if (info) InfoService.info('Nothing selected');
       return;
@@ -102,8 +101,7 @@ class ClipboardManager {
       if (systemClipboard == null) {
         return InfoService.info('Clipboard is empty');
       }
-      treeTraverser.addChildToCurrent(TreeNode.textNode(systemClipboard),
-          position: position);
+      treeTraverser.addChildToCurrent(TreeNode.textNode(systemClipboard), position: position);
       InfoService.info('Pasted from system clipboard: $systemClipboard');
       return;
     }

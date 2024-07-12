@@ -96,12 +96,14 @@ class TreeTraverser {
 
   void removeFromCurrent(TreeNode item) {
     currentParent.remove(item);
+    item.parent = null;
     unsavedChanges = true;
     focusNode = null;
   }
 
   void removeFromParent(TreeNode item, TreeNode parent) {
     parent.remove(item);
+    item.parent = null;
     unsavedChanges = true;
   }
 

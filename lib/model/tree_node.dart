@@ -17,12 +17,16 @@ class TreeNode {
 
   TreeNode clone() {
     final newChildren = children.map((child) => child.clone()).toList();
-    return TreeNode(
+    final newNode = TreeNode(
       name: name,
       parent: parent,
       children: newChildren,
       type: type,
     );
+    for (final child in newChildren) {
+      child.parent = newNode;
+    }
+    return newNode;
   }
 
   static TreeNode rootNode() {
