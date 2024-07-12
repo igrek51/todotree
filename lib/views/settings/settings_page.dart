@@ -116,7 +116,7 @@ class _SettingsPageState extends State<SettingsPage> {
               },
             ),
             SettingsTile.switchTile(
-              leading: Icon(Icons.navigation),
+              leading: Icon(Icons.save),
               title: Text('Save & Go Inside'),
               description: Text('Show Save & Go Inside button in the editor'),
               initialValue: showSaveAndGoInside,

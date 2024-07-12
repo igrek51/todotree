@@ -32,7 +32,6 @@ class CursorIndicator extends StatefulWidget {
 
 const double cursrorDiameter = 20;
 const double brakeFactor = 0.99;
-const double alignFactor = 0.9;
 const double velocityTransmission = 1.1;
 const double dragTransmission = 1.6;
 const double overscrollTransmission = 3.0;
@@ -42,6 +41,7 @@ const double touchpadWidth = 150; // empty space inside
 const double touchpadHeight = 200;
 const double localScrollThreshold = 0.25;
 const int gestureTimeMs = 250;
+const int gestureCooldownMs = 350;
 const bool swipeRightEnabled = true;
 const double swipeDistanceThreshold = 0.5;
 const double swipeAngleThreshold = 30;
@@ -63,6 +63,7 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
   double w = 0;
   double h = 0;
   List<GesturePoint> gesturePoints = [];
+  int lastGestureActivationTimeMs = 0;
 
   double get cursorX => widget.browserController.cursorIndicatorX;
   double get cursorY => widget.browserController.cursorIndicatorY;
@@ -96,7 +97,6 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
         double offsetY = (cursorY + _velocity.dy * velocityTransmission * timeScale).clamp(0, h);
         double velocityX = _velocity.dx * pow(1 - brakeFactor, timeScale);
         double velocityY = _velocity.dy * pow(1 - brakeFactor, timeScale);
-        // offsetX += (w / 2 - offsetX) * alignFactor * timeScale;
 
         widget.browserController.cursorIndicatorX = offsetX;
         widget.browserController.cursorIndicatorY = offsetY;
@@ -182,21 +182,21 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
   }
 
   void detectGestures() {
-    final timeCutOff = DateTime.now().millisecondsSinceEpoch - gestureTimeMs;
+    final now = DateTime.now().millisecondsSinceEpoch;
+    final timeCutOff = now - gestureTimeMs;
     gesturePoints.removeWhere((point) => point.timeMs < timeCutOff);
-    if (gesturePoints.length >= 2) {
-      final dx = gesturePoints.last.x - gesturePoints.first.x;
-      final dy = gesturePoints.last.y - gesturePoints.first.y;
-      final dragDeltaDistance = sqrt(dx * dx + dy * dy);
-      if (dragDeltaDistance >= swipeDistanceThreshold) {
-        final angle = atan2(dy, dx) * 180.0 / pi; // [0; 180] on top, [0; -180] on bottom
-        final detected = detectGesturesStep2(angle);
-        if (detected) {
-          _velocity = Offset.zero;
-          gesturePoints.clear();
-        }
-      }
-    }
+    if (gesturePoints.length < 2) return;
+    final dx = gesturePoints.last.x - gesturePoints.first.x;
+    final dy = gesturePoints.last.y - gesturePoints.first.y;
+    final dragDeltaDistance = sqrt(dx * dx + dy * dy);
+    if (now - lastGestureActivationTimeMs < gestureCooldownMs) return;
+    if (dragDeltaDistance < swipeDistanceThreshold) return;
+    final angle = atan2(dy, dx) * 180.0 / pi; // [0; 180] on top, [0; -180] on bottom
+    final detected = detectGesturesStep2(angle);
+    if (!detected) return;
+    _velocity = Offset.zero;
+    gesturePoints.clear();
+    lastGestureActivationTimeMs = now;
   }
 
   bool detectGesturesStep2(double angle) {
