@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:todotree/services/settings_provider.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:todotree/util/collections.dart';
 
 import 'package:todotree/views/components/cursor_indicator.dart';
 import 'package:todotree/views/components/explosion_indicator.dart';
@@ -33,16 +32,6 @@ class _BrowserWidgetState extends State<BrowserWidget> {
     final browserStateImmut = Provider.of<BrowserState>(context, listen: false);
     final cursorStateImmut = Provider.of<CursorState>(context, listen: false);
     cursorStateImmut.cursorNavigator = settingsProvider.cursorNavigator;
-    // final cursorState = context.watch<CursorState>();
-    // var cursorIndicator = cursorStateImmut.cursorNavigator
-    //     ? CursorIndicator(
-    //         key: _cursorIndicatorKey,
-    //         rippleIndicatorKey: _rippleIndicatorKey,
-    //         browserController: browserController,
-    //         cursorState: cursorState,
-    //         browserState: browserStateImmut,
-    //       )
-    //     : null;
     return Stack(
       children: [
         RippleIndicator(key: _rippleIndicatorKey),
@@ -55,7 +44,7 @@ class _BrowserWidgetState extends State<BrowserWidget> {
           ),
         ExplosionIndicator(key: explosionIndicatorKey),
         TreeListView(rippleIndicatorKey: _rippleIndicatorKey, cursorIndicatorKey: _cursorIndicatorKey),
-      ].filterNotNull(),
+      ],
     );
   }
 }
