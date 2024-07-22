@@ -108,6 +108,17 @@ class TitleBar extends StatelessWidget {
       true => 18.0,
       false => 16.0,
     };
+    if (browserState.selectedIndexes.isNotEmpty) {
+      return Text(
+        '${browserState.selectedIndexes.length} selected',
+        overflow: TextOverflow.fade,
+        style: TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          fontSize: fontSize,
+        ),
+      );
+    }
     List<Widget> rowChildren = [
       Flexible(
         child: Text(
