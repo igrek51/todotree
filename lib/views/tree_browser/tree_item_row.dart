@@ -15,7 +15,7 @@ import 'package:todotree/views/tree_browser/browser_state.dart';
 const double _iconButtonInternalSize = 24;
 const double _reoderButtonPaddingH = 12;
 const double _moreButtonPaddingH = 11;
-const double _midButtonPaddingH = 4;
+const double _altButtonPaddingH = 10;
 const double _addButtonPaddingH = 4;
 
 class TreeItemRow extends StatelessWidget {
@@ -195,7 +195,7 @@ class TreeItemRow extends StatelessWidget {
             size: _iconButtonInternalSize,
             color: Colors.white,
           ),
-          padding: EdgeInsets.symmetric(vertical: iconButtonPaddingV, horizontal: _midButtonPaddingH),
+          padding: EdgeInsets.symmetric(vertical: iconButtonPaddingV, horizontal: _altButtonPaddingH),
           constraints: BoxConstraints(),
           style: const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
           onPressed: () {
@@ -205,7 +205,7 @@ class TreeItemRow extends StatelessWidget {
               final xOffset = w -
                   _moreButtonPaddingH * 2 -
                   _addButtonPaddingH * 2 -
-                  _midButtonPaddingH -
+                  _altButtonPaddingH -
                   _iconButtonInternalSize * 2.5;
               rippleIndicatorKey.currentState?.animate(xOffset, centerY);
             });
@@ -221,7 +221,7 @@ class TreeItemRow extends StatelessWidget {
             size: _iconButtonInternalSize,
             color: Colors.white,
           ),
-          padding: EdgeInsets.symmetric(vertical: iconButtonPaddingV, horizontal: _midButtonPaddingH),
+          padding: EdgeInsets.symmetric(vertical: iconButtonPaddingV, horizontal: _altButtonPaddingH),
           constraints: BoxConstraints(),
           style: const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
           onPressed: () {
