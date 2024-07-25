@@ -11,9 +11,11 @@ For Android, iOS and Linux.
     <a href="https://github.com/igrek51/todotree2">GitHub</a>
     -
     <a href="https://play.google.com/store/apps/details?id=dev.igrek.todotree.v2">Google Play</a>
+    -
+    <a href="https://github.com/igrek51/todotree2/releases/latest">Latest Release</a>
 </div>
 
-## Running
+## Running from source
 ### Run desktop app on Linux
 ```sh
 make run-linux
@@ -33,11 +35,17 @@ make run-release
   <img src="./docs/img/screenshots/android/04.png" height="540px"/>
 </div>
 
-or install it from Google Play:
+## Install to Android
+### Install from Google Play
+You can install it from Google Play:
 
 <a href='https://play.google.com/store/apps/details?id=dev.igrek.todotree.v2&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1' target="_blank" rel="noopener noreferrer">
     <img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png' width="200"/>
 </a>
+
+### Install from APK
+Alternatively, install APK file found in the
+[latest release](https://github.com/igrek51/todotree2/releases/latest).
 
 ## Features
 
