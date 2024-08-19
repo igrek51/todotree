@@ -163,6 +163,7 @@ class EditorWidget extends StatelessWidget {
         icon: Icon(Icons.check),
         label: 'Save',
         expandHeight: true,
+        minHeight: 100.0,
         onPressed: () {
           editorController.saveNode();
         },
@@ -204,6 +205,7 @@ class FlatButton extends StatelessWidget {
     this.flex = 1,
     this.expandHeight = false,
     this.tooltip = '',
+    this.minHeight = 50.0,
   });
 
   final String? label;
@@ -212,6 +214,7 @@ class FlatButton extends StatelessWidget {
   final int flex;
   final bool expandHeight;
   final String tooltip;
+  final double minHeight;
 
   @override
   Widget build(BuildContext context) {
@@ -237,7 +240,7 @@ class FlatButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(5.0),
         ),
         padding: EdgeInsets.symmetric(vertical: 10.0),
-        minimumSize: Size.fromHeight(50.0),
+        minimumSize: Size.fromHeight(minHeight),
       ),
       onPressed: () {
         safeExecute(onPressed);
