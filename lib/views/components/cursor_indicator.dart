@@ -47,12 +47,7 @@ const double swipeDistanceThreshold = 0.4;
 const double swipeAngleThreshold = 30;
 
 class CursorIndicatorState extends State<CursorIndicator> with TickerProviderStateMixin {
-  late final AnimationController _animController = AnimationController(
-    value: 1.0,
-    vsync: this,
-    duration: const Duration(milliseconds: 2500),
-    lowerBound: 0.0,
-  );
+  AnimationController? _animController;
   Offset _velocity = Offset.zero;
   GlobalKey _boxKey = GlobalKey();
   int lastTickTimestampUs = 0;
@@ -67,10 +62,22 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
 
   double get cursorX => widget.browserController.cursorIndicatorX;
   double get cursorY => widget.browserController.cursorIndicatorY;
+  AnimationController get animController => _animController!;
+
+  @override
+  void initState() {
+    super.initState();
+    _animController = AnimationController(
+      value: 1.0,
+      vsync: this,
+      duration: const Duration(milliseconds: 2500),
+      lowerBound: 0.0,
+    );
+  }
 
   @override
   void dispose() {
-    _animController.dispose();
+    _animController?.dispose();
     super.dispose();
   }
 
@@ -172,7 +179,7 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
     _velocity = Offset.zero;
     dragDelta = details.globalPosition - dragStartPos;
     lastTickTimestampUs = DateTime.now().microsecondsSinceEpoch;
-    _animController.forward(from: 0);
+    _animController?.forward(from: 0);
     dragLocalY = details.localPosition.dy / touchpadHeight;
 
     final localRelX = details.localPosition.dx / touchpadHeight;
@@ -319,7 +326,7 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
     }
 
     return AnimatedBuilder(
-      animation: CurvedAnimation(parent: _animController, curve: Curves.linear),
+      animation: CurvedAnimation(parent: animController, curve: Curves.linear),
       builder: (context, child) {
         frameTick(context);
         return Stack(
@@ -333,7 +340,7 @@ class CursorIndicatorState extends State<CursorIndicator> with TickerProviderSta
                 height: cursrorDiameter,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Color.fromARGB(255, 241, 165, 77).withOpacity(0.7 * (1 - _animController.value)),
+                  color: Color.fromARGB(255, 241, 165, 77).withOpacity(0.7 * (1 - animController.value)),
                 ),
               ),
             )
