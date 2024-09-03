@@ -118,45 +118,44 @@ class TreeItemRow extends StatelessWidget {
       true => const EdgeInsets.symmetric(vertical: 10),
       false => const EdgeInsets.symmetric(vertical: 8),
     };
+    final textStyle = switch (true) {
+      true when treeItem.isLink => TextStyle(
+          color: Color(0xFFD2D2D2),
+          fontSize: fontSize,
+          decoration: TextDecoration.underline,
+        ),
+      true when !treeItem.isLeaf => TextStyle(
+          color: Colors.white,
+          fontSize: fontSize,
+          fontWeight: FontWeight.bold,
+        ),
+      _ => TextStyle(
+          color: Colors.white,
+          fontSize: fontSize,
+        ),
+    };
+    String textContent = switch (treeItem.isLink) {
+      true => treeTraverser.displayLinkName(treeItem),
+      false => treeItem.name,
+    };
+    Container textContainer = Container(
+      padding: padding,
+      child: Text(
+        textContent,
+        style: textStyle,
+      ),
+    );
+    int childrenSize = switch (treeItem.isLink) {
+      true => treeTraverser.linkChildrenSize(treeItem),
+      false => treeItem.size,
+    };
     final child = switch (true) {
-      true when treeItem.isLink => Container(
-          padding: padding,
-          child: Text(
-            treeTraverser.displayLinkName(treeItem),
-            style: TextStyle(
-              color: Color(0xFFD2D2D2),
-              fontSize: fontSize,
-              decoration: TextDecoration.underline,
-            ),
-          ),
-        ),
-      true when treeItem.isLeaf => Container(
-          padding: padding,
-          child: Text(
-            treeItem.name,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: fontSize,
-            ),
-          ),
-        ),
+      true when childrenSize == 0 => textContainer,
       _ => Row(
           children: [
-            Expanded(
-              child: Container(
-                padding: padding,
-                child: Text(
-                  treeItem.name,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: fontSize,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
+            Expanded(child: textContainer),
             SizedBox(width: 2),
-            RoundedBadge(text: treeItem.size.toString()),
+            RoundedBadge(text: childrenSize.toString()),
           ],
         )
     };

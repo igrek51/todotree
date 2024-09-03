@@ -217,6 +217,15 @@ class TreeTraverser {
       return target.name;
     }
   }
+
+  int linkChildrenSize(TreeNode link) {
+    final target = findLinkTarget(link.name);
+    if (target == null) {
+      return 0;
+    } else {
+      return target.size;
+    }
+  }
 }
 
 class NoSuperItemException implements Exception {
