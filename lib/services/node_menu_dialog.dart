@@ -40,6 +40,12 @@ List<Widget> buildNodeActions(BuildContext context, TreeNode item, int position)
   final actions = <Widget>[];
 
   actions.add(ListTile(
+    title: Text('➕ Add above'),
+    onTap: () {
+      Navigator.pop(context, 'add-above');
+    },
+  ));
+  actions.add(ListTile(
     title: Text('❌ Remove'),
     onTap: () {
       Navigator.pop(context, 'remove-nodes');
@@ -109,12 +115,6 @@ List<Widget> buildNodeActions(BuildContext context, TreeNode item, int position)
     title: Text('➡️ Go inside'),
     onTap: () {
       Navigator.pop(context, 'go-inside');
-    },
-  ));
-  actions.add(ListTile(
-    title: Text('➕ Add above'),
-    onTap: () {
-      Navigator.pop(context, 'add-above');
     },
   ));
   if (item.type == TreeNodeType.text && (item.displayName.contains(',') || item.displayName.contains('\n'))) {

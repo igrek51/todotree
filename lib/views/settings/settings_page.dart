@@ -21,6 +21,7 @@ class _SettingsPageState extends State<SettingsPage> {
   bool largeFont = false;
   bool cursorNavigator = false;
   bool showSaveAndGoInside = false;
+  bool showAddNodeButton = false;
 
   SettingsProvider settingsProvider = SettingsProvider();
 
@@ -35,6 +36,7 @@ class _SettingsPageState extends State<SettingsPage> {
       largeFont = settingsProvider.largeFont;
       cursorNavigator = settingsProvider.cursorNavigator;
       showSaveAndGoInside = settingsProvider.showSaveAndGoInside;
+      showAddNodeButton = settingsProvider.showAddNodeButton;
     });
   }
 
@@ -124,6 +126,18 @@ class _SettingsPageState extends State<SettingsPage> {
                 settingsProvider.showSaveAndGoInside = value;
                 setState(() {
                   showSaveAndGoInside = value;
+                });
+              },
+            ),
+            SettingsTile.switchTile(
+              leading: Icon(Icons.settings),
+              title: Text('Add above button'),
+              description: Text('Show "Add above" button for each node'),
+              initialValue: showAddNodeButton,
+              onToggle: (value) {
+                settingsProvider.showAddNodeButton = value;
+                setState(() {
+                  showAddNodeButton = value;
                 });
               },
             ),

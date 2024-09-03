@@ -165,6 +165,17 @@ class TreeListItemWidgetState extends State<TreeListItemWidget> with TickerProvi
               foregroundColor: Colors.white,
               icon: Icons.delete,
             ),
+            // SlidableAction(
+            //   padding: EdgeInsets.zero,
+            //   onPressed: (BuildContext context) {
+            //     safeExecute(() {
+            //       browserController.addNodeAt(widget.position);
+            //     });
+            //   },
+            //   backgroundColor: Color.fromARGB(255, 73, 115, 254),
+            //   foregroundColor: Colors.white,
+            //   icon: Icons.add,
+            // ),
           ],
         ),
         child: inkWell,

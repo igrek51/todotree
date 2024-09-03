@@ -34,17 +34,20 @@ class TreeItemRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final settingsProvider = Provider.of<SettingsProvider>(context, listen: false);
     final browserState = context.watch<BrowserState>();
     final selectionMode = browserState.selectedIndexes.isNotEmpty;
     final isItemSelected = browserState.selectedIndexes.contains(position);
     final browserController = Provider.of<BrowserController>(context, listen: false);
+    final showAlt = !selectionMode;
+    final showAdd = settingsProvider.showAddNodeButton && !selectionMode;
 
     return Row(
       children: [
         buildLeftIcon(selectionMode, isItemSelected, browserController),
         buildMiddleText(context),
-        selectionMode ? null : buildAltActionButton(context, browserController),
-        selectionMode ? null : buildAddButton(browserController),
+        showAlt ? buildAltActionButton(context, browserController) : null,
+        showAdd ? buildAddButton(browserController) : null,
         buildMoreActionButton(context),
       ].filterNotNull(),
     );

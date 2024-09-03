@@ -67,4 +67,11 @@ class SettingsProvider {
   set showSaveAndGoInside(bool value) {
     sharedPreferences?.setBool('showSaveAndGoInside', value);
   }
+
+  bool get showAddNodeButton {
+    return sharedPreferences?.getBool('showAddNodeButton') ?? false;
+  }
+  set showAddNodeButton(bool value) {
+    sharedPreferences?.setBool('showAddNodeButton', value);
+  }
 }
