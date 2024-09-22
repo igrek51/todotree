@@ -145,6 +145,32 @@ class TreeListItemWidgetState extends State<TreeListItemWidget> with TickerProvi
     );
 
     if (settingsProvider.slidableActions) {
+      final slidableActions = [
+        SlidableAction(
+          padding: EdgeInsets.zero,
+          onPressed: (BuildContext context) {
+            safeExecute(() {
+              browserController.removeOneNode(widget.treeItem);
+            });
+          },
+          backgroundColor: Color(0xFFFE4A49),
+          foregroundColor: Colors.white,
+          icon: Icons.delete,
+        ),
+      ];
+      if (settingsProvider.showSlidableAddNode) {
+        slidableActions.add(SlidableAction(
+          padding: EdgeInsets.zero,
+          onPressed: (BuildContext context) {
+            safeExecute(() {
+              browserController.addNodeAt(widget.position);
+            });
+          },
+          backgroundColor: Color.fromARGB(255, 73, 115, 254),
+          foregroundColor: Colors.white,
+          icon: Icons.add,
+        ));
+      }
       return Slidable(
         groupTag: '0',
         key: ValueKey(widget.key),
@@ -153,30 +179,7 @@ class TreeListItemWidgetState extends State<TreeListItemWidget> with TickerProvi
           extentRatio: 0.25,
           openThreshold: 0.2,
           closeThreshold: 0.2,
-          children: [
-            SlidableAction(
-              padding: EdgeInsets.zero,
-              onPressed: (BuildContext context) {
-                safeExecute(() {
-                  browserController.removeOneNode(widget.treeItem);
-                });
-              },
-              backgroundColor: Color(0xFFFE4A49),
-              foregroundColor: Colors.white,
-              icon: Icons.delete,
-            ),
-            // SlidableAction(
-            //   padding: EdgeInsets.zero,
-            //   onPressed: (BuildContext context) {
-            //     safeExecute(() {
-            //       browserController.addNodeAt(widget.position);
-            //     });
-            //   },
-            //   backgroundColor: Color.fromARGB(255, 73, 115, 254),
-            //   foregroundColor: Colors.white,
-            //   icon: Icons.add,
-            // ),
-          ],
+          children: slidableActions,
         ),
         child: inkWell,
       );

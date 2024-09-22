@@ -22,6 +22,7 @@ class _SettingsPageState extends State<SettingsPage> {
   bool cursorNavigator = false;
   bool showSaveAndGoInside = false;
   bool showAddNodeButton = false;
+  bool showSlidableAddNode = false;
 
   SettingsProvider settingsProvider = SettingsProvider();
 
@@ -37,6 +38,7 @@ class _SettingsPageState extends State<SettingsPage> {
       cursorNavigator = settingsProvider.cursorNavigator;
       showSaveAndGoInside = settingsProvider.showSaveAndGoInside;
       showAddNodeButton = settingsProvider.showAddNodeButton;
+      showSlidableAddNode = settingsProvider.showSlidableAddNode;
     });
   }
 
@@ -138,6 +140,18 @@ class _SettingsPageState extends State<SettingsPage> {
                 settingsProvider.showAddNodeButton = value;
                 setState(() {
                   showAddNodeButton = value;
+                });
+              },
+            ),
+            SettingsTile.switchTile(
+              leading: Icon(Icons.settings),
+              title: Text('Slidable Add above action'),
+              description: Text('Show "Add above" button after sliding node sideways'),
+              initialValue: showSlidableAddNode,
+              onToggle: (value) {
+                settingsProvider.showSlidableAddNode = value;
+                setState(() {
+                  showSlidableAddNode = value;
                 });
               },
             ),
