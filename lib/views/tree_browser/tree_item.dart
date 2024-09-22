@@ -171,12 +171,17 @@ class TreeListItemWidgetState extends State<TreeListItemWidget> with TickerProvi
           icon: Icons.add,
         ));
       }
+      double extentRatio = switch (settingsProvider.showSlidableAddNode) {
+        false => 0.25,
+        true => 0.4,
+      };
+      
       return Slidable(
         groupTag: '0',
         key: ValueKey(widget.key),
         endActionPane: ActionPane(
           motion: BehindMotion(),
-          extentRatio: 0.25,
+          extentRatio: extentRatio,
           openThreshold: 0.2,
           closeThreshold: 0.2,
           children: slidableActions,
