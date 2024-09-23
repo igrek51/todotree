@@ -1,0 +1,4 @@
+[submodule "vendor/shared_storage"]
+	path = vendor/shared_storage
+	url = https://github.com/igrek51/flutter-shared-storage
+	branch = master
