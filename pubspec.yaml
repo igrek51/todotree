@@ -25,7 +25,8 @@ dependencies:
   http: ^1.2.1
   confetti: ^0.7.0
   swipe_to: ^1.0.6
-  shared_storage: ^0.8.1
+  shared_storage:
+    path: vendor/shared_storage
 
 dev_dependencies:
   flutter_test:
