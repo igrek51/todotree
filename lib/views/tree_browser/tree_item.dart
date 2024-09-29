@@ -145,7 +145,7 @@ class TreeListItemWidgetState extends State<TreeListItemWidget> with TickerProvi
     );
 
     if (settingsProvider.slidableActions) {
-      final slidableActions = [
+      final rightSlidableActions = [
         SlidableAction(
           padding: EdgeInsets.zero,
           onPressed: (BuildContext context) {
@@ -158,33 +158,71 @@ class TreeListItemWidgetState extends State<TreeListItemWidget> with TickerProvi
           icon: Icons.delete,
         ),
       ];
+      final leftSlidableActions = [];
       if (settingsProvider.showSlidableAddNode) {
-        slidableActions.add(SlidableAction(
+        leftSlidableActions.add(SlidableAction(
           padding: EdgeInsets.zero,
           onPressed: (BuildContext context) {
             safeExecute(() {
               browserController.addNodeAt(widget.position);
             });
           },
-          backgroundColor: Color.fromARGB(255, 73, 115, 254),
+          backgroundColor: Color.fromARGB(255, 73, 254, 88),
           foregroundColor: Colors.white,
           icon: Icons.add,
         ));
+        if (widget.treeItem.isLeaf) {
+          // go inside
+          leftSlidableActions.add(SlidableAction(
+            padding: EdgeInsets.zero,
+            onPressed: (BuildContext context) {
+              safeExecute(() async {
+                await browserController.goIntoNode(widget.treeItem);
+              });
+            },
+            backgroundColor: Color.fromARGB(255, 73, 115, 254),
+            foregroundColor: Colors.white,
+            icon: Icons.arrow_right,
+          ));
+        } else {
+          // edit
+          leftSlidableActions.add(SlidableAction(
+            padding: EdgeInsets.zero,
+            onPressed: (BuildContext context) {
+              safeExecute(() {
+                browserController.editNode(widget.treeItem);
+              });
+            },
+            backgroundColor: Color.fromARGB(255, 73, 115, 254),
+            foregroundColor: Colors.white,
+            icon: Icons.edit,
+          ));
+        }
       }
       double extentRatio = switch (settingsProvider.showSlidableAddNode) {
         false => 0.25,
         true => 0.4,
       };
-      
+      ActionPane? startActionPane = leftSlidableActions.isEmpty
+          ? null
+          : ActionPane(
+              motion: BehindMotion(),
+              extentRatio: extentRatio,
+              openThreshold: 0.2,
+              closeThreshold: 0.2,
+              children: rightSlidableActions,
+            );
+
       return Slidable(
         groupTag: '0',
         key: ValueKey(widget.key),
+        startActionPane: startActionPane,
         endActionPane: ActionPane(
           motion: BehindMotion(),
-          extentRatio: extentRatio,
+          extentRatio: 0.25,
           openThreshold: 0.2,
           closeThreshold: 0.2,
-          children: slidableActions,
+          children: rightSlidableActions,
         ),
         child: inkWell,
       );
