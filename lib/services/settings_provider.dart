@@ -75,10 +75,10 @@ class SettingsProvider {
     sharedPreferences?.setBool('showAddNodeButton', value);
   }
 
-  bool get showSlidableAddNode {
-    return sharedPreferences?.getBool('showSlidableAddNode') ?? false;
+  bool get showAltNodeButton {
+    return sharedPreferences?.getBool('showAltNodeButton') ?? false;
   }
-  set showSlidableAddNode(bool value) {
-    sharedPreferences?.setBool('showSlidableAddNode', value);
+  set showAltNodeButton(bool value) {
+    sharedPreferences?.setBool('showAltNodeButton', value);
   }
 }

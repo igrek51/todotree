@@ -14,7 +14,7 @@ import 'package:todotree/views/tree_browser/browser_state.dart';
 
 const double _iconButtonInternalSize = 24;
 const double _reoderButtonPaddingH = 12;
-const double _moreButtonPaddingH = 11;
+const double _moreButtonPaddingH = 12;
 const double _altButtonPaddingH = 10;
 const double _addButtonPaddingH = 4;
 
@@ -39,7 +39,7 @@ class TreeItemRow extends StatelessWidget {
     final selectionMode = browserState.selectedIndexes.isNotEmpty;
     final isItemSelected = browserState.selectedIndexes.contains(position);
     final browserController = Provider.of<BrowserController>(context, listen: false);
-    final showAlt = !selectionMode;
+    final showAlt = settingsProvider.showAltNodeButton && !selectionMode;
     final showAdd = settingsProvider.showAddNodeButton && !selectionMode;
 
     return Row(
@@ -188,52 +188,46 @@ class TreeItemRow extends StatelessWidget {
   }
 
   Widget buildAltActionButton(BuildContext context, BrowserController browserController) {
-    if (treeItem.isLeaf) {
-      return Tooltip(
-        message: 'Go inside',
-        child: IconButton(
-          icon: const Icon(
-            Icons.arrow_right,
-            size: _iconButtonInternalSize,
-            color: Colors.white,
-          ),
-          padding: EdgeInsets.symmetric(vertical: iconButtonPaddingV, horizontal: _altButtonPaddingH),
-          constraints: BoxConstraints(),
-          style: const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
-          onPressed: () {
-            safeExecute(() async {
-              var (_, centerY, w, _) = getRenderBoxCoordinates(context);
-              await browserController.goIntoNode(treeItem);
-              final xOffset = w -
-                  _moreButtonPaddingH * 2 -
-                  _addButtonPaddingH * 2 -
-                  _altButtonPaddingH -
-                  _iconButtonInternalSize * 2.5;
-              rippleIndicatorKey.currentState?.animate(xOffset, centerY);
-            });
-          },
+    String tooltipMessage = switch (treeItem.isLeaf) {
+      true => 'Go inside',
+      false => 'Edit',
+    };
+    Icon icon = switch (treeItem.isLeaf) {
+      true => const Icon(
+          Icons.arrow_right,
+          size: _iconButtonInternalSize,
+          color: Colors.white,
         ),
-      );
-    } else {
-      return Tooltip(
-        message: 'Edit',
-        child: IconButton(
-          icon: const Icon(
-            Icons.edit,
-            size: _iconButtonInternalSize,
-            color: Colors.white,
-          ),
-          padding: EdgeInsets.symmetric(vertical: iconButtonPaddingV, horizontal: _altButtonPaddingH),
-          constraints: BoxConstraints(),
-          style: const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
-          onPressed: () {
-            safeExecute(() {
-              browserController.editNode(treeItem);
-            });
-          },
+      false => const Icon(
+          Icons.edit,
+          size: _iconButtonInternalSize,
+          color: Colors.white,
         ),
-      );
-    }
+    };
+    final onPressed = switch (treeItem.isLeaf) {
+      true => () async {
+          var (_, centerY, w, _) = getRenderBoxCoordinates(context);
+          await browserController.goIntoNode(treeItem);
+          final xOffset =
+              w - _moreButtonPaddingH * 2 - _addButtonPaddingH * 2 - _altButtonPaddingH - _iconButtonInternalSize * 2.5;
+          rippleIndicatorKey.currentState?.animate(xOffset, centerY);
+        },
+      false => () {
+          browserController.editNode(treeItem);
+        },
+    };
+    return Tooltip(
+      message: tooltipMessage,
+      child: IconButton(
+        icon: icon,
+        padding: EdgeInsets.symmetric(vertical: iconButtonPaddingV, horizontal: _altButtonPaddingH),
+        constraints: BoxConstraints(),
+        style: const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+        onPressed: () {
+          safeExecute(onPressed);
+        },
+      ),
+    );
   }
 
   Widget buildAddButton(BrowserController browserController) {

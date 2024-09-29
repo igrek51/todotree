@@ -145,105 +145,129 @@ class TreeListItemWidgetState extends State<TreeListItemWidget> with TickerProvi
     );
 
     if (settingsProvider.slidableActions) {
-      final rightSlidableActions = [
-        SlidableAction(
+      return buildSlidableWidget(browserController, settingsProvider, inkWell);
+    } else if (settingsProvider.swipeNavigation) {
+      return buildSwipeNavigationWidget(inkWell, browserController);
+    } else {
+      return inkWell;
+    }
+  }
+
+  Slidable buildSlidableWidget(
+    BrowserController browserController,
+    SettingsProvider settingsProvider,
+    AnimatedBuilder inkWell,
+  ) {
+    final rightSlidableActions = [
+      SlidableAction(
+        padding: EdgeInsets.zero,
+        onPressed: (BuildContext context) {
+          safeExecute(() {
+            browserController.removeNodesAt(widget.position);
+          });
+        },
+        backgroundColor: Color(0xFFFE4A49),
+        foregroundColor: Colors.white,
+        icon: Icons.delete,
+      ),
+    ];
+
+    List<SlidableAction> leftSlidableActions = buildLeftSlidableActions(settingsProvider, browserController);
+    double leftExtentRatio = switch (leftSlidableActions.length) {
+      1 => 0.25,
+      _ => 0.4,
+    };
+    ActionPane? startActionPane = leftSlidableActions.isEmpty
+        ? null
+        : ActionPane(
+            motion: BehindMotion(),
+            extentRatio: leftExtentRatio,
+            openThreshold: 0.2,
+            closeThreshold: 0.2,
+            children: leftSlidableActions,
+          );
+
+    return Slidable(
+      groupTag: '0',
+      key: ValueKey(widget.key),
+      startActionPane: startActionPane,
+      endActionPane: ActionPane(
+        motion: BehindMotion(),
+        extentRatio: 0.25,
+        openThreshold: 0.2,
+        closeThreshold: 0.2,
+        children: rightSlidableActions,
+      ),
+      child: inkWell,
+    );
+  }
+
+  List<SlidableAction> buildLeftSlidableActions(
+    SettingsProvider settingsProvider,
+    BrowserController browserController,
+  ) {
+    List<SlidableAction> leftSlidableActions = [];
+    if (!settingsProvider.showAddNodeButton) {
+      leftSlidableActions.add(SlidableAction(
+        padding: EdgeInsets.zero,
+        onPressed: (BuildContext context) {
+          safeExecute(() {
+            browserController.addNodeAt(widget.position);
+          });
+        },
+        backgroundColor: Color.fromARGB(255, 73, 254, 88),
+        foregroundColor: Colors.white,
+        icon: Icons.add,
+      ));
+    }
+
+    if (!settingsProvider.showAltNodeButton) {
+      if (widget.treeItem.isLeaf) {
+        // go inside
+        leftSlidableActions.add(SlidableAction(
           padding: EdgeInsets.zero,
           onPressed: (BuildContext context) {
-            safeExecute(() {
-              browserController.removeNodesAt(widget.position);
+            safeExecute(() async {
+              await browserController.goIntoNode(widget.treeItem);
             });
           },
-          backgroundColor: Color(0xFFFE4A49),
+          backgroundColor: Color.fromARGB(255, 73, 115, 254),
           foregroundColor: Colors.white,
-          icon: Icons.delete,
-        ),
-      ];
-      final leftSlidableActions = [];
-      if (settingsProvider.showSlidableAddNode) {
+          icon: Icons.arrow_right,
+        ));
+      } else {
+        // edit
         leftSlidableActions.add(SlidableAction(
           padding: EdgeInsets.zero,
           onPressed: (BuildContext context) {
             safeExecute(() {
-              browserController.addNodeAt(widget.position);
+              browserController.editNode(widget.treeItem);
             });
           },
-          backgroundColor: Color.fromARGB(255, 73, 254, 88),
+          backgroundColor: Color.fromARGB(255, 73, 115, 254),
           foregroundColor: Colors.white,
-          icon: Icons.add,
+          icon: Icons.edit,
         ));
-        if (widget.treeItem.isLeaf) {
-          // go inside
-          leftSlidableActions.add(SlidableAction(
-            padding: EdgeInsets.zero,
-            onPressed: (BuildContext context) {
-              safeExecute(() async {
-                await browserController.goIntoNode(widget.treeItem);
-              });
-            },
-            backgroundColor: Color.fromARGB(255, 73, 115, 254),
-            foregroundColor: Colors.white,
-            icon: Icons.arrow_right,
-          ));
-        } else {
-          // edit
-          leftSlidableActions.add(SlidableAction(
-            padding: EdgeInsets.zero,
-            onPressed: (BuildContext context) {
-              safeExecute(() {
-                browserController.editNode(widget.treeItem);
-              });
-            },
-            backgroundColor: Color.fromARGB(255, 73, 115, 254),
-            foregroundColor: Colors.white,
-            icon: Icons.edit,
-          ));
-        }
       }
-      double extentRatio = switch (settingsProvider.showSlidableAddNode) {
-        false => 0.25,
-        true => 0.4,
-      };
-      ActionPane? startActionPane = leftSlidableActions.isEmpty
-          ? null
-          : ActionPane(
-              motion: BehindMotion(),
-              extentRatio: extentRatio,
-              openThreshold: 0.2,
-              closeThreshold: 0.2,
-              children: rightSlidableActions,
-            );
-
-      return Slidable(
-        groupTag: '0',
-        key: ValueKey(widget.key),
-        startActionPane: startActionPane,
-        endActionPane: ActionPane(
-          motion: BehindMotion(),
-          extentRatio: 0.25,
-          openThreshold: 0.2,
-          closeThreshold: 0.2,
-          children: rightSlidableActions,
-        ),
-        child: inkWell,
-      );
-    } else if (settingsProvider.swipeNavigation) {
-      return SwipeTo(
-        key: UniqueKey(),
-        iconOnLeftSwipe: Icons.arrow_back,
-        onLeftSwipe: (details) {
-          browserController.goBack();
-        },
-        iconOnRightSwipe: Icons.arrow_right,
-        onRightSwipe: (details) {
-          safeExecute(() async {
-            await browserController.goIntoNode(widget.treeItem);
-          });
-        },
-        swipeSensitivity: 5,
-        child: inkWell,
-      );
     }
+    return leftSlidableActions;
+  }
 
-    return inkWell;
+  Widget buildSwipeNavigationWidget(AnimatedBuilder inkWell, BrowserController browserController) {
+    return SwipeTo(
+      key: UniqueKey(),
+      iconOnLeftSwipe: Icons.arrow_back,
+      onLeftSwipe: (details) {
+        browserController.goBack();
+      },
+      iconOnRightSwipe: Icons.arrow_right,
+      onRightSwipe: (details) {
+        safeExecute(() async {
+          await browserController.goIntoNode(widget.treeItem);
+        });
+      },
+      swipeSensitivity: 5,
+      child: inkWell,
+    );
   }
 }

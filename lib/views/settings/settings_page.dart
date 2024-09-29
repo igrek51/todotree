@@ -22,7 +22,7 @@ class _SettingsPageState extends State<SettingsPage> {
   bool cursorNavigator = false;
   bool showSaveAndGoInside = false;
   bool showAddNodeButton = false;
-  bool showSlidableAddNode = false;
+  bool showAltNodeButton = false;
 
   SettingsProvider settingsProvider = SettingsProvider();
 
@@ -38,7 +38,7 @@ class _SettingsPageState extends State<SettingsPage> {
       cursorNavigator = settingsProvider.cursorNavigator;
       showSaveAndGoInside = settingsProvider.showSaveAndGoInside;
       showAddNodeButton = settingsProvider.showAddNodeButton;
-      showSlidableAddNode = settingsProvider.showSlidableAddNode;
+      showAltNodeButton = settingsProvider.showAltNodeButton;
     });
   }
 
@@ -71,8 +71,8 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             SettingsTile.switchTile(
               leading: Icon(Icons.swipe),
-              title: Text('Swipe menu'),
-              description: Text('Slide left to perform quick actions on nodes. Exclusive with "Swipe navigation"'),
+              title: Text('Slide menu'),
+              description: Text('Slide left or right to perform quick actions on nodes. Exclusive with "Swipe navigation"'),
               initialValue: _slidableActions,
               onToggle: (value) {
                 settingsProvider.slidableActions = value;
@@ -133,8 +133,8 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             SettingsTile.switchTile(
               leading: Icon(Icons.settings),
-              title: Text('Add above button'),
-              description: Text('Show "Add above" button for each node'),
+              title: Text('Button: Add node above'),
+              description: Text('Show "Add above" button for each node. Otherwise, show it after sliding node sideways.'),
               initialValue: showAddNodeButton,
               onToggle: (value) {
                 settingsProvider.showAddNodeButton = value;
@@ -145,13 +145,13 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             SettingsTile.switchTile(
               leading: Icon(Icons.settings),
-              title: Text('Slidable Add above action'),
-              description: Text('Show "Add above" button after sliding node sideways'),
-              initialValue: showSlidableAddNode,
+              title: Text('Button: Alternative node action'),
+              description: Text('Show alternative action button for each node. Otherwise, show it after sliding node sideways.'),
+              initialValue: showAltNodeButton,
               onToggle: (value) {
-                settingsProvider.showSlidableAddNode = value;
+                settingsProvider.showAltNodeButton = value;
                 setState(() {
-                  showSlidableAddNode = value;
+                  showAltNodeButton = value;
                 });
               },
             ),
