@@ -150,7 +150,7 @@ class TreeListItemWidgetState extends State<TreeListItemWidget> with TickerProvi
           padding: EdgeInsets.zero,
           onPressed: (BuildContext context) {
             safeExecute(() {
-              browserController.removeOneNode(widget.treeItem);
+              browserController.removeNodesAt(widget.position);
             });
           },
           backgroundColor: Color(0xFFFE4A49),

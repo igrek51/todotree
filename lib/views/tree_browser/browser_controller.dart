@@ -186,6 +186,7 @@ class BrowserController {
     treeTraverser.removeFromCurrent(node);
     remoteService.checkUnsavedRemoteChanges();
     nodeTrash.putToTrash(node, originalPosition, parent);
+    treeTraverser.cancelSelection();
 
     if (originalPosition < treeTraverser.currentParent.size) {
       offsetAnimationRequests[originalPosition] = removedHeight;
@@ -223,6 +224,9 @@ class BrowserController {
   void removeNodesAt(int position) {
     if (treeTraverser.selectionMode) {
       List<int> sortedPositions = treeTraverser.selectedIndexes.toList()..sort();
+      if (!sortedPositions.contains(position)) {
+        throw Exception('This node is not currently selected');
+      }
       removeMultipleNodes(sortedPositions);
     } else {
       final node = treeTraverser.getChild(position);
