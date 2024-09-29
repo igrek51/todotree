@@ -215,7 +215,7 @@ class TreeListItemWidgetState extends State<TreeListItemWidget> with TickerProvi
             browserController.addNodeAt(widget.position);
           });
         },
-        backgroundColor: Color.fromARGB(255, 73, 254, 88),
+        backgroundColor: Color.fromARGB(255, 52, 180, 62),
         foregroundColor: Colors.white,
         icon: Icons.add,
       ));

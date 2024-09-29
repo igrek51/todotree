@@ -16,13 +16,13 @@ class ContextError implements Exception {
 void safeExecute(dynamic Function() function) {
   if (function is Future Function()) {
     function().catchError((e) {
-      InfoService.error(e, 'Error handler');
+      InfoService.error(e, 'Error caught');
     });
   } else {
     try {
       function();
     } catch (e) {
-      InfoService.error(e, 'Error handler');
+      InfoService.error(e, 'Error caught');
     }
   }
 }
