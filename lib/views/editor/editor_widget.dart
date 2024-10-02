@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:todotree/services/settings_provider.dart';
 import 'package:todotree/util/collections.dart';
 import 'package:todotree/util/errors.dart';
+import 'package:todotree/util/logger.dart';
 import 'package:todotree/views/editor/editor_controller.dart';
 import 'package:todotree/views/editor/editor_state.dart';
 
@@ -41,7 +44,7 @@ class EditorWidget extends StatelessWidget {
           editorController.jumpCursorToStart();
         },
       ),
-      FlatButton(
+      HoldFlatButton(
         icon: Icon(Icons.keyboard_arrow_left_rounded),
         onPressed: () {
           editorController.moveCursorLeft();
@@ -54,7 +57,7 @@ class EditorWidget extends StatelessWidget {
           editorController.selectAll();
         },
       ),
-      FlatButton(
+      HoldFlatButton(
         icon: Icon(Icons.keyboard_arrow_right_rounded),
         onPressed: () {
           editorController.moveCursorRight();
@@ -81,13 +84,13 @@ class EditorWidget extends StatelessWidget {
           await editorController.pasteFromClipboard();
         },
       ),
-      FlatButton(
+      HoldFlatButton(
         icon: Icon(Icons.backspace),
         onPressed: () {
           editorController.keyBackspace();
         },
       ),
-      FlatButton(
+      HoldFlatButton(
         icon: Transform.flip(
           flipX: true,
           child: const Icon(Icons.backspace),
@@ -262,5 +265,147 @@ class FlatButton extends StatelessWidget {
         child: button,
       ),
     );
+  }
+}
+
+class HoldFlatButton extends StatefulWidget {
+  const HoldFlatButton({
+    super.key,
+    this.label,
+    this.icon,
+    required this.onPressed,
+    this.flex = 1,
+    this.expandHeight = false,
+    this.tooltip = '',
+    this.minHeight = 50.0,
+  });
+
+  final String? label;
+  final Widget? icon;
+  final dynamic Function() onPressed;
+  final int flex;
+  final bool expandHeight;
+  final String tooltip;
+  final double minHeight;
+
+  @override
+  State<HoldFlatButton> createState() => _HoldFlatButtonState();
+}
+
+class _HoldFlatButtonState extends State<HoldFlatButton> {
+  Timer? _timer;
+  int _callCounter = 0;
+  bool pressed = false;
+
+  void _startHolding() {
+    pressed = true;
+    safeExecute(widget.onPressed);
+    _callCounter = 1;
+    _scheduleNext();
+  }
+
+  void _scheduleNext() {
+    if (!pressed) {
+      return;
+    }
+    final milliseconds = switch (_callCounter) {
+      1 => 400,
+      _ => 200,
+    };
+    if (_timer != null) {
+      _timer?.cancel();
+    }
+    _timer = Timer(Duration(milliseconds: milliseconds), () {
+      if (!pressed) {
+        return;
+      }
+      safeExecute(widget.onPressed);
+      _callCounter++;
+      logger.debug('HoldFlatButton called repeatedly: $_callCounter');
+      _scheduleNext();
+    });
+  }
+
+  void _cancelHolding() {
+    pressed = false;
+    if (_timer != null) {
+      _timer?.cancel();
+    }
+  }
+
+  @override
+  void dispose() {
+    _cancelHolding();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    Widget child;
+    if (widget.icon == null && widget.label == null) {
+      throw ArgumentError('icon and label cannot be null at the same time');
+    } else if (widget.icon != null && widget.label != null) {
+      child = Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[widget.icon!, SizedBox(width: 3), Flexible(child: Text(widget.label!))],
+      );
+    } else if (widget.icon != null) {
+      child = widget.icon!;
+    } else {
+      child = Text(widget.label!);
+    }
+
+    Widget button = ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        foregroundColor: Colors.white,
+        backgroundColor: Color.fromARGB(255, 60, 60, 60),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(5.0),
+        ),
+        padding: EdgeInsets.symmetric(vertical: 10.0),
+        minimumSize: Size.fromHeight(widget.minHeight),
+      ),
+      onPressed: () {
+        // on a very short click, GestureDetector might not get tap event
+        if (!pressed) {
+          logger.debug('HoldFlatButton: ElevatedButton: onPressed');
+          safeExecute(widget.onPressed);
+        }
+      },
+      child: child,
+    );
+
+    if (widget.tooltip.isNotEmpty) {
+      button = Tooltip(
+        message: widget.tooltip,
+        child: button,
+      );
+    }
+
+    final gestureDetector = GestureDetector(
+      onTap: () {
+        safeExecute(widget.onPressed);
+      },
+      onTapDown: (details) {
+        _startHolding();
+      },
+      onTapUp: (details) {
+        _cancelHolding();
+      },
+      onTapCancel: () {
+        _cancelHolding();
+      },
+      child: button,
+    );
+
+    Widget outerChild = Expanded(
+      flex: widget.flex,
+      child: Container(
+        margin: const EdgeInsets.all(2.0),
+        child: gestureDetector,
+      ),
+    );
+
+    return outerChild;
   }
 }
