@@ -1,7 +1,7 @@
 import 'package:todotree/app/factory.dart';
-import 'package:todotree/model/remote_node.dart';
+import 'package:todotree/node_model/remote_node.dart';
 import 'package:todotree/services/info_service.dart';
-import 'package:todotree/views/components/textfield_dialog.dart';
+import 'package:todotree/components/textfield_dialog.dart';
 
 class Commander {
   Commander(this.app);

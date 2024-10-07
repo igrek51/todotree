@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/services.dart';
 import 'package:todotree/util/errors.dart';
-import 'package:todotree/services/database/tree_storage.dart';
+import 'package:todotree/database/tree_storage.dart';
 import 'package:todotree/services/tree_traverser.dart';
 import 'package:todotree/util/logger.dart';
 

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:settings_ui/settings_ui.dart';
-import 'package:todotree/services/database/tree_storage.dart';
+import 'package:todotree/database/tree_storage.dart';
 
-import 'package:todotree/services/settings_provider.dart';
-import 'package:todotree/views/components/textfield_dialog.dart';
-import 'package:todotree/views/tree_browser/cursor_state.dart';
+import 'package:todotree/settings/settings_provider.dart';
+import 'package:todotree/components/textfield_dialog.dart';
+import 'package:todotree/tree_browser/cursor_state.dart';
 
 class SettingsPage extends StatefulWidget {
   @override

@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:todotree/services/settings_provider.dart';
+import 'package:todotree/settings/settings_provider.dart';
 import 'package:todotree/util/collections.dart';
 import 'package:todotree/util/display.dart';
 
 import 'package:todotree/util/errors.dart';
 import 'package:todotree/services/tree_traverser.dart';
-import 'package:todotree/model/tree_node.dart';
-import 'package:todotree/views/components/ripple_indicator.dart';
-import 'package:todotree/views/components/rounded_badge.dart';
-import 'package:todotree/views/tree_browser/browser_controller.dart';
-import 'package:todotree/views/tree_browser/browser_state.dart';
+import 'package:todotree/node_model/tree_node.dart';
+import 'package:todotree/components/ripple_indicator.dart';
+import 'package:todotree/components/rounded_badge.dart';
+import 'package:todotree/tree_browser/browser_controller.dart';
+import 'package:todotree/tree_browser/browser_state.dart';
 
 const double _iconButtonInternalSize = 24;
 const double _reoderButtonPaddingH = 12;

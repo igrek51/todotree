@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:todotree/util/errors.dart';
 import 'package:provider/provider.dart';
 
-import 'package:todotree/views/components/cursor_indicator.dart';
-import 'package:todotree/views/components/cursor_indicator.dart' as cursor_indicator;
-import 'package:todotree/views/home/home_controller.dart';
-import 'package:todotree/views/tree_browser/cursor_state.dart';
+import 'package:todotree/components/cursor_indicator.dart';
+import 'package:todotree/components/cursor_indicator.dart' as cursor_indicator;
+import 'package:todotree/home/home_controller.dart';
+import 'package:todotree/tree_browser/cursor_state.dart';
 
 class NavigatorPad extends StatelessWidget {
   const NavigatorPad({

@@ -3,14 +3,14 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
-import 'package:todotree/model/tree_node.dart';
+import 'package:todotree/node_model/tree_node.dart';
 import 'package:todotree/util/errors.dart';
 import 'package:todotree/util/logger.dart';
 import 'package:todotree/util/numbers.dart';
-import 'package:todotree/views/components/ripple_indicator.dart';
-import 'package:todotree/views/tree_browser/browser_controller.dart';
-import 'package:todotree/views/tree_browser/browser_state.dart';
-import 'package:todotree/views/tree_browser/cursor_state.dart';
+import 'package:todotree/components/ripple_indicator.dart';
+import 'package:todotree/tree_browser/browser_controller.dart';
+import 'package:todotree/tree_browser/browser_state.dart';
+import 'package:todotree/tree_browser/cursor_state.dart';
 
 class CursorIndicator extends StatefulWidget {
   CursorIndicator({

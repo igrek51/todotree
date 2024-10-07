@@ -1,25 +1,25 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:todotree/model/remote_node.dart';
+import 'package:todotree/node_model/remote_node.dart';
 
-import 'package:todotree/services/app_lifecycle.dart';
+import 'package:todotree/app/app_lifecycle.dart';
 import 'package:todotree/services/clipboard_manager.dart';
 import 'package:todotree/services/node_menu_dialog.dart';
 import 'package:todotree/services/node_trash.dart';
 import 'package:todotree/services/remote_service.dart';
-import 'package:todotree/services/settings_provider.dart';
+import 'package:todotree/settings/settings_provider.dart';
 import 'package:todotree/util/errors.dart';
 import 'package:todotree/services/info_service.dart';
 import 'package:todotree/util/logger.dart';
 import 'package:todotree/util/collections.dart';
 import 'package:todotree/util/numbers.dart';
 import 'package:todotree/util/time.dart';
-import 'package:todotree/views/components/explosion_indicator.dart';
-import 'package:todotree/views/editor/editor_controller.dart';
+import 'package:todotree/components/explosion_indicator.dart';
+import 'package:todotree/editor/editor_controller.dart';
 import 'package:todotree/services/tree_traverser.dart';
-import 'package:todotree/model/tree_node.dart';
-import 'package:todotree/views/home/home_state.dart';
-import 'package:todotree/views/tree_browser/browser_state.dart';
+import 'package:todotree/node_model/tree_node.dart';
+import 'package:todotree/home/home_state.dart';
+import 'package:todotree/tree_browser/browser_state.dart';
 
 class BrowserController {
   HomeState homeState;

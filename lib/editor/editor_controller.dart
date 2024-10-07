@@ -2,16 +2,16 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
-import 'package:todotree/model/tree_node.dart';
+import 'package:todotree/node_model/tree_node.dart';
 import 'package:todotree/services/clipboard_manager.dart';
 import 'package:todotree/services/info_service.dart';
 import 'package:todotree/services/remote_service.dart';
 import 'package:todotree/util/numbers.dart';
-import 'package:todotree/views/components/confirmation_dialog.dart';
-import 'package:todotree/views/editor/editor_state.dart';
+import 'package:todotree/components/confirmation_dialog.dart';
+import 'package:todotree/editor/editor_state.dart';
 import 'package:todotree/services/tree_traverser.dart';
-import 'package:todotree/views/home/home_state.dart';
-import 'package:todotree/views/tree_browser/browser_controller.dart';
+import 'package:todotree/home/home_state.dart';
+import 'package:todotree/tree_browser/browser_controller.dart';
 
 class EditorController {
   HomeState homeState;

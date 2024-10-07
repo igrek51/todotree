@@ -6,12 +6,12 @@ import 'package:intl/intl.dart';
 
 import 'package:path_provider/path_provider.dart';
 import 'package:todotree/app/factory.dart';
-import 'package:todotree/services/database/saf_helper.dart';
+import 'package:todotree/database/saf_helper.dart';
 import 'package:todotree/services/info_service.dart';
 import 'package:todotree/util/files.dart';
 import 'package:todotree/util/logger.dart';
 import 'package:todotree/util/collections.dart';
-import 'package:todotree/views/components/options_dialog.dart';
+import 'package:todotree/components/options_dialog.dart';
 
 const int _localBackupLastVersions = 10;
 const int _localBackupLastDays = 14;

@@ -1,4 +1,4 @@
-import 'package:todotree/model/tree_node.dart';
+import 'package:todotree/node_model/tree_node.dart';
 
 class RemoteNode extends TreeNode {
   RemoteNode({

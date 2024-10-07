@@ -3,10 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:todotree/util/errors.dart';
 import 'package:todotree/util/logger.dart';
-import 'package:todotree/views/editor/editor_controller.dart';
+import 'package:todotree/editor/editor_controller.dart';
 
-import 'package:todotree/views/home/home_controller.dart';
-import 'package:todotree/views/home/home_state.dart';
+import 'package:todotree/home/home_controller.dart';
+import 'package:todotree/home/home_state.dart';
 
 class ShortcutHandler {
   final HomeController homeController;

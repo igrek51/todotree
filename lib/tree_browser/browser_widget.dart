@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:todotree/services/settings_provider.dart';
+import 'package:todotree/settings/settings_provider.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
-import 'package:todotree/views/components/cursor_indicator.dart';
-import 'package:todotree/views/components/explosion_indicator.dart';
-import 'package:todotree/views/components/ripple_indicator.dart';
-import 'package:todotree/views/home/home_controller.dart';
-import 'package:todotree/views/tree_browser/browser_controller.dart';
-import 'package:todotree/views/tree_browser/browser_state.dart';
-import 'package:todotree/views/tree_browser/cursor_state.dart';
-import 'package:todotree/views/tree_browser/navigator_pad.dart';
-import 'package:todotree/views/tree_browser/plus_item.dart';
-import 'package:todotree/views/tree_browser/tree_item.dart';
+import 'package:todotree/components/cursor_indicator.dart';
+import 'package:todotree/components/explosion_indicator.dart';
+import 'package:todotree/components/ripple_indicator.dart';
+import 'package:todotree/home/home_controller.dart';
+import 'package:todotree/tree_browser/browser_controller.dart';
+import 'package:todotree/tree_browser/browser_state.dart';
+import 'package:todotree/tree_browser/cursor_state.dart';
+import 'package:todotree/tree_browser/navigator_pad.dart';
+import 'package:todotree/tree_browser/plus_item.dart';
+import 'package:todotree/tree_browser/tree_item.dart';
 
 class BrowserWidget extends StatefulWidget {
   const BrowserWidget({super.key});

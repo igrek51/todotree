@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:todotree/services/settings_provider.dart';
+import 'package:todotree/settings/settings_provider.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:swipe_to/swipe_to.dart';
 
 import 'package:todotree/util/errors.dart';
-import 'package:todotree/views/tree_browser/browser_controller.dart';
+import 'package:todotree/tree_browser/browser_controller.dart';
 
 class PlusItemWidget extends StatelessWidget {
   const PlusItemWidget({super.key});

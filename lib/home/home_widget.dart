@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
-import 'package:todotree/views/editor/editor_widget.dart';
-import 'package:todotree/views/home/home_controller.dart';
-import 'package:todotree/views/home/home_state.dart';
-import 'package:todotree/views/home/title_bar.dart';
-import 'package:todotree/views/tree_browser/browser_widget.dart';
+import 'package:todotree/editor/editor_widget.dart';
+import 'package:todotree/home/home_controller.dart';
+import 'package:todotree/home/home_state.dart';
+import 'package:todotree/home/title_bar.dart';
+import 'package:todotree/tree_browser/browser_widget.dart';
 
 class HomeWidget extends StatelessWidget {
   const HomeWidget({super.key});

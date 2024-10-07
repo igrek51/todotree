@@ -3,16 +3,16 @@ import 'package:provider/provider.dart';
 
 import 'package:todotree/app/factory.dart';
 import 'package:todotree/services/clipboard_manager.dart';
-import 'package:todotree/services/database/tree_storage.dart';
+import 'package:todotree/database/tree_storage.dart';
 import 'package:todotree/services/info_service.dart';
-import 'package:todotree/services/settings_provider.dart';
+import 'package:todotree/settings/settings_provider.dart';
 import 'package:todotree/util/logger.dart';
 import 'package:todotree/services/main_menu_runner.dart';
 import 'package:todotree/services/tree_traverser.dart';
-import 'package:todotree/views/editor/editor_controller.dart';
-import 'package:todotree/views/home/home_controller.dart';
-import 'package:todotree/views/tree_browser/browser_controller.dart';
-import 'package:todotree/views/home/home_widget.dart';
+import 'package:todotree/editor/editor_controller.dart';
+import 'package:todotree/home/home_controller.dart';
+import 'package:todotree/tree_browser/browser_controller.dart';
+import 'package:todotree/home/home_widget.dart';
 
 class AppWidget extends StatefulWidget {
   AppWidget({super.key, required this.appFactory});

@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:todotree/model/remote_node.dart';
-import 'package:todotree/model/tree_node.dart';
-import 'package:todotree/services/database/yaml_tree_deserializer.dart';
-import 'package:todotree/services/database/yaml_tree_serializer.dart';
+import 'package:todotree/node_model/remote_node.dart';
+import 'package:todotree/node_model/tree_node.dart';
+import 'package:todotree/database/yaml_tree_deserializer.dart';
+import 'package:todotree/database/yaml_tree_serializer.dart';
 import 'package:todotree/services/info_service.dart';
-import 'package:todotree/services/settings_provider.dart';
+import 'package:todotree/settings/settings_provider.dart';
 import 'package:todotree/services/tree_traverser.dart';
 import 'package:todotree/util/logger.dart';
 

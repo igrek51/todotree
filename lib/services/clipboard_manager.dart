@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:todotree/services/info_service.dart';
 import 'package:todotree/util/logger.dart';
 import 'package:todotree/services/tree_traverser.dart';
-import 'package:todotree/model/tree_node.dart';
+import 'package:todotree/node_model/tree_node.dart';
 
 class ClipboardManager {
   List<TreeNode> clipboardNodes = [];

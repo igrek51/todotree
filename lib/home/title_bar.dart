@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:todotree/services/settings_provider.dart';
+import 'package:todotree/settings/settings_provider.dart';
 
 import 'package:todotree/util/errors.dart';
 import 'package:todotree/services/main_menu_runner.dart';
-import 'package:todotree/views/components/rounded_badge.dart';
-import 'package:todotree/views/home/home_controller.dart';
-import 'package:todotree/views/home/home_state.dart';
-import 'package:todotree/views/tree_browser/browser_state.dart';
+import 'package:todotree/components/rounded_badge.dart';
+import 'package:todotree/home/home_controller.dart';
+import 'package:todotree/home/home_state.dart';
+import 'package:todotree/tree_browser/browser_state.dart';
 
 class TitleBar extends StatelessWidget {
   const TitleBar({super.key});

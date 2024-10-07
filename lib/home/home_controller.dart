@@ -1,7 +1,7 @@
 import 'package:todotree/services/tree_traverser.dart';
-import 'package:todotree/views/editor/editor_controller.dart';
-import 'package:todotree/views/home/home_state.dart';
-import 'package:todotree/views/tree_browser/browser_controller.dart';
+import 'package:todotree/editor/editor_controller.dart';
+import 'package:todotree/home/home_state.dart';
+import 'package:todotree/tree_browser/browser_controller.dart';
 
 class HomeController {
   HomeState homeState;

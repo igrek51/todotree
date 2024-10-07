@@ -5,13 +5,13 @@ import 'package:path_provider/path_provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:todotree/app/factory.dart';
 
-import 'package:todotree/services/database/backup_manager.dart';
-import 'package:todotree/services/database/saf_helper.dart';
-import 'package:todotree/services/database/yaml_tree_deserializer.dart';
-import 'package:todotree/services/database/yaml_tree_serializer.dart';
-import 'package:todotree/model/tree_node.dart';
+import 'package:todotree/database/backup_manager.dart';
+import 'package:todotree/database/saf_helper.dart';
+import 'package:todotree/database/yaml_tree_deserializer.dart';
+import 'package:todotree/database/yaml_tree_serializer.dart';
+import 'package:todotree/node_model/tree_node.dart';
 import 'package:todotree/services/info_service.dart';
-import 'package:todotree/services/settings_provider.dart';
+import 'package:todotree/settings/settings_provider.dart';
 import 'package:todotree/util/logger.dart';
 import 'package:todotree/util/errors.dart';
 

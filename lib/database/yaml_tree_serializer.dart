@@ -1,7 +1,7 @@
-import 'package:todotree/model/remote_node.dart';
+import 'package:todotree/node_model/remote_node.dart';
 import 'package:yaml_writer/yaml_writer.dart';
 
-import 'package:todotree/model/tree_node.dart';
+import 'package:todotree/node_model/tree_node.dart';
 import 'package:todotree/util/logger.dart';
 
 class YamlTreeSerializer {

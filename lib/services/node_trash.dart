@@ -1,7 +1,7 @@
-import 'package:todotree/model/tree_node.dart';
+import 'package:todotree/node_model/tree_node.dart';
 import 'package:todotree/services/info_service.dart';
 import 'package:todotree/util/collections.dart';
-import 'package:todotree/views/tree_browser/browser_controller.dart';
+import 'package:todotree/tree_browser/browser_controller.dart';
 
 class NodeTrash {
   List<Pair<int, TreeNode>> trashedNodes = [];
