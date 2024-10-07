@@ -263,7 +263,7 @@ class TreeListItemWidgetState extends State<TreeListItemWidget> with TickerProvi
         },
         backgroundColor: Color.fromARGB(255, 73, 115, 254),
         foregroundColor: Colors.white,
-        icon: Icons.add,
+        icon: Icons.more_vert,
       ));
     }
 
