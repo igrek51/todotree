@@ -23,6 +23,7 @@ class _SettingsPageState extends State<SettingsPage> {
   bool showSaveAndGoInside = false;
   bool showAddNodeButton = false;
   bool showAltNodeButton = false;
+  bool slidableMoreAction = false;
 
   SettingsProvider settingsProvider = SettingsProvider();
 
@@ -39,6 +40,7 @@ class _SettingsPageState extends State<SettingsPage> {
       showSaveAndGoInside = settingsProvider.showSaveAndGoInside;
       showAddNodeButton = settingsProvider.showAddNodeButton;
       showAltNodeButton = settingsProvider.showAltNodeButton;
+      slidableMoreAction = settingsProvider.slidableMoreAction;
     });
   }
 
@@ -152,6 +154,18 @@ class _SettingsPageState extends State<SettingsPage> {
                 settingsProvider.showAltNodeButton = value;
                 setState(() {
                   showAltNodeButton = value;
+                });
+              },
+            ),
+            SettingsTile.switchTile(
+              leading: Icon(Icons.settings),
+              title: Text('Slidable more action'),
+              description: Text('Show three dots as a slidable action for each node.'),
+              initialValue: slidableMoreAction,
+              onToggle: (value) {
+                settingsProvider.slidableMoreAction = value;
+                setState(() {
+                  slidableMoreAction = value;
                 });
               },
             ),

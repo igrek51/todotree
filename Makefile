@@ -20,13 +20,18 @@ run-linux-kickstart:
 run-chrome:
 	flutter run --device-id chrome --web-renderer html
 
-run-android-1:
-	flutter run --device-id "2201117TY" --release
+run-android-debug:
+	flutter run --device-id "moto g54 5G" --debug
 
-run-android-2:
+run-android-release:
 	flutter run --device-id "moto g54 5G" --release
 
-release: run-android-2
+release: run-android-release
+
+adb-wireless:
+	adb tcpip 5555
+	adb connect 192.168.0.23
+	adb devices
 
 emulators:
 	flutter emulators

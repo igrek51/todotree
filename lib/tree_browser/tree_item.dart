@@ -158,20 +158,6 @@ class TreeListItemWidgetState extends State<TreeListItemWidget> with TickerProvi
     SettingsProvider settingsProvider,
     AnimatedBuilder inkWell,
   ) {
-    final rightSlidableActions = [
-      SlidableAction(
-        padding: EdgeInsets.zero,
-        onPressed: (BuildContext context) {
-          safeExecute(() {
-            browserController.removeNodesAt(widget.position);
-          });
-        },
-        backgroundColor: Color(0xFFFE4A49),
-        foregroundColor: Colors.white,
-        icon: Icons.delete,
-      ),
-    ];
-
     List<SlidableAction> leftSlidableActions = buildLeftSlidableActions(settingsProvider, browserController);
     double leftExtentRatio = switch (leftSlidableActions.length) {
       1 => 0.25,
@@ -187,17 +173,26 @@ class TreeListItemWidgetState extends State<TreeListItemWidget> with TickerProvi
             children: leftSlidableActions,
           );
 
+    List<SlidableAction> rightSlidableActions = buildRightSlidableActions(settingsProvider, browserController);
+    double rightExtentRatio = switch (rightSlidableActions.length) {
+      1 => 0.25,
+      _ => 0.4,
+    };
+    ActionPane? endActionPane = rightSlidableActions.isEmpty
+        ? null
+        : ActionPane(
+            motion: BehindMotion(),
+            extentRatio: rightExtentRatio,
+            openThreshold: 0.2,
+            closeThreshold: 0.2,
+            children: rightSlidableActions,
+          );
+
     return Slidable(
       groupTag: '0',
       key: ValueKey(widget.key),
       startActionPane: startActionPane,
-      endActionPane: ActionPane(
-        motion: BehindMotion(),
-        extentRatio: 0.25,
-        openThreshold: 0.2,
-        closeThreshold: 0.2,
-        children: rightSlidableActions,
-      ),
+      endActionPane: endActionPane,
       child: inkWell,
     );
   }
@@ -251,6 +246,39 @@ class TreeListItemWidgetState extends State<TreeListItemWidget> with TickerProvi
       }
     }
     return leftSlidableActions;
+  }
+
+  List<SlidableAction> buildRightSlidableActions(
+    SettingsProvider settingsProvider,
+    BrowserController browserController,
+  ) {
+    List<SlidableAction> actions = [];
+    if (settingsProvider.slidableMoreAction) {
+      actions.add(SlidableAction(
+        padding: EdgeInsets.zero,
+        onPressed: (BuildContext context) {
+          safeExecute(() {
+            browserController.showItemOptionsDialog(widget.treeItem, widget.position);
+          });
+        },
+        backgroundColor: Color.fromARGB(255, 73, 115, 254),
+        foregroundColor: Colors.white,
+        icon: Icons.add,
+      ));
+    }
+
+    actions.add(SlidableAction(
+      padding: EdgeInsets.zero,
+      onPressed: (BuildContext context) {
+        safeExecute(() {
+          browserController.removeNodesAt(widget.position);
+        });
+      },
+      backgroundColor: Color(0xFFFE4A49),
+      foregroundColor: Colors.white,
+      icon: Icons.delete,
+    ));
+    return actions;
   }
 
   Widget buildSwipeNavigationWidget(AnimatedBuilder inkWell, BrowserController browserController) {

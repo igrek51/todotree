@@ -81,4 +81,11 @@ class SettingsProvider {
   set showAltNodeButton(bool value) {
     sharedPreferences?.setBool('showAltNodeButton', value);
   }
+
+  bool get slidableMoreAction {
+    return sharedPreferences?.getBool('slidableMoreAction') ?? true;
+  }
+  set slidableMoreAction(bool value) {
+    sharedPreferences?.setBool('slidableMoreAction', value);
+  }
 }
