@@ -89,7 +89,7 @@ class TreeListItemWidgetState extends State<TreeListItemWidget> with TickerProvi
     final settingsProvider = Provider.of<SettingsProvider>(context, listen: false);
 
     _iconButtonPaddingV = switch (settingsProvider.largeFont) {
-      true => 11.0,
+      true => 12.0,
       false => 9.0,
     };
 
