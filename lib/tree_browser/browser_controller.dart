@@ -39,6 +39,7 @@ class BrowserController {
   double cursorIndicatorX = 0;
   double cursorIndicatorY = 0;
   NodeTrash nodeTrash = NodeTrash();
+  VoidCallback? undoOperation;
 
   BrowserController(this.homeState, this.browserState, this.treeTraverser, this.clipboardManager, this.appLifecycle,
       this.settingsProvider, this.remoteService);
@@ -192,13 +193,14 @@ class BrowserController {
       offsetAnimationRequests[originalPosition] = removedHeight;
     }
 
-    renderItems();
-    explosionIndicatorKey.currentState?.animate();
-
-    InfoService.snackbarAction('Removed: ${node.name}', 'UNDO', () {
+    undoCallback() {
       nodeTrash.restore(this);
       renderItems();
-    });
+    }
+    undoOperation = undoCallback;
+    renderItems();
+    explosionIndicatorKey.currentState?.animate();
+    InfoService.snackbarAction('Removed: ${node.name}', 'UNDO', undoCallback);
   }
 
   void removeMultipleNodes(List<int> sortedPositions) {
@@ -213,12 +215,14 @@ class BrowserController {
     remoteService.checkUnsavedRemoteChanges();
     treeTraverser.cancelSelection();
 
-    renderItems();
-    explosionIndicatorKey.currentState?.animate();
-    InfoService.snackbarAction('Removed: ${sortedPositions.length}', 'UNDO', () {
+    undoCallback() {
       nodeTrash.restore(this);
       renderItems();
-    });
+    }
+    undoOperation = undoCallback;
+    renderItems();
+    explosionIndicatorKey.currentState?.animate();
+    InfoService.snackbarAction('Removed: ${sortedPositions.length}', 'UNDO', undoCallback);
   }
 
   void removeNodesAt(int position) {
@@ -256,12 +260,14 @@ class BrowserController {
     remoteService.checkUnsavedRemoteChanges();
     nodeTrash.putLinkAndTarget(link, originalLinkPosition, parent, linkTarget, originalTargetPosition, linkTargetParent);
 
-    renderItems();
-    explosionIndicatorKey.currentState?.animate();
-    InfoService.snackbarAction('Link & target removed: ${link.name}', 'UNDO', () {
+    undoCallback() {
       nodeTrash.restore(this);
       renderItems();
-    });
+    }
+    undoOperation = undoCallback;
+    renderItems();
+    explosionIndicatorKey.currentState?.animate();
+    InfoService.snackbarAction('Link & target removed: ${link.name}', 'UNDO', undoCallback);
   }
 
   void runNodeMenuAction(String action, {TreeNode? node, int? position}) {
@@ -494,5 +500,10 @@ class BrowserController {
   void restoreFromTrash() {
     nodeTrash.restore(this);
     renderItems();
+  }
+
+  void undoLastOperation() {
+    undoOperation?.call();
+    undoOperation = null;
   }
 }

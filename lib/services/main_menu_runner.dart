@@ -45,6 +45,15 @@ class MainMenuRunner {
         },
       ));
     }
+    if (appFactory.browserController.undoOperation != null) {
+      menuActions.add(ActionMenuItem(
+        id: 'last-undo',
+        name: '⏪ Undo',
+        action: () {
+          appFactory.browserController.undoLastOperation();
+        },
+      ));
+    }
 
     menuActions.addAll([
       ActionMenuItem(
