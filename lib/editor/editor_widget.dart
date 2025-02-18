@@ -39,32 +39,32 @@ class EditorWidget extends StatelessWidget {
 
     final rowCursorBtns = [
       FlatButton(
-        icon: Icon(Icons.skip_previous_rounded),
+        iconData: Icons.skip_previous_rounded,
         onPressed: () {
           editorController.jumpCursorToStart();
         },
       ),
       HoldFlatButton(
-        icon: Icon(Icons.keyboard_arrow_left_rounded),
+        iconData: Icons.keyboard_arrow_left_rounded,
         onPressed: () {
           editorController.moveCursorLeft();
         },
       ),
       FlatButton(
-        icon: Icon(Icons.select_all),
+        iconData: Icons.select_all,
         tooltip: 'Select all',
         onPressed: () {
           editorController.selectAll();
         },
       ),
       HoldFlatButton(
-        icon: Icon(Icons.keyboard_arrow_right_rounded),
+        iconData: Icons.keyboard_arrow_right_rounded,
         onPressed: () {
           editorController.moveCursorRight();
         },
       ),
       FlatButton(
-        icon: Icon(Icons.skip_next_rounded),
+        iconData: Icons.skip_next_rounded,
         onPressed: () {
           editorController.jumpCursorToEnd();
         },
@@ -73,19 +73,19 @@ class EditorWidget extends StatelessWidget {
 
     final rowClipboardBtns = [
       FlatButton(
-        icon: Icon(Icons.copy),
+        iconData: Icons.copy,
         onPressed: () {
           editorController.copyToClipboard();
         },
       ),
       FlatButton(
-        icon: Icon(Icons.paste),
+        iconData: Icons.paste,
         onPressed: () async {
           await editorController.pasteFromClipboard();
         },
       ),
       HoldFlatButton(
-        icon: Icon(Icons.backspace),
+        iconData: Icons.backspace,
         onPressed: () {
           editorController.keyBackspace();
         },
@@ -93,7 +93,7 @@ class EditorWidget extends StatelessWidget {
       HoldFlatButton(
         icon: Transform.flip(
           flipX: true,
-          child: const Icon(Icons.backspace),
+          child: const Icon(Icons.backspace, color: Colors.white),
         ),
         onPressed: () {
           editorController.keyDelete();
@@ -124,7 +124,7 @@ class EditorWidget extends StatelessWidget {
         },
       ),
       FlatButton(
-        icon: Icon(Icons.keyboard),
+        iconData: Icons.keyboard,
         label: editorState.numericKeyboard ? 'ABC' : '123',
         tooltip: 'Toggle numeric / alphabetical keyboard',
         onPressed: () {
@@ -135,7 +135,7 @@ class EditorWidget extends StatelessWidget {
 
     final rowSaveAuxBtns = [
       FlatButton(
-        icon: Icon(Icons.cancel),
+        iconData: Icons.cancel,
         label: 'Cancel',
         onPressed: () {
           editorController.cancelEdit();
@@ -143,7 +143,7 @@ class EditorWidget extends StatelessWidget {
       ),
       settingsProvider.showSaveAndGoInside
           ? FlatButton(
-              icon: Icon(Icons.check),
+              iconData: Icons.check,
               label: '& Go Inside',
               tooltip: 'Save and enter into this item',
               onPressed: () {
@@ -152,7 +152,7 @@ class EditorWidget extends StatelessWidget {
             )
           : null,
       FlatButton(
-        icon: Icon(Icons.check),
+        iconData: Icons.check,
         label: '& Next',
         tooltip: 'Save and add a next item right after',
         onPressed: () {
@@ -163,7 +163,7 @@ class EditorWidget extends StatelessWidget {
 
     final rowSaveBtns = [
       FlatButton(
-        icon: Icon(Icons.check),
+        iconData: Icons.check,
         label: 'Save',
         expandHeight: true,
         minHeight: 100.0,
@@ -203,7 +203,7 @@ class FlatButton extends StatelessWidget {
   const FlatButton({
     super.key,
     this.label,
-    this.icon,
+    this.iconData,
     required this.onPressed,
     this.flex = 1,
     this.expandHeight = false,
@@ -212,7 +212,7 @@ class FlatButton extends StatelessWidget {
   });
 
   final String? label;
-  final Widget? icon;
+  final IconData? iconData;
   final dynamic Function() onPressed;
   final int flex;
   final bool expandHeight;
@@ -222,15 +222,19 @@ class FlatButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Widget child;
-    if (icon == null && label == null) {
+    if (iconData == null && label == null) {
       throw ArgumentError('icon and label cannot be null at the same time');
-    } else if (icon != null && label != null) {
+    } else if (iconData != null && label != null) {
       child = Row(
         mainAxisSize: MainAxisSize.min,
-        children: <Widget>[icon!, SizedBox(width: 3), Flexible(child: Text(label!))],
+        children: <Widget>[
+          Icon(iconData, color: Colors.white),
+          SizedBox(width: 3),
+          Flexible(child: Text(label!)),
+        ],
       );
-    } else if (icon != null) {
-      child = icon!;
+    } else if (iconData != null) {
+      child = Icon(iconData, color: Colors.white);
     } else {
       child = Text(label!);
     }
@@ -272,6 +276,7 @@ class HoldFlatButton extends StatefulWidget {
   const HoldFlatButton({
     super.key,
     this.label,
+    this.iconData,
     this.icon,
     required this.onPressed,
     this.flex = 1,
@@ -281,6 +286,7 @@ class HoldFlatButton extends StatefulWidget {
   });
 
   final String? label;
+  final IconData? iconData;
   final Widget? icon;
   final dynamic Function() onPressed;
   final int flex;
@@ -342,15 +348,20 @@ class _HoldFlatButtonState extends State<HoldFlatButton> {
   @override
   Widget build(BuildContext context) {
     Widget child;
-    if (widget.icon == null && widget.label == null) {
+    Widget? icon = widget.icon ?? (widget.iconData != null ? Icon(widget.iconData, color: Colors.white) : null);
+    if (icon == null && widget.label == null) {
       throw ArgumentError('icon and label cannot be null at the same time');
-    } else if (widget.icon != null && widget.label != null) {
+    } else if (icon != null && widget.label != null) {
       child = Row(
         mainAxisSize: MainAxisSize.min,
-        children: <Widget>[widget.icon!, SizedBox(width: 3), Flexible(child: Text(widget.label!))],
+        children: <Widget>[
+          icon,
+          SizedBox(width: 3),
+          Flexible(child: Text(widget.label!)),
+        ],
       );
-    } else if (widget.icon != null) {
-      child = widget.icon!;
+    } else if (icon != null) {
+      child = icon;
     } else {
       child = Text(widget.label!);
     }
