@@ -50,13 +50,16 @@ class HomeWidget extends StatelessWidget {
         }
         await aHomeController.goBackOrExit();
       },
-      child: SafeArea(
-        child: AnnotatedRegion(
-          value: SystemUiOverlayStyle(
-            statusBarColor: statusBarColor,
-            statusBarIconBrightness: Brightness.light,
+      child: AnnotatedRegion(
+        value: SystemUiOverlayStyle(
+          statusBarColor: statusBarColor,
+          statusBarIconBrightness: Brightness.light,
+        ),
+        child: Container(
+          color: statusBarColor,
+          child: SafeArea(
+            child: scaffold,
           ),
-          child: scaffold,
         ),
       ),
     );
