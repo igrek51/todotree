@@ -15,6 +15,7 @@ class InfoService {
         content: Text(message),
         showCloseIcon: true,
         dismissDirection: DismissDirection.horizontal,
+        duration: const Duration(seconds: 2),
       ),
     );
   }
@@ -28,7 +29,8 @@ class InfoService {
         content: Text(message),
         showCloseIcon: false,
         dismissDirection: DismissDirection.horizontal,
-        duration: const Duration(milliseconds: 5000),
+        duration: const Duration(seconds: 10),
+        persist: false,
         action: SnackBarAction(
           label: actionLabel,
           onPressed: action,
@@ -52,7 +54,8 @@ class InfoService {
         content: Text(fullMessage),
         showCloseIcon: false,
         dismissDirection: DismissDirection.horizontal,
-        duration: const Duration(minutes: 5),
+        duration: const Duration(seconds: 10),
+        persist: false,
         action: SnackBarAction(
           label: 'DETAILS',
           onPressed: () {
