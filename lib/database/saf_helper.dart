@@ -1,28 +1,65 @@
 import 'dart:convert' show utf8;
-import 'dart:typed_data';
+import 'dart:io';
 import 'package:collection/collection.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:shared_storage/shared_storage.dart';
 import 'package:todotree/util/logger.dart';
 
 class SafHelper {
-  // folder URI: content://com.android.externalstorage.documents/tree/1111-2808%3Atodo%2Ftodotree
-  // file URI: content://com.android.externalstorage.documents/tree/1111-2808%3Atodo%2Ftodotree/document/1111-2808%3Atodo%2Ftodotree%2Ftodo.yaml
-
   final RegExp safTreeUriRegex = RegExp('^content://com\\.android\\.externalstorage\\.documents/tree/(.*?)%3A(.*)\$');
+  final RegExp iOSFileUriRegex = RegExp('^file://(/.*)/$');
 
-  Future<Uri?> grantFolderAccess() async {
-    return await openDocumentTree();
+  bool get isIOS => Platform.isIOS;
+  bool get isAndroid => Platform.isAndroid;
+
+  Future<String?> grantFolderAccess() async {
+    if (isIOS) {
+      String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
+      if (selectedDirectory != null) {
+        return 'file://$selectedDirectory/';
+      }
+      return null;
+    } else if (isAndroid) {
+      return await openDocumentTree();
+    }
+    return null;
   }
 
   bool isSafUri(String location) {
-    return location.startsWith('content://');
+    return location.startsWith('content://') || location.startsWith('file://');
   }
 
-  Future<void> saveFileContent(String content, String folderSafUri, String filename) async {
-    final folderUri = Uri.parse(folderSafUri);
-    final (bool fileExists, Uri fileUri) = await getChildFileUri(folderSafUri, folderUri, filename);
-    final Uint8List contentBytes = utf8.encode(content);
+  bool isIOSUri(String location) {
+    return location.startsWith('file://') && !location.startsWith('content://');
+  }
 
+  Future<void> saveFileContent(String content, String folderUri, String filename) async {
+    if (isIOSUri(folderUri)) {
+      await _saveIOSFile(content, folderUri, filename);
+    } else if (isAndroid) {
+      await _saveAndroidFile(content, folderUri, filename);
+    }
+    logger.info('external backup saved');
+  }
+
+  Future<void> _saveIOSFile(String content, String folderUri, String filename) async {
+    final match = iOSFileUriRegex.firstMatch(folderUri);
+    if (match == null) {
+      throw Exception('Invalid iOS file URI: $folderUri');
+    }
+    final folderPath = match.group(1)!;
+    final filePath = '$folderPath/$filename';
+    final file = File(filePath);
+    await file.writeAsString(content);
+    logger.debug('iOS file written: $filePath');
+  }
+
+  Future<void> _saveAndroidFile(String content, String folderSafUri, String filename) async {
+    final folderUri = Uri.parse(folderSafUri);
+    final contentBytes = utf8.encode(content);
+    
+    final (fileExists, fileUri) = await _getChildFileUriAndroid(folderSafUri, folderUri, filename);
+    
     if (fileExists) {
       final result = await writeToFileAsBytes(fileUri, bytes: contentBytes);
       if (result != true) {
@@ -36,11 +73,9 @@ class SafHelper {
       }
       logger.debug('SAF file created: ${doc.uri}');
     }
-
-    logger.debug('external backup saved to $fileUri');
   }
 
-  Future<(bool, Uri)> getChildFileUri(String folderSafUri, Uri folderUri, String filename) async {
+  Future<(bool, Uri)> _getChildFileUriAndroid(String folderSafUri, Uri folderUri, String filename) async {
     final match = safTreeUriRegex.firstMatch(folderSafUri);
     if (match != null) {
       String disk = match.group(1) ?? '';
@@ -50,7 +85,6 @@ class SafHelper {
       final fileUri = Uri.parse(fileUriStr);
       bool fileExists = await exists(fileUri) ?? false;
       return (fileExists, fileUri);
-
     } else {
       logger.info('Looking for child document using generic SAF provider');
       List<DocumentFile> docChildren = await listFiles(folderUri, columns: [DocumentFileColumn.id, DocumentFileColumn.displayName]).toList();

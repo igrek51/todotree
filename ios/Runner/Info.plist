@@ -45,5 +45,11 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>UIFileSharingEnabled</key>
+	<true/>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
+	<key>NSDocumentFolderUsageDescription</key>
+	<string>ToDo Tree needs access to save backup files to your selected folder.</string>
 </dict>
 </plist>
