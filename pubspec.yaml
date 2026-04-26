@@ -21,6 +21,7 @@ dependencies:
   file_picker: ^10.1.9
   settings_ui: ^2.0.2
   shared_preferences: ^2.2.3
+  idb_shim: ^2.8.2
   flutter_slidable: ^4.0.0
   http: ^1.2.1
   confetti: ^0.8.0

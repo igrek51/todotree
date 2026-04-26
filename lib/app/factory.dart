@@ -52,6 +52,7 @@ class AppFactory {
     yamlTreeDeserializer = YamlTreeDeserializer();
     backupManager = BackupManager();
     treeStorage = TreeStorage(backupManager, settingsProvider);
+    treeStorage.localStorage.initialize();
     clipboardManager = ClipboardManager();
     treeTraverser = TreeTraverser(treeStorage);
     remoteService = RemoteService(settingsProvider, treeTraverser);

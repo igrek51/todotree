@@ -3,9 +3,11 @@ import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:todotree/app/factory.dart';
 
 import 'package:todotree/database/backup_manager.dart';
+import 'package:todotree/database/local_storage.dart';
 import 'package:todotree/database/saf_helper.dart';
 import 'package:todotree/database/yaml_tree_deserializer.dart';
 import 'package:todotree/database/yaml_tree_serializer.dart';
@@ -22,10 +24,10 @@ class TreeStorage {
   TreeStorage(this.backupManager, this.settingsProvider);
 
   SafHelper safHelper = SafHelper();
+  LocalStorage localStorage = LocalStorage.instance;
 
   Future<TreeNode> readDbTree({File? file}) async {
-    File nFile = file ?? await _localDbFile;
-    final String content = await _readDbString(nFile);
+    final String content = await readDbString();
     if (content.isEmpty) {
       InfoService.info('No database file, initializing with a default tree.');
       return createDefaultRootNode();
@@ -37,15 +39,18 @@ class TreeStorage {
   Future<void> writeDbTree(TreeNode root) async {
     logger.debug('saving local database...');
     final String content = YamlTreeSerializer().serializeTree(root);
-    File dbFile = await _writeDbString(content);
-    logger.info('local database saved to ${dbFile.absolute.path}');
-    await backupManager.saveLocalBackup(dbFile);
-    // run in background, without awaiting
-    saveExternalBackups(settingsProvider.externalBackupLocation, dbFile, content).catchError((e) {
-      if (e != null) {
-        InfoService.error(e, 'Failed to save external backup');
-      }
-    });
+    await writeDbString(content);
+    logger.info('local database saved');
+    
+    // Skip backups on web
+    if (!localStorage.isWeb) {
+      await backupManager.saveLocalBackup(await _localDbFile);
+      saveExternalBackups(settingsProvider.externalBackupLocation, await _localDbFile, content).catchError((e) {
+        if (e != null) {
+          InfoService.error(e, 'Failed to save external backup');
+        }
+      });
+    }
   }
 
   Future<void> saveExternalBackups(String locationString, File dbFile, String content) async {
@@ -60,6 +65,9 @@ class TreeStorage {
   }
 
   Future<String> get _localPath async {
+    if (localStorage.isWeb) {
+      return 'web';
+    }
     final Directory directory = await getApplicationSupportDirectory();
     return directory.path;
   }
@@ -69,9 +77,26 @@ class TreeStorage {
     return File('$path/todo.yaml');
   }
 
-  Future<File> _writeDbString(String content) async {
+  Future<String> readDbString() async {
+    if (localStorage.isWeb) {
+      return await localStorage.readFileContent('todo.yaml');
+    }
     final file = await _localDbFile;
-    return file.writeAsString(content, flush: true);
+    return await _readDbString(file);
+  }
+
+  Future<void> writeDbString(String content) async {
+    if (localStorage.isWeb) {
+      await localStorage.writeFileContent('todo.yaml', content);
+      return;
+    }
+    final file = await _localDbFile;
+    await file.writeAsString(content, flush: true);
+  }
+
+  Future<File> _writeDbString(String content) async {
+    await writeDbString(content);
+    return await _localDbFile;
   }
 
   Future<String> _readDbString(File file) async {
@@ -91,11 +116,28 @@ class TreeStorage {
     FilePickerResult? fpickResult = await FilePicker.platform.pickFiles(
       dialogTitle: 'Import database file',
       allowMultiple: false,
+      type: FileType.custom,
+      allowedExtensions: ['yaml', 'yml'],
     );
     if (fpickResult == null) {
       return logger.info('file picker canceled');
     }
-    File file = File(fpickResult.files.single.path!);
+    final path = fpickResult.files.single.path;
+    if (path == null) {
+      if (kIsWeb) {
+        final bytes = fpickResult.files.single.bytes;
+        if (bytes != null) {
+          final content = String.fromCharCodes(bytes);
+          final node = YamlTreeDeserializer().deserializeTree(content);
+          await app.treeTraverser.loadFromString(content);
+          app.browserController.renderAll();
+          InfoService.info('Tree loaded from uploaded file');
+          return;
+        }
+      }
+      return logger.warning('no file path or bytes available');
+    }
+    File file = File(path);
     await app.treeTraverser.loadFromFile(file);
     app.browserController.renderAll();
     InfoService.info('Tree loaded from ${file.absolute.path}');
@@ -104,12 +146,11 @@ class TreeStorage {
   Future<String> grantBackupLocationUri(String locationsString) async {
     List<String> locations = splitLocationPaths(locationsString);
 
-    final Uri? grantedUri = await safHelper.grantFolderAccess();
-    if (grantedUri == null) {
+    final String? grantedUriStr = await safHelper.grantFolderAccess();
+    if (grantedUriStr == null) {
       InfoService.info('Cancelled storage permission');
       return locationsString;
     }
-    final grantedUriStr = grantedUri.toString();
     if (!locations.contains(grantedUriStr)){
       locations.add(grantedUriStr);
     }

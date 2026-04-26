@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:todotree/services/info_service.dart';
 import 'package:todotree/node_model/tree_node.dart';
 import 'package:todotree/database/tree_storage.dart';
+import 'package:todotree/database/yaml_tree_deserializer.dart';
 import 'package:todotree/util/logger.dart';
 
 class TreeTraverser {
@@ -38,6 +39,14 @@ class TreeTraverser {
   Future<void> loadFromFile(File file) async {
     reset();
     final value = await treeStorage.readDbTree(file: file);
+    rootNode = value;
+    currentParent = value;
+    unsavedChanges = true;
+  }
+
+  Future<void> loadFromString(String content) async {
+    reset();
+    final value = YamlTreeDeserializer().deserializeTree(content);
     rootNode = value;
     currentParent = value;
     unsavedChanges = true;

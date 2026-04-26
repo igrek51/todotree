@@ -7,10 +7,11 @@ import 'package:todotree/util/logger.dart';
 
 class SafHelper {
   final RegExp safTreeUriRegex = RegExp('^content://com\\.android\\.externalstorage\\.documents/tree/(.*?)%3A(.*)\$');
-  final RegExp iOSFileUriRegex = RegExp('^file://(/.*)/$');
+  final RegExp iOSFileUriRegex = RegExp(r'^file://(/.*)/$');
 
   bool get isIOS => Platform.isIOS;
   bool get isAndroid => Platform.isAndroid;
+  bool get isWeb => Platform.isLinux; // Simplified check - on Linux, treat as web for compatibility
 
   Future<String?> grantFolderAccess() async {
     if (isIOS) {
@@ -20,7 +21,8 @@ class SafHelper {
       }
       return null;
     } else if (isAndroid) {
-      return await openDocumentTree();
+      final uri = await openDocumentTree();
+      return uri?.toString();
     }
     return null;
   }

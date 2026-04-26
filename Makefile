@@ -20,6 +20,9 @@ run-linux-kickstart:
 run-chrome:
 	flutter run --device-id chrome --web-renderer html
 
+run-web:
+	flutter run -d chrome
+
 run-android-debug:
 	flutter run --device-id "moto g54 5G" --debug
 
@@ -50,6 +53,9 @@ doctor:
 
 build-apk:
 	flutter build apk --release
+
+build-web:
+	flutter build web
 
 build-bundle:
 	flutter build appbundle --release
