@@ -1,15 +1,22 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:window_manager/window_manager.dart';
 
 import 'package:todotree/app/factory.dart';
 import 'package:todotree/util/errors.dart';
 import 'package:todotree/util/logger.dart';
 
+// Conditional imports - will use the correct implementation based on platform
+import 'package:todotree/app/starter_native.dart'
+    if (dart.library.html) 'package:todotree/app/starter_web.dart'
+    as starter_platform;
+
 Future<void> startupApp(AppFactory app) async {
   try {
-    _resizeWindow();
+    // Initialize storage first (especially important for web with IndexedDB)
+    await app.initializeStorage();
+    
+    // Initialize window manager (native stub on native, no-op on web)
+    WidgetsFlutterBinding.ensureInitialized();
+    await starter_platform.initializeWindowManager();
     
     await app.settingsProvider.init();
     await app.treeTraverser.load();
@@ -20,14 +27,6 @@ Future<void> startupApp(AppFactory app) async {
     logger.info('App initialized');
   } catch (error, stackTrace) {
     reportError(error, stackTrace, 'Startup failed');
-  }
-}
-
-void _resizeWindow() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  if (!kIsWeb && Platform.isLinux) {
-    await windowManager.ensureInitialized();
-    await windowManager.setSize(Size(450, 800));
   }
 }
 

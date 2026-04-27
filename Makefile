@@ -55,12 +55,11 @@ build-apk:
 	flutter build apk --release
 
 build-web:
-	flutter build web
+	flutter build web --release
 
-web-release:
-	@echo "Building and deploying to GitHub Pages..."
-	@flutter build web --release
-	@git subtree push --prefix build/web origin gh-pages
+web-release: build-web
+	@echo "Deploying to GitHub Pages..."
+	git subtree push --prefix build/web origin gh-pages
 
 web-serve: build-web
 	cd build/web && python3 -m http.server 8080 --bind 0.0.0.0

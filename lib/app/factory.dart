@@ -52,7 +52,6 @@ class AppFactory {
     yamlTreeDeserializer = YamlTreeDeserializer();
     backupManager = BackupManager();
     treeStorage = TreeStorage(backupManager, settingsProvider);
-    treeStorage.localStorage.initialize();
     clipboardManager = ClipboardManager();
     treeTraverser = TreeTraverser(treeStorage);
     remoteService = RemoteService(settingsProvider, treeTraverser);
@@ -66,5 +65,9 @@ class AppFactory {
     mainMenuRunner = MainMenuRunner(this);
     shortcutHandler = ShortcutHandler(homeController, editorController);
     logger.debug('AppFactory created');
+  }
+  
+  Future<void> initializeStorage() async {
+    await treeStorage.localStorage.initialize();
   }
 }

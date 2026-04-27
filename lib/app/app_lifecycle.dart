@@ -1,50 +1,5 @@
-import 'dart:io';
+// Conditional imports - use the correct implementation based on platform
+export 'package:todotree/app/app_lifecycle_native.dart'
+    if (dart.library.html) 'package:todotree/app/app_lifecycle_web.dart';
 
-import 'package:flutter/services.dart';
-import 'package:todotree/util/errors.dart';
-import 'package:todotree/database/tree_storage.dart';
-import 'package:todotree/services/tree_traverser.dart';
-import 'package:todotree/util/logger.dart';
-
-class AppLifecycle {
-  final TreeStorage treeStorage;
-  final TreeTraverser treeTraverser;
-
-  AppLifecycle(this.treeStorage, this.treeTraverser);
-
-  static const minimizeChannel = MethodChannel('minimize_channel');
-
-  void onInactive() {
-    safeExecute(() async {
-      await treeTraverser.saveIfChanged();
-    });
-  }
-
-  Future<void> minimizeApp() async {
-    if (Platform.isAndroid) {
-      try {
-        await _minimizeNative();
-      } on MissingPluginException catch (e) {
-        logger.error('MissingPluginException: $e');
-        exitNow();
-      }
-    } else {
-      exitNow();
-    }
-  }
-
-  Future<void> _minimizeNative() async {
-    try {
-      await minimizeChannel.invokeMethod<bool>('minimize');
-      logger.info('app minimized');
-    } on PlatformException catch (e) {
-      logger.error('failed to minimize native app: PlatformException: $e');
-      exitNow();
-    }
-  }
-
-  void exitNow() {
-    logger.debug('Exiting...');
-    SystemNavigator.pop();
-  }
-}
+// Note: The AppLifecycle class and safeExecute function are exported from the platform-specific implementations
