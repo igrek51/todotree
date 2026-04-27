@@ -57,10 +57,6 @@ build-apk:
 build-web:
 	flutter build web --release
 
-web-release: build-web
-	@echo "Deploying to GitHub Pages..."
-	git subtree push --prefix build/web origin gh-pages
-
 web-serve: build-web
 	cd build/web && python3 -m http.server 8080 --bind 0.0.0.0
 
