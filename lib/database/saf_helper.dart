@@ -1,17 +1,19 @@
 import 'dart:convert' show utf8;
 import 'dart:io';
+
 import 'package:collection/collection.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:shared_storage/shared_storage.dart';
 import 'package:todotree/util/logger.dart';
 
 class SafHelper {
-  final RegExp safTreeUriRegex = RegExp('^content://com\\.android\\.externalstorage\\.documents/tree/(.*?)%3A(.*)\$');
+  final RegExp safTreeUriRegex = RegExp('^content://com\\.android\\.externalstorage\\.documents/tree/(.*?)%3A(.*)$');
   final RegExp iOSFileUriRegex = RegExp(r'^file://(/.*)/$');
 
-  bool get isIOS => Platform.isIOS;
-  bool get isAndroid => Platform.isAndroid;
-  bool get isWeb => Platform.isLinux; // Simplified check - on Linux, treat as web for compatibility
+  bool get isIOS => !kIsWeb && Platform.isIOS;
+  bool get isAndroid => !kIsWeb && Platform.isAndroid;
+  bool get isWeb => kIsWeb;
 
   Future<String?> grantFolderAccess() async {
     if (isIOS) {
