@@ -1,4 +1,4 @@
-.PHONY: build run android test web linux
+.PHONY: build run android test web linux web-release web-serve
 
 devices:
 	flutter devices
@@ -56,6 +56,14 @@ build-apk:
 
 build-web:
 	flutter build web
+
+web-release:
+	@echo "Building and deploying to GitHub Pages..."
+	@flutter build web --release
+	@git subtree push --prefix build/web origin gh-pages
+
+web-serve: build-web
+	cd build/web && python3 -m http.server 8080 --bind 0.0.0.0
 
 build-bundle:
 	flutter build appbundle --release

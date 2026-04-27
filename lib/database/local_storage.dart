@@ -6,10 +6,11 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:idb_shim/idb_browser.dart';
+import 'package:todotree/util/logger.dart';
 
 class LocalStorage {
   static LocalStorage? _instance;
-  static SharedPreferences? _prefs;
+  static SharedPreferences? _prefs; // Only for preferences, not file storage
   static bool _webInitialized = false;
   static IdbFactory? _idbFactory;
   static Database? _idbDatabase;
@@ -25,12 +26,16 @@ class LocalStorage {
   
   Future<void> initialize() async {
     if (isWeb && !_webInitialized) {
-      _prefs = await SharedPreferences.getInstance();
       _idbFactory = getIdbFactory();
-      if (_idbFactory != null && IdbFactory.supported) {
+      if (_idbFactory == null || !IdbFactory.supported) {
+        throw Exception('IndexedDB is not supported in this browser');
+      }
+      try {
         await _openDatabase();
-      } else {
-        _idbFactory = null;
+        logger.info('IndexedDB initialized successfully');
+      } catch (e) {
+        logger.error('Failed to initialize IndexedDB: $e');
+        rethrow;
       }
       _webInitialized = true;
     }
@@ -143,34 +148,54 @@ class _WebStorageFile implements StorageFile {
   @override
   String get path => name;
   
-  @override
-  Future<bool> exists() async {
-    if (LocalStorage._idbDatabase == null) return false;
-    final txn = LocalStorage._idbDatabase!.transaction('files', 'readonly');
-    final store = txn.objectStore('files');
-    final result = await store.getObject(name);
-    await txn.completed;
-    return result != null;
+  Database get _database {
+    if (LocalStorage._idbDatabase == null) {
+      throw Exception('IndexedDB not initialized. Call LocalStorage.instance.initialize() first.');
+    }
+    return LocalStorage._idbDatabase!;
   }
   
-@override
+  @override
+  Future<bool> exists() async {
+    try {
+      final txn = _database.transaction('files', 'readonly');
+      final store = txn.objectStore('files');
+      final result = await store.getObject(name);
+      await txn.completed;
+      return result != null;
+    } catch (e) {
+      logger.error('Error checking if file exists in IndexedDB: $e');
+      rethrow;
+    }
+  }
+  
+  @override
   Future<String> readAsString() async {
-    if (LocalStorage._idbDatabase == null) return '';
-    final txn = LocalStorage._idbDatabase!.transaction('files', 'readonly');
-    final store = txn.objectStore('files');
-    final result = await store.getObject(name);
-    await txn.completed;
-    if (result == null) return '';
-    final map = result as Map<String, dynamic>;
-    return map['content'] as String? ?? '';
+    try {
+      final txn = _database.transaction('files', 'readonly');
+      final store = txn.objectStore('files');
+      final result = await store.getObject(name);
+      await txn.completed;
+      if (result == null) return '';
+      final map = result as Map<String, dynamic>;
+      return map['content'] as String? ?? '';
+    } catch (e) {
+      logger.error('Error reading file from IndexedDB: $e');
+      rethrow;
+    }
   }
 
   @override
   Future<void> writeAsString(String contents) async {
-    if (LocalStorage._idbDatabase == null) return;
-    final txn = LocalStorage._idbDatabase!.transaction('files', 'readwrite');
-    final store = txn.objectStore('files');
-    await store.put(<String, dynamic>{'name': name, 'content': contents});
-    await txn.completed;
+    try {
+      final txn = _database.transaction('files', 'readwrite');
+      final store = txn.objectStore('files');
+      await store.put(<String, dynamic>{'name': name, 'content': contents});
+      await txn.completed;
+      logger.debug('Saved to IndexedDB: $name (${contents.length} bytes)');
+    } catch (e) {
+      logger.error('Error writing file to IndexedDB: $e');
+      rethrow;
+    }
   }
 }

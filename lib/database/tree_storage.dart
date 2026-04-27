@@ -86,12 +86,17 @@ class TreeStorage {
   }
 
   Future<void> writeDbString(String content) async {
-    if (localStorage.isWeb) {
-      await localStorage.writeFileContent('todo.yaml', content);
-      return;
+    try {
+      if (localStorage.isWeb) {
+        await localStorage.writeFileContent('todo.yaml', content);
+        return;
+      }
+      final file = await _localDbFile;
+      await file.writeAsString(content, flush: true);
+    } catch (e) {
+      logger.error('Failed to write database: $e');
+      rethrow;
     }
-    final file = await _localDbFile;
-    await file.writeAsString(content, flush: true);
   }
 
   Future<File> _writeDbString(String content) async {

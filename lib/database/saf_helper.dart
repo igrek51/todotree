@@ -8,7 +8,7 @@ import 'package:shared_storage/shared_storage.dart';
 import 'package:todotree/util/logger.dart';
 
 class SafHelper {
-  final RegExp safTreeUriRegex = RegExp('^content://com\\.android\\.externalstorage\\.documents/tree/(.*?)%3A(.*)$');
+  final RegExp safTreeUriRegex = RegExp(r'^content://com\.android\.externalstorage\.documents/tree/(.*?)%3A(.*)$');
   final RegExp iOSFileUriRegex = RegExp(r'^file://(/.*)/$');
 
   bool get isIOS => !kIsWeb && Platform.isIOS;
