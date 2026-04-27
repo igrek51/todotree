@@ -57,6 +57,18 @@ build-apk:
 build-web:
 	flutter build web --release
 
+web-release:
+	@echo "Building web app in release mode..."
+	flutter build web --release
+	@echo ""
+	@echo "✓ Build complete!"
+	@echo ""
+	@echo "GitHub Actions will automatically deploy when you push:"
+	@echo "  git push origin master"
+	@echo ""
+	@echo "Check deployment status at:"
+	@echo "  https://github.com/$$(git config --get remote.origin.url | sed 's/.*github.com[:/]\([^/]*\/[^.]*\).*/\1/')/actions"
+
 web-serve: build-web
 	cd build/web && python3 -m http.server 8080 --bind 0.0.0.0
 
