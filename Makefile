@@ -24,10 +24,10 @@ run-web:
 	flutter run -d chrome
 
 run-android-debug:
-	flutter run --device-id "moto g54 5G" --debug
+	flutter run --device-id "Pixel 9" --debug
 
 run-android-release:
-	flutter run --device-id "moto g54 5G" --release
+	flutter run --device-id "Pixel 9" --release
 
 release: run-android-release
 
