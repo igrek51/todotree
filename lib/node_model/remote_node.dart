@@ -26,7 +26,7 @@ class RemoteNode extends TreeNode {
         deviceId: deviceId);
   }
 
-  updateChange() {
+  void updateChange() {
     localUpdateTimestamp = DateTime.now().millisecondsSinceEpoch ~/ 1000;
   }
 }

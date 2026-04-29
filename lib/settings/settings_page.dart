@@ -27,7 +27,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   SettingsProvider settingsProvider = SettingsProvider();
 
-  readSharedPrefs() async {
+  Future<void> readSharedPrefs() async {
     await settingsProvider.init();
     setState(() {
       _externalBackupLocation = settingsProvider.externalBackupLocation;

@@ -106,6 +106,7 @@ abstract class StorageFile {
 }
 
 class _NativeStorageFile implements StorageFile {
+  @override
   final String name;
   
   _NativeStorageFile(this.name);
@@ -141,6 +142,7 @@ class _NativeStorageFile implements StorageFile {
 }
 
 class _WebStorageFile implements StorageFile {
+  @override
   final String name;
   
   _WebStorageFile(this.name);
