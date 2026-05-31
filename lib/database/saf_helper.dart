@@ -17,7 +17,7 @@ class SafHelper {
 
   Future<String?> grantFolderAccess() async {
     if (isIOS) {
-      String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
+      String? selectedDirectory = await FilePicker.getDirectoryPath();
       if (selectedDirectory != null) {
         return 'file://$selectedDirectory/';
       }

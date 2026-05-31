@@ -118,7 +118,7 @@ class TreeStorage {
   }
 
   Future<void> importDatabaseUi(AppFactory app) async {
-    FilePickerResult? fpickResult = await FilePicker.platform.pickFiles(
+    FilePickerResult? fpickResult = await FilePicker.pickFiles(
       dialogTitle: 'Import database file',
       allowMultiple: false,
       type: FileType.custom,

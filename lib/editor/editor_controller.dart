@@ -31,10 +31,12 @@ class EditorController {
     editorState.editedNode = null;
     editorState.numericKeyboard = false;
     editorState.editTextController.text = '';
-    editorState.textEditFocus.requestFocus();
-    editorState.notify();
     homeState.pageView = HomePageView.itemEditor;
+    editorState.notify();
     homeState.notify();
+    Future.microtask(() {
+      editorState.textEditFocus.requestFocus();
+    });
   }
 
   void editNode(TreeNode node) {
@@ -42,10 +44,12 @@ class EditorController {
     editorState.editedNode = node;
     editorState.numericKeyboard = false;
     editorState.editTextController.text = node.name;
-    editorState.textEditFocus.requestFocus();
-    editorState.notify();
     homeState.pageView = HomePageView.itemEditor;
+    editorState.notify();
     homeState.notify();
+    Future.microtask(() {
+      editorState.textEditFocus.requestFocus();
+    });
   }
 
   void saveNode() {
@@ -211,7 +215,9 @@ class EditorController {
     editorState.editTextController.selection = TextSelection.fromPosition(
       TextPosition(offset: 0),
     );
-    editorState.textEditFocus.requestFocus();
+    Future.microtask(() {
+      editorState.textEditFocus.requestFocus();
+    });
   }
 
   void jumpCursorToEnd() {
@@ -222,12 +228,13 @@ class EditorController {
       editorState.editTextController.selection = TextSelection.fromPosition(
         TextPosition(offset: editorState.editTextController.text.length - 1),
       );
-      editorState.textEditFocus.requestFocus();
     }
     editorState.editTextController.selection = TextSelection.fromPosition(
       TextPosition(offset: editorState.editTextController.text.length),
     );
-    editorState.textEditFocus.requestFocus();
+    Future.microtask(() {
+      editorState.textEditFocus.requestFocus();
+    });
   }
 
   void moveCursorLeft() {
@@ -235,7 +242,9 @@ class EditorController {
     editorState.editTextController.selection = TextSelection.fromPosition(
       TextPosition(offset: newPos),
     );
-    editorState.textEditFocus.requestFocus();
+    Future.microtask(() {
+      editorState.textEditFocus.requestFocus();
+    });
   }
 
   void moveCursorRight() {
@@ -243,7 +252,9 @@ class EditorController {
     editorState.editTextController.selection = TextSelection.fromPosition(
       TextPosition(offset: newPos),
     );
-    editorState.textEditFocus.requestFocus();
+    Future.microtask(() {
+      editorState.textEditFocus.requestFocus();
+    });
   }
 
   void selectAll() {
@@ -259,7 +270,9 @@ class EditorController {
         extentOffset: len,
       );
     }
-    editorState.textEditFocus.requestFocus();
+    Future.microtask(() {
+      editorState.textEditFocus.requestFocus();
+    });
   }
 
   void copyToClipboard() {
